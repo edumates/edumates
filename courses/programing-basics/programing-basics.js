@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js");
     const { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js");
-    const { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, where, getDocs } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js");
+    const { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, where, getDocs, doc, deleteDoc, updateDoc } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js");
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         chatLoading: document.getElementById('chatLoading'),
         viewRoadmapBtn: document.getElementById('viewRoadmapBtn'),
         roadmapModal: document.getElementById('roadmapModal'),
-        closeRoadmap: document.getElementById('closeRoadmap'),
+        closeRoadmap: document.getElementById('closeModal'),  // تعديل هنا ليطابق HTML
         currentYear: document.querySelector('.current-year')
     };
 
@@ -103,41 +103,82 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (e.key === 'Enter') el.sendMessageBtn.click();
     });
 
-    // Ratings - بدون رسائل، وتلون النجوم فوراً
+    // نظام التقييم (منسوخ من courses=det-script.js مع تعديلات طفيفة)
+    let unsubscribeRatings = {};
+
+    const loadRatings = async (linkId, starsContainer) => {
+        const q = query(collection(db, 'ratings'), where('linkId', '==', linkId));
+        const snap = await getDocs(q);
+        let sum = 0, count = 0;
+        snap.forEach(d => { sum += d.data().rating; count++; });
+        const avg = count ? (sum / count).toFixed(1) : '0.0';
+        starsContainer.querySelector('.average-rating').textContent = avg;
+        starsContainer.querySelector('.rating-count').textContent = `(${count} تقييم)`;
+
+        // تحديث النجوم بناءً على المتوسط
+        updateStars(starsContainer, Math.round(avg));
+
+        // إذا كان المستخدم مسجلاً، حمّل تقييمه الشخصي
+        if (auth.currentUser) {
+            const userRatingQuery = query(collection(db, 'ratings'), where('linkId', '==', linkId), where('userId', '==', auth.currentUser.uid));
+            unsubscribeRatings[linkId] = onSnapshot(userRatingQuery, userSnap => {
+                if (!userSnap.empty) {
+                    const userRating = userSnap.docs[0].data().rating;
+                    updateStars(starsContainer, userRating);
+                }
+            });
+        }
+    };
+
+    const submitRating = async (linkId, rating) => {
+        const user = auth.currentUser;
+        if (!user) {
+            alert('يرجى تسجيل الدخول للتقييم');
+            return;
+        }
+
+        const userRatingQuery = query(collection(db, 'ratings'), where('linkId', '==', linkId), where('userId', '==', user.uid));
+        const userRatingSnap = await getDocs(userRatingQuery);
+
+        if (!userRatingSnap.empty) {
+            alert('لقد قيّمت هذا المورد سابقًا');
+            return;
+        }
+
+        try {
+            await addDoc(collection(db, 'ratings'), {
+                linkId,
+                userId: user.uid,
+                rating,
+                timestamp: serverTimestamp()
+            });
+            // إعادة تحميل التقييمات
+            document.querySelectorAll('.rating-stars').forEach(container => {
+                if (container.parentElement.getAttribute('data-link-id') === linkId) {
+                    loadRatings(linkId, container);
+                }
+            });
+        } catch (error) {
+            console.error('خطأ في إرسال التقييم:', error);
+            alert('حدث خطأ أثناء إرسال التقييم');
+        }
+    };
+
     const updateStars = (container, rating) => {
         container.querySelectorAll('i').forEach((star, i) => {
             star.classList.toggle('active', i < rating);
         });
     };
 
-    document.querySelectorAll('.rating-stars').forEach(container => {
-        const linkId = container.closest('[data-link-id]').dataset.linkId;
+    // إضافة مستمعي الأحداث للنجوم
+    document.querySelectorAll('.rating-stars').forEach(starsContainer => {
+        const linkId = starsContainer.parentElement.getAttribute('data-link-id');
+        loadRatings(linkId, starsContainer);
 
-        // تحميل التقييمات
-        const load = async () => {
-            const q = query(collection(db, 'ratings'), where('linkId', '==', linkId));
-            const snap = await getDocs(q);
-            let sum = 0, count = 0;
-            snap.forEach(d => { sum += d.data().rating; count++; });
-            const avg = count ? (sum / count).toFixed(1) : '0.0';
-            container.querySelector('.average-rating').textContent = avg;
-            container.querySelector('.rating-count').textContent = `(${count} تقييم)`;
-            updateStars(container, Math.round(avg));
-        };
-        load();
-
-        // إرسال تقييم
-        container.querySelectorAll('i').forEach(star => {
-            star.addEventListener('click', async () => {
-                if (!auth.currentUser) return;
-                const rating = +star.dataset.value;
-                await addDoc(collection(db, 'ratings'), {
-                    linkId,
-                    userId: auth.currentUser.uid,
-                    rating,
-                    timestamp: serverTimestamp()
-                });
-                load();
+        starsContainer.querySelectorAll('i').forEach(star => {
+            star.addEventListener('click', () => {
+                const rating = parseInt(star.getAttribute('data-value'));
+                submitRating(linkId, rating);
             });
         });
     });
@@ -151,6 +192,20 @@ document.addEventListener('DOMContentLoaded', async function() {
                 <img src="${user.photoURL}" class="user-avatar">
                 <span>${user.displayName.split(' ')[0]}</span>
             `;
+            // تحديث تقييمات المستخدم
+            document.querySelectorAll('.rating-stars').forEach(starsContainer => {
+                const linkId = starsContainer.parentElement.getAttribute('data-link-id');
+                loadRatings(linkId, starsContainer);
+            });
+        } else {
+            // إلغاء الاشتراك في تقييمات المستخدم
+            Object.values(unsubscribeRatings).forEach(unsubscribe => unsubscribe());
+            unsubscribeRatings = {};
+            // إعادة تحميل التقييمات العامة
+            document.querySelectorAll('.rating-stars').forEach(starsContainer => {
+                const linkId = starsContainer.parentElement.getAttribute('data-link-id');
+                loadRatings(linkId, starsContainer);
+            });
         }
     });
 });
