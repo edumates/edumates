@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
             lessons: 18,
             price: "مجاني",
             description: "هذا الكورس سيعلمك أساسيات تحليل البيانات باستخدام Python و Pandas، مع التركيز على التنظيف، التحليل، والتصور البياني للبيانات.",
-            link: "../J-data-analysis/data-analysis.html"
+            link: "../courses/J-data-analysis/data-analysis.html"
         }
     ];
 
@@ -141,4 +141,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // بدء التطبيق
     app.init();
+
 });
