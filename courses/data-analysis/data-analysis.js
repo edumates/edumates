@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         try {
             elements.sendMessageBtn.disabled = true;
-            await addDoc(collection(db, 'data-analysis-messages'), {   // تم التغيير إلى مجموعة خاصة بتحليل البيانات
+            await addDoc(collection(db, 'data-analysis-chat'), {   // تم التغيير إلى مجموعة خاصة بتحليل البيانات
                 text: messageText,
                 userId: user.uid,
                 userName: user.displayName || 'مستخدم',
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (!hasMoreMessages) return;
         elements.chatLoading.classList.add('active');
         let messagesQuery = query(
-            collection(db, 'data-analysis-messages'),   // تم التغيير إلى مجموعة خاصة
+            collection(db, 'data-analysis-chat'),   // تم التغيير إلى مجموعة خاصة
             orderBy('timestamp', 'asc'),
             limit(messagesPerPage)
         );
