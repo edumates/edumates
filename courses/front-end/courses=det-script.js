@@ -193,7 +193,7 @@ async function sendMessage() {
         }
 
         // 🔹 إرسال الرسالة
-        await addDoc(collection(db, 'messages'), {
+        await addDoc(collection(db, 'frontend-chat'), {
             text: messageText,
             userId: user.uid,
             userName: chatUserName,
@@ -220,7 +220,7 @@ async function sendMessage() {
     
     // تحميل جميع الرسائل مرة واحدة بدون تقسيم
     let messagesQuery = query(
-        collection(db, 'messages'),
+        collection(db, 'frontend-chat'),
         orderBy('timestamp', 'asc')
     );
 
@@ -343,7 +343,7 @@ async function sendMessage() {
         try {
             // التحقق مما إذا كان المستخدم قد قيّم الرابط مسبقًا
             const existingRatingQuery = query(
-                collection(db, 'ratings'),
+                collection(db, 'frontend-ratings'),
                 where('linkId', '==', linkId),
                 where('userId', '==', user.uid)
             );
@@ -354,7 +354,7 @@ async function sendMessage() {
                 return;
             }
 
-            await addDoc(collection(db, 'ratings'), {
+            await addDoc(collection(db, 'frontend-ratings'), {
                 linkId: linkId,
                 userId: user.uid,
                 rating: rating,
@@ -395,7 +395,7 @@ async function sendMessage() {
 
     async function loadRatings(linkId, starsContainer) {
         const ratingsQuery = query(
-            collection(db, 'ratings'),
+            collection(db, 'frontend-ratings'),
             where('linkId', '==', linkId)
         );
 
@@ -407,7 +407,7 @@ async function sendMessage() {
             const user = auth.currentUser;
             if (user) {
                 const userRatingQuery = query(
-                    collection(db, 'ratings'),
+                    collection(db, 'frontend-ratings'),
                     where('linkId', '==', linkId),
                     where('userId', '==', user.uid)
                 );
