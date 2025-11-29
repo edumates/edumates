@@ -545,16 +545,12 @@
       </div>
     </div>
 
-    <div class="chat-popup" id="chatPopup" aria-hidden="true">
+   <div class="chat-popup" id="chatPopup" aria-hidden="true">
       <div class="chat-content">
         <i class="fas fa-times close-chat" id="closeChat" aria-label="Close Chat"></i>
         <h2>Student Chat</h2>
         <div class="chat-loading" id="chatLoading">Loading...</div>
-        <div class="chat-username">
-          <input type="text" id="usernameInput" placeholder="Enter your name to display in chat..." />
-          <button id="saveUsernameBtn">Save Name</button>
-        </div>
-
+        
         <div class="chat-messages" id="chatMessages"></div>
         <div class="chat-input">
           <input type="text" id="messageInput" placeholder="Type your message here..." aria-label="Type message">
@@ -564,7 +560,43 @@
         </div>
       </div>
     </div>
-  </section>
+
+    <div class="survey-modal" id="surveyModal" aria-hidden="true">
+      <div class="survey-content">
+        <span class="close-survey" id="closeSurvey">&times;</span>
+        <h3>Welcome to Community Chat</h3>
+        <p class="survey-intro">Before you start, please complete your profile and agree to our community guidelines.</p>
+        
+        <div class="survey-form">
+            <div class="form-group">
+                <label for="surveyNameInput">Display Name:</label>
+                <input type="text" id="surveyNameInput" placeholder="Enter your name (e.g., Ahmed Ali)">
+            </div>
+
+            <div class="survey-terms-box">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="surveyTermsCheck">
+                    <span class="checkmark"></span>
+                    <span class="terms-text">
+                        I agree to the <a href="../../legal/terms-of-use.html" target="_blank">Terms of Use</a> and <a href="../../legal/privacy-policy.html" target="_blank">Privacy Policy</a>.
+                    </span>
+                </label>
+                
+                <label class="checkbox-container">
+                    <input type="checkbox" id="surveyConductCheck">
+                    <span class="checkmark"></span>
+                    <span class="terms-text">
+                        I pledge not to misuse the chat for advertising, insults, spreading misinformation, or any illegal activities.
+                    </span>
+                </label>
+            </div>
+
+            <button id="startChattingBtn" class="btn start-chat-btn" disabled>
+                Agree & Start Chatting
+            </button>
+        </div>
+      </div>
+    </div>
   
   <footer class="site-footer">
     <div class="footer-container">
@@ -604,4 +636,5 @@
   <script type="module" src="../../roadmap.js"></script>
   <script type="module" src="courses-det-script.js"></script>
 </body>
+
 </html>
