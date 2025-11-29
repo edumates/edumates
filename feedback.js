@@ -1,5 +1,5 @@
 // popup-rating.js
-// Displays a popup after 40 seconds to collect rating + comment and save to Firestore collection "feedback"
+// Displays a popup after 90 seconds to collect rating + comment and save to Firestore collection "feedback"
 
 (async function () {
   // ====== Firebase Init ======
@@ -21,63 +21,133 @@
   const db = getFirestore(app);
 
   let rating = 0;
+  
+  // New: LocalStorage Key for frequency control
+  const FEEDBACK_SHOWN_KEY = 'edumates_feedback_shown';
 
   function createStyles() {
     const css = `
-      .sr-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:9999}
-      .sr-popup{max-width:520px;width:92%;background:#fff;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.3);padding:18px;font-family:Arial, sans-serif}
-      .sr-popup h3{margin:0 0 8px;font-size:18px}
-      .sr-stars{display:flex;gap:8px;align-items:center;justify-content:center;margin:10px 0}
-      .sr-star{font-size:28px;cursor:pointer;user-select:none}
-      .sr-star.filled::before{content:'★'}
-      .sr-star.empty::before{content:'☆'}
-      .sr-text{width:100%;min-height:80px;padding:10px;border-radius:8px;border:1px solid #ddd;resize:vertical}
-      .sr-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
-      .sr-btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
-      .sr-btn.submit{background:#0b74de;color:white}
-      .sr-btn.later{background:#efefef}
+      .sr-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.3s;
+        opacity: 0;
+      }
+      .sr-overlay.visible {
+        opacity: 1;
+      }
+      .sr-modal {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+        transform: scale(0.8);
+        transition: transform 0.3s ease-out;
+      }
+      .sr-overlay.visible .sr-modal {
+        transform: scale(1);
+      }
+      .sr-close {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #999;
+      }
+      .sr-star-rating {
+        margin: 15px 0 20px;
+        display: flex;
+        justify-content: center;
+      }
+      .sr-star {
+        font-size: 30px;
+        color: #ccc;
+        cursor: pointer;
+        margin: 0 5px;
+        transition: color 0.2s;
+      }
+      .sr-star.filled {
+        color: #ffc107; /* Gold */
+      }
+      .sr-star.empty {
+        color: #ccc;
+      }
+      .sr-comment-area {
+        width: 100%;
+        min-height: 80px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        resize: vertical;
+        font-family: inherit;
+      }
+      .sr-submit-btn {
+        background-color: #1e3a8a;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.2s;
+        width: 100%;
+      }
+      .sr-submit-btn:hover {
+        background-color: #2563eb;
+      }
+      .sr-modal h3 {
+          margin-top: 0;
+          color: #1e3a8a;
+      }
     `;
-    const s = document.createElement('style');
-    s.textContent = css;
-    document.head.appendChild(s);
+    const style = document.createElement('style');
+    style.textContent = css;
+    document.head.appendChild(style);
   }
 
-  function buildPopup() {
+  function createPopup() {
     const overlay = document.createElement('div');
-    overlay.className = 'sr-popup-overlay';
+    overlay.className = 'sr-overlay';
 
-    const popup = document.createElement('div');
-    popup.className = 'sr-popup';
-
-    popup.innerHTML = `
-      <h3>Rate Our Site</h3>
-      <p>Help us improve the site — choose your rating and leave a short comment.</p>
-      <div class="sr-stars"></div>
-      <textarea class="sr-text" placeholder="What changes or additions would you suggest?"></textarea>
-      <div class="sr-actions">
-        <button class="sr-btn later">Later</button>
-        <button class="sr-btn submit">Submit</button>
+    const modal = document.createElement('div');
+    modal.className = 'sr-modal';
+    modal.innerHTML = `
+      <span class="sr-close" aria-label="Close">&times;</span>
+      <h3>How would you rate your experience?</h3>
+      <div class="sr-star-rating">
+        <i class="sr-star empty" data-value="1">&#9733;</i>
+        <i class="sr-star empty" data-value="2">&#9733;</i>
+        <i class="sr-star empty" data-value="3">&#9733;</i>
+        <i class="sr-star empty" data-value="4">&#9733;</i>
+        <i class="sr-star empty" data-value="5">&#9733;</i>
       </div>
+      <textarea class="sr-comment-area" placeholder="Any suggestions or comments? (Optional)"></textarea>
+      <button class="sr-submit-btn">Submit Feedback</button>
     `;
+    overlay.appendChild(modal);
 
-    overlay.appendChild(popup);
+    // Event Listeners
+    modal.querySelector('.sr-close').addEventListener('click', () => {
+      document.body.removeChild(overlay);
+    });
 
-    const starsContainer = popup.querySelector('.sr-stars');
-    for (let i = 1; i <= 5; i++) {
-      const s = document.createElement('span');
-      s.className = 'sr-star empty';
-      s.setAttribute('data-value', i);
-      s.addEventListener('click', onStarClick);
-      starsContainer.appendChild(s);
-    }
+    modal.querySelectorAll('.sr-star').forEach(star => {
+      star.addEventListener('click', onStarClick);
+    });
 
-    const btnLater = popup.querySelector('.later');
-    const btnSubmit = popup.querySelector('.submit');
-    const textarea = popup.querySelector('.sr-text');
-
-    btnLater.addEventListener('click', () => { document.body.removeChild(overlay); });
-    btnSubmit.addEventListener('click', async () => {
-      const comment = textarea.value.trim();
+    modal.querySelector('.sr-submit-btn').addEventListener('click', async () => {
+      const commentArea = modal.querySelector('.sr-comment-area');
+      const comment = commentArea.value.trim();
       await submitFeedback(rating, comment);
       document.body.removeChild(overlay);
     });
@@ -85,6 +155,9 @@
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) document.body.removeChild(overlay);
     });
+
+    // Animate in
+    setTimeout(() => overlay.classList.add('visible'), 10);
 
     return overlay;
   }
@@ -120,12 +193,22 @@
 
   function init() {
     createStyles();
+    
+    // Check if the form has already been shown to this user
+    if (localStorage.getItem(FEEDBACK_SHOWN_KEY) === 'true') {
+        console.log("Feedback form previously shown. Skipping.");
+        return;
+    }
+
+    // 1. Update timeout to 90 seconds (1 minute 30 seconds)
     setTimeout(() => {
-      const popup = buildPopup();
-      document.body.appendChild(popup);
-    }, 40000); // 40 seconds
+      
+      // 2. Set the flag in localStorage immediately before displaying
+      localStorage.setItem(FEEDBACK_SHOWN_KEY, 'true');
+      
+      document.body.appendChild(createPopup());
+    }, 90000); // 90 seconds
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-  else init();
+  init();
 })();
