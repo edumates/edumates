@@ -33,6 +33,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         closeRoadmap: document.querySelector('#closeRoadmap'),
         toggleFeatures: document.querySelectorAll('.toggle-features'),
         googleLoginBtn: document.getElementById('googleLoginBtn'),
+        
+        // Chat Elements
         chatBtn: document.getElementById('chatBtn'),
         chatPopup: document.getElementById('chatPopup'),
         closeChat: document.getElementById('closeChat'),
@@ -40,50 +42,21 @@ document.addEventListener('DOMContentLoaded', async function() {
         messageInput: document.getElementById('messageInput'),
         sendMessageBtn: document.getElementById('sendMessageBtn'),
         chatLoading: document.getElementById('chatLoading'),
-        loadMoreBtn: document.getElementById('loadMoreBtn')
+        loadMoreBtn: document.getElementById('loadMoreBtn'),
+
+        // Survey Modal Elements (New)
+        surveyModal: document.getElementById('surveyModal'),
+        closeSurvey: document.getElementById('closeSurvey'),
+        surveyNameInput: document.getElementById('surveyNameInput'),
+        surveyTermsCheck: document.getElementById('surveyTermsCheck'),
+        surveyConductCheck: document.getElementById('surveyConductCheck'),
+        startChattingBtn: document.getElementById('startChattingBtn')
     };
 
     // Set current year
     if (elements.currentYear) {
         elements.currentYear.textContent = new Date().getFullYear();
     }
-
-    // Check saved name on load
-    const savedName = localStorage.getItem('chatUserName');
-    if (savedName) {
-        const nameField = document.getElementById('usernameInput');
-        if (nameField) {
-            nameField.value = savedName;
-            nameField.style.display = 'none';
-        }
-    }
-
-    // Update Exam Links (Preserved but logic might need checking if file names changed)
-    function updateExamLinks() {
-        const examLinks = [
-            { text: 'HTML Quiz', href: 'exam-html.html' },
-            { text: 'CSS Quiz', href: 'exam-css.html' },
-            { text: 'JavaScript Quiz', href: 'exam-js.html' },
-            { text: 'Git Quiz', href: 'exam-git.html' },
-            { text: 'Frameworks Quiz', href: 'exam-frameworks.html' },
-            { text: 'Tools Quiz', href: 'exam-tools.html' },
-            { text: 'Design Quiz', href: 'exam-design.html' },
-            { text: 'Performance Quiz', href: 'exam-performance.html' },
-            { text: 'Accessibility Quiz', href: 'exam-accessibility.html' },
-            { text: 'Testing Quiz', href: 'exam-testing.html' },
-            { text: 'Deployment Quiz', href: 'exam-deployment.html' }
-        ];
-
-        document.querySelectorAll('.features-list a').forEach(link => {
-            examLinks.forEach(exam => {
-                if (link.textContent.trim() === exam.text) {
-                    link.setAttribute('href', exam.href);
-                }
-            });
-        });
-    }
-
-    updateExamLinks();
 
     // Page variables
     let lastVisible = null;
@@ -117,7 +90,82 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
 
-    // Chat Popup
+    // --- CHAT & SURVEY LOGIC START ---
+
+    // 1. Handle Main Chat Button Click
+    function handleChatButtonClick() {
+        const user = auth.currentUser;
+        if (!user) {
+            alert('Please login to use the chat.');
+            return;
+        }
+
+        // Check if user has already completed the survey
+        const savedName = localStorage.getItem('chatUserName');
+        const termsAccepted = localStorage.getItem('chatTermsAccepted');
+
+        if (savedName && termsAccepted === 'true') {
+            toggleChatPopup(); // Open Chat directly
+        } else {
+            openSurveyModal(user); // Open Survey first
+        }
+    }
+
+    // 2. Open Survey Modal
+    function openSurveyModal(user) {
+        if(elements.surveyModal) {
+            elements.surveyModal.classList.add('active');
+            elements.surveyModal.setAttribute('aria-hidden', 'false');
+            
+            // Pre-fill name from Google Account if available and input is empty
+            if(user.displayName && elements.surveyNameInput && !elements.surveyNameInput.value) {
+                elements.surveyNameInput.value = user.displayName;
+            }
+            validateSurveyForm(); // Check initial state
+        }
+    }
+
+    // 3. Close Survey Modal
+    function closeSurveyModal() {
+        if(elements.surveyModal) {
+            elements.surveyModal.classList.remove('active');
+            elements.surveyModal.setAttribute('aria-hidden', 'true');
+        }
+    }
+
+    // 4. Validate Survey Form (Enable button only if all valid)
+    function validateSurveyForm() {
+        if (!elements.startChattingBtn) return;
+
+        const name = elements.surveyNameInput ? elements.surveyNameInput.value.trim() : '';
+        const termsChecked = elements.surveyTermsCheck ? elements.surveyTermsCheck.checked : false;
+        const conductChecked = elements.surveyConductCheck ? elements.surveyConductCheck.checked : false;
+
+        if (name.length > 0 && termsChecked && conductChecked) {
+            elements.startChattingBtn.disabled = false;
+            elements.startChattingBtn.classList.add('ready');
+        } else {
+            elements.startChattingBtn.disabled = true;
+            elements.startChattingBtn.classList.remove('ready');
+        }
+    }
+
+    // 5. Handle Start Chatting Button Click (Save & Open Chat)
+    function handleStartChatting() {
+        const name = elements.surveyNameInput.value.trim();
+        
+        if (name && elements.surveyTermsCheck.checked && elements.surveyConductCheck.checked) {
+            // Save to LocalStorage
+            localStorage.setItem('chatUserName', name);
+            localStorage.setItem('chatTermsAccepted', 'true');
+            
+            // Close Survey and Open Chat
+            closeSurveyModal();
+            toggleChatPopup();
+        }
+    }
+
+    // Chat Popup Toggle
     function toggleChatPopup() {
         if (elements.chatPopup) {
             const isActive = elements.chatPopup.classList.toggle('active');
@@ -141,6 +189,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
 
+    // Send Message
     async function sendMessage() {
         const user = auth.currentUser;
         if (!user) {
@@ -150,7 +199,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         const messageText = elements.messageInput.value.trim();
         if (!messageText) {
-            alert('Please enter a valid message');
             return;
         }
 
@@ -163,21 +211,10 @@ document.addEventListener('DOMContentLoaded', async function() {
             elements.sendMessageBtn.disabled = true;
             elements.messageInput.disabled = true;
 
-            const nameField = document.getElementById('usernameInput');
-            const saveBtn = document.getElementById('saveUsernameBtn');
-            let chatUserName =
-                localStorage.getItem('chatUserName') ||
-                nameField?.value.trim() ||
-                user.displayName ||
-                'User';
+            // Get name from storage (guaranteed by survey) or fallback to display name
+            const chatUserName = localStorage.getItem('chatUserName') || user.displayName || 'User';
 
-            if (nameField && nameField.value.trim() !== '') {
-                localStorage.setItem('chatUserName', nameField.value.trim());
-                nameField.style.display = 'none';
-                if (saveBtn) saveBtn.style.display = 'none';
-            }
-
-            // Using 'frontend-chat' collection (Same as Arabic version to keep functionality)
+            // Using 'frontend-chat' collection
             await addDoc(collection(db, 'frontend-chat'), {
                 text: messageText,
                 userId: user.uid,
@@ -247,7 +284,10 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
 
+    // --- CHAT & SURVEY LOGIC END ---
+
     function sanitizeHTML(str) {
+        if (!str) return '';
         const div = document.createElement('div');
         div.textContent = str.replace(/[<>]/g, '');
         return div.innerHTML;
@@ -424,23 +464,36 @@ document.addEventListener('DOMContentLoaded', async function() {
             });
         }
 
+        // --- Chat & Survey Listeners ---
+        
+        // Chat Button click triggers survey check first
         if (elements.chatBtn) {
-            elements.chatBtn.addEventListener('click', () => {
-                const user = auth.currentUser;
-                if (!user) {
-                    alert('Please login to open chat');
-                    return;
-                }
-                toggleChatPopup();
-            });
+            elements.chatBtn.addEventListener('click', handleChatButtonClick);
         }
 
+        // Close Chat
         if (elements.closeChat) {
-            elements.closeChat.addEventListener('click', () => {
-                toggleChatPopup();
-            });
+            elements.closeChat.addEventListener('click', toggleChatPopup);
         }
 
+        // Survey Modal Listeners
+        if (elements.closeSurvey) {
+            elements.closeSurvey.addEventListener('click', closeSurveyModal);
+        }
+        if (elements.surveyNameInput) {
+            elements.surveyNameInput.addEventListener('input', validateSurveyForm);
+        }
+        if (elements.surveyTermsCheck) {
+            elements.surveyTermsCheck.addEventListener('change', validateSurveyForm);
+        }
+        if (elements.surveyConductCheck) {
+            elements.surveyConductCheck.addEventListener('change', validateSurveyForm);
+        }
+        if (elements.startChattingBtn) {
+            elements.startChattingBtn.addEventListener('click', handleStartChatting);
+        }
+
+        // Send Message
         if (elements.sendMessageBtn) {
             elements.sendMessageBtn.addEventListener('click', sendMessage);
         }
@@ -453,6 +506,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 }
             });
         }
+        // -----------------------------
 
         elements.toggleFeatures.forEach(toggle => {
             toggle.addEventListener('click', toggleFeatures);
@@ -501,6 +555,32 @@ document.addEventListener('DOMContentLoaded', async function() {
             });
         }
     });
+
+    // Update Exam Links
+    function updateExamLinks() {
+        const examLinks = [
+            { text: 'HTML Quiz', href: 'exam-html.html' },
+            { text: 'CSS Quiz', href: 'exam-css.html' },
+            { text: 'JavaScript Quiz', href: 'exam-js.html' },
+            { text: 'Git Quiz', href: 'exam-git.html' },
+            { text: 'Frameworks Quiz', href: 'exam-frameworks.html' },
+            { text: 'Tools Quiz', href: 'exam-tools.html' },
+            { text: 'Design Quiz', href: 'exam-design.html' },
+            { text: 'Performance Quiz', href: 'exam-performance.html' },
+            { text: 'Accessibility Quiz', href: 'exam-accessibility.html' },
+            { text: 'Testing Quiz', href: 'exam-testing.html' },
+            { text: 'Deployment Quiz', href: 'exam-deployment.html' }
+        ];
+
+        document.querySelectorAll('.features-list a').forEach(link => {
+            examLinks.forEach(exam => {
+                if (link.textContent.trim() === exam.text) {
+                    link.setAttribute('href', exam.href);
+                }
+            });
+        });
+    }
+    updateExamLinks();
 });
 
 // Roadmap Logic (English)
@@ -514,7 +594,7 @@ document.addEventListener('DOMContentLoaded', function () {
       closeBtn.setAttribute('aria-label', 'Close Roadmap');
       closeBtn.style.position = 'absolute';
       closeBtn.style.top = '10px';
-      closeBtn.style.right = '20px'; // Changed to right
+      closeBtn.style.right = '20px';
       closeBtn.style.background = 'transparent';
       closeBtn.style.border = 'none';
       closeBtn.style.fontSize = '1.5rem';
