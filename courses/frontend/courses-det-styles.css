@@ -1121,4 +1121,117 @@ body {
 }
 #usernameInput {
     text-align: left; /* Changed to left */
+
+}
+/* Survey Modal Styles */
+.survey-modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7);
+  z-index: 3000;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.survey-modal.active {
+  display: flex;
+}
+
+.survey-content {
+  background: #fff;
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 12px;
+  position: relative;
+  text-align: left; /* Changed to left for English */
+}
+
+.close-survey {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+}
+
+.survey-content h3 {
+  color: var(--primary-blue);
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+}
+
+.survey-intro {
+  color: var(--text-medium);
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.survey-terms-box {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #eee;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+}
+
+.checkbox-container input {
+  margin-right: 10px;
+  margin-top: 4px;
+  width: auto;
+}
+
+.checkbox-container a {
+  color: var(--primary-blue);
+  text-decoration: underline;
+}
+
+.start-chat-btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  background: var(--text-light); /* Disabled state color */
+  cursor: not-allowed;
+}
+
+.start-chat-btn.ready {
+  background: var(--primary-gradient);
+  cursor: pointer;
+}
+
+.start-chat-btn.ready:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
 }
