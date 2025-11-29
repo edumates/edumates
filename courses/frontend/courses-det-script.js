@@ -10,11 +10,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         measurementId: "G-L1KCZTW8R9"
     };
 
-    // Import Firebase libraries
+    // Import Firebase libraries - UPDATED to include doc and setDoc
     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js");
     const { getAuth, GoogleAuthProvider, signInWithPopup, signOut } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js");
     const { getAnalytics } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-analytics.js");
-    const { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, limit, startAfter, where, getDocs } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js");
+    const { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, limit, startAfter, where, getDocs, doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js");
 
     // Initialize App
     const app = initializeApp(firebaseConfig);
@@ -100,10 +100,13 @@ document.addEventListener('DOMContentLoaded', async function() {
             return;
         }
 
-        // Check if user has already completed the survey
+        // Check if user has already completed the survey in LocalStorage
         const savedName = localStorage.getItem('chatUserName');
         const termsAccepted = localStorage.getItem('chatTermsAccepted');
 
+        // Note: For simplicity, we still rely on localStorage for the quick check.
+        // If data is deleted from localStorage, the survey will appear again, 
+        // but the data in Firestore will remain.
         if (savedName && termsAccepted === 'true') {
             toggleChatPopup(); // Open Chat directly
         } else {
@@ -150,18 +153,59 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
 
-    // 5. Handle Start Chatting Button Click (Save & Open Chat)
-    function handleStartChatting() {
+    // New function: Save survey results to a specific document (User UID) in Firestore
+    async function saveSurveyToDatabase(user, name) {
+        if (!user) return;
+
+        const surveyData = {
+            userId: user.uid,
+            userName: name,
+            termsAccepted: elements.surveyTermsCheck.checked,
+            conductPledge: elements.surveyConductCheck.checked,
+            email: user.email,
+            firstAgreementTimestamp: serverTimestamp() // Record the time of agreement
+        };
+        
+        try {
+            // Use user.uid as the document ID for easy lookup and to ensure uniqueness
+            const surveyDocRef = doc(db, 'user-profiles', user.uid);
+            // setDoc with merge: true ensures we don't overwrite other profile data if it exists
+            await setDoc(surveyDocRef, surveyData, { merge: true }); 
+            return true;
+        } catch (error) {
+            console.error("Error saving survey data to Firestore:", error);
+            alert("Failed to save profile data. Please check your network.");
+            throw error; // Stop the process
+        }
+    }
+
+    // 5. Handle Start Chatting Button Click (Save to DB & Open Chat)
+    async function handleStartChatting() {
+        const user = auth.currentUser;
+        if (!user) return; 
+        
         const name = elements.surveyNameInput.value.trim();
         
         if (name && elements.surveyTermsCheck.checked && elements.surveyConductCheck.checked) {
-            // Save to LocalStorage
-            localStorage.setItem('chatUserName', name);
-            localStorage.setItem('chatTermsAccepted', 'true');
-            
-            // Close Survey and Open Chat
-            closeSurveyModal();
-            toggleChatPopup();
+            elements.startChattingBtn.disabled = true; // Disable button while processing
+            elements.startChattingBtn.textContent = 'Saving...';
+
+            try {
+                // 1. Save to Firestore (Permanent record)
+                await saveSurveyToDatabase(user, name);
+
+                // 2. Save to LocalStorage (Quick local check for next time)
+                localStorage.setItem('chatUserName', name);
+                localStorage.setItem('chatTermsAccepted', 'true');
+                
+                // 3. Close Survey and Open Chat
+                closeSurveyModal();
+                toggleChatPopup();
+            } catch (error) {
+                // Re-enable button on failure
+                elements.startChattingBtn.disabled = false;
+                elements.startChattingBtn.textContent = 'Agree & Start Chatting';
+            }
         }
     }
 
