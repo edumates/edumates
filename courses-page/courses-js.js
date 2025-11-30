@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
             lessons: 24,
             price: "Free",
             description: "Master the fundamentals of web interface development using HTML and CSS to build stunning, interactive, and responsive websites.",
-            link: "../courses/front-end/courses-det.html"
+            link: "../courses/frontend/courses-det.html"
         },
         {
             id: 2,
@@ -144,3 +144,4 @@ document.addEventListener('DOMContentLoaded', function() {
     app.init();
 
 });
+
