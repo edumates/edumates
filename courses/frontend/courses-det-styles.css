@@ -1235,3 +1235,31 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
 }
+
+/* Level Separators */
+.level-header {
+  background: var(--primary-dark);
+  color: var(--white);
+  padding: 1rem 4%;
+  margin: 2rem 0;
+  border-radius: var(--border-radius);
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  box-shadow: var(--box-shadow);
+}
+
+/* تعديل بسيط للأزرار في الـ Roadmap */
+.roadmap-task {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.roadmap-task.completed span {
+    text-decoration: line-through;
+    color: var(--accent-green);
+}
