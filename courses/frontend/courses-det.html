@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Edumates - Course Details</title>
+  <title>Edumates - Frontend Path</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="../../roadmap.css">
   <link rel="stylesheet" href="courses-det-styles.css">
@@ -34,608 +34,349 @@
   </nav>
 
   <div class="breadcrumbs">
-    <a href="../../index.html">Home</a> > <a href="../../courses-page/courses.html">Courses</a> > <span>Frontend</span>
+    <a href="../../index.html">Home</a> > <a href="../../courses-page/courses.html">Courses</a> > <span>Frontend Path</span>
   </div>
 
   <section class="course-details-section">
     <div class="section-header">
-      <h2>Learn Frontend</h2>
-      <p>Discover web development fundamentals with comprehensive resources including videos, books, and interactive quizzes.</p>
-      <button class="view-roadmap-btn" id="viewRoadmapBtn">Roadmap</button>
+      <h2>Frontend Developer Path</h2>
+      <p>Master web development from beginner to intermediate level.</p>
+      <button class="view-roadmap-btn" id="viewRoadmapBtn">Roadmap Checklist</button>
       <button class="chat-btn" id="chatBtn">
         <i class="fas fa-comments"></i> Chat
       </button>
-      <div class="roadmap-modal" id="roadmapModal">
+
+      <div class="roadmap-modal" id="roadmapPopup">
         <div class="roadmap-content">
           <span class="close-roadmap" id="closeRoadmap">&times;</span>
-          <h2>Roadmap</h2>
-          <ul>
-            <li class="roadmap-task">
-              HTML 
-              <button class="mark-done">Check</button>
-            </li>
-            <li class="roadmap-task">
-              CSS 
-              <button class="mark-done">Check</button>
-            </li>
-            <li class="roadmap-task">
-              JavaScript 
-              <button class="mark-done">Check</button>
-            </li>
-            <li class="roadmap-task">
-              Git & GitHub 
-              <button class="mark-done">Check</button>
-            </li>
-            <li class="roadmap-task">
-              React.js 
-              <button class="mark-done">Check</button>
-            </li>
-            <li class="roadmap-task">
-              Figma & UI/UX
-              <button class="mark-done">Check</button>
-            </li>
-          </ul>
+          <h2>My Progress</h2>
+          <div id="roadmapList">
+             </div>
         </div>
       </div>
     </div>
 
-    <div class="language-section" id="html-section">
-      <h3><i class="fab fa-html5"></i> HTML</h3>
+    <div class="level-header">Level 1: Beginner</div>
+
+    <div class="language-section" id="html-section" data-skill="HTML">
+      <h3>1. HTML</h3>
       <div class="resources-container">
-        <img src="../../pic/frontend/html.png" alt="HTML Course" class="course-image">
+        <img src="../../pic/frontend/html.png" alt="HTML" class="course-image">
         <div class="video-links">
-          <h4>Video Tutorials</h4>
-          <ul>
-            <li data-link-id="html-fcc">
-              <div class="link-title">
-                <a href="https://youtu.be/kUMe1FH4CHE?si=u5H8K5mP-_MhF3lH" target="_blank">HTML Full Course - FreeCodeCamp</a>
-                <i class="fas fa-chevron-down toggle-arrow"></i>
-              </div>
-              <div class="rating-stars">
-                <span class="average-rating">0.0</span>
-                <span class="rating-count">(0 ratings)</span>
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-              </div>
-              <div class="features-list">
-                <p>Comprehensive guide</p>
-                <p>Beginner friendly</p>
-                <p>Project based</p>
-              </div>
-            </li>
-            <li data-link-id="html-traversy">
-              <div class="link-title">
-                <a href="https://youtu.be/UB1O30fR-EE?si=7J3_2e_H2q3s8x_J" target="_blank">HTML Crash Course - Traversy Media</a>
-                <i class="fas fa-chevron-down toggle-arrow"></i>
-              </div>
-              <div class="rating-stars">
-                <span class="average-rating">0.0</span>
-                <span class="rating-count">(0 ratings)</span>
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-              </div>
-              <div class="features-list">
-                <p>Fast paced</p>
-                <p>Covers all basics</p>
-                <p>Great for review</p>
-              </div>
-            </li>
-            <li data-link-id="html-supersimple">
-              <div class="link-title">
-                <a href="https://youtu.be/G3e-cpL7ofc?si=8Y9J_9k_0l_1m_2n" target="_blank">HTML & CSS - SuperSimpleDev</a>
-                <i class="fas fa-chevron-down toggle-arrow"></i>
-              </div>
-              <div class="rating-stars">
-                <span class="average-rating">0.0</span>
-                <span class="rating-count">(0 ratings)</span>
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-              </div>
-              <div class="features-list">
-                <p>Very detailed</p>
-                <p>Practical examples</p>
-                <p>High quality</p>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <div class="book-links">
-          <h4>Important Resources</h4>
-          <ul>
-            <li data-link-id="html-ref">
-              <div class="link-title">
-                <a href="https://www.w3schools.com/html/html_elements.asp" target="_blank">HTML Elements Reference</a>
-                <i class="fas fa-chevron-down toggle-arrow"></i>
-              </div>
-              <div class="rating-stars">
-                <span class="average-rating">0.0</span>
-                <span class="rating-count">(0 ratings)</span>
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-              </div>
-              <div class="features-list">
-                <p>All tags listed</p>
-                <p>Code examples</p>
-                <p>Easy to read</p>
-              </div>
-            </li>
-            <li data-link-id="html-mdn">
-              <div class="link-title">
-                <a href="https://developer.mozilla.org/en-US/docs/Web/HTML" target="_blank">MDN Web Docs - HTML</a>
-                <i class="fas fa-chevron-down toggle-arrow"></i>
-              </div>
-              <div class="rating-stars">
-                <span class="average-rating">0.0</span>
-                <span class="rating-count">(0 ratings)</span>
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-              </div>
-              <div class="features-list">
-                <p>Official Standard</p>
-                <p>Deep details</p>
-                <p>Best for professionals</p>
-              </div>
-            </li>
-          </ul>
+            <h4>Video Tutorials</h4>
+            <ul>
+              <li data-link-id="html-fcc">
+                <div class="link-title">
+                  <a href="https://youtu.be/kUMe1FH4CHE" target="_blank">HTML Full Course - FreeCodeCamp</a>
+                  <i class="fas fa-chevron-down toggle-arrow"></i>
+                </div>
+                <div class="rating-stars"><span class="average-rating">0.0</span><span class="rating-count">(0)</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                <div class="features-list"><p>Comprehensive</p><p>Beginner friendly</p></div>
+              </li>
+            </ul>
         </div>
       </div>
     </div>
 
-    <div class="language-section" id="css-section">
-      <h3><i class="fab fa-css3-alt"></i> CSS</h3>
+    <div class="language-section" id="css-section" data-skill="CSS">
+      <h3>2. CSS</h3>
       <div class="resources-container">
-        <img src="../../pic/frontend/css.png" alt="CSS Course" class="course-image">
+        <img src="../../pic/frontend/css.png" alt="CSS" class="course-image">
         <div class="video-links">
-          <h4>Video Tutorials</h4>
-          <ul>
-            <li data-link-id="css-kevin">
-              <div class="link-title">
-                <a href="https://www.youtube.com/user/KepowOb" target="_blank">Kevin Powell - CSS King</a>
-                <i class="fas fa-chevron-down toggle-arrow"></i>
-              </div>
-              <div class="rating-stars">
-                <span class="average-rating">0.0</span>
-                <span class="rating-count">(0 ratings)</span>
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-              </div>
-              <div class="features-list">
-                <p>Best for CSS</p>
-                <p>Modern techniques</p>
-                <p>Deep dives</p>
-              </div>
-            </li>
-            <li data-link-id="css-wds">
-              <div class="link-title">
-                <a href="https://youtu.be/1Rs2ND1ryYc?si=4_5_6_7_8" target="_blank">CSS Full Course - Web Dev Simplified</a>
-                <i class="fas fa-chevron-down toggle-arrow"></i>
-              </div>
-              <div class="rating-stars">
-                <span class="average-rating">0.0</span>
-                <span class="rating-count">(0 ratings)</span>
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-              </div>
-              <div class="features-list">
-                <p>Concise</p>
-                <p>Clear explanations</p>
-                <p>Practical</p>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <div class="book-links">
-          <h4>Resources</h4>
-          <ul>
-            <li data-link-id="css-tricks">
-              <div class="link-title">
-                <a href="https://css-tricks.com/" target="_blank">CSS-Tricks</a>
-                <i class="fas fa-chevron-down toggle-arrow"></i>
-              </div>
-              <div class="rating-stars">
-                <span class="average-rating">0.0</span>
-                <span class="rating-count">(0 ratings)</span>
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-              </div>
-              <div class="features-list">
-                <p>Great articles</p>
-                <p>Flexbox/Grid Guides</p>
-                <p>Community driven</p>
-              </div>
-            </li>
-            <li data-link-id="css-mdn">
-              <div class="link-title">
-                <a href="https://developer.mozilla.org/en-US/docs/Web/CSS" target="_blank">MDN CSS Reference</a>
-                <i class="fas fa-chevron-down toggle-arrow"></i>
-              </div>
-              <div class="rating-stars">
-                <span class="average-rating">0.0</span>
-                <span class="rating-count">(0 ratings)</span>
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-              </div>
-              <div class="features-list">
-                <p>The Documentation</p>
-                <p>All properties</p>
-                <p>Browser support</p>
-              </div>
-            </li>
-          </ul>
+            <h4>Video Tutorials</h4>
+            <ul>
+              <li data-link-id="css-wds">
+                <div class="link-title">
+                  <a href="https://youtu.be/1Rs2ND1ryYc" target="_blank">CSS Full Course - Web Dev Simplified</a>
+                  <i class="fas fa-chevron-down toggle-arrow"></i>
+                </div>
+                 <div class="rating-stars"><span class="average-rating">0.0</span><span class="rating-count">(0)</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                <div class="features-list"><p>Modern CSS</p><p>Clear Audio</p></div>
+              </li>
+            </ul>
         </div>
       </div>
     </div>
 
-    <div class="language-section" id="js-section">
-      <h3><i class="fab fa-js"></i> JavaScript</h3>
+    <div class="language-section" id="responsive-section" data-skill="Responsive Design">
+      <h3>3. Responsive Design</h3>
       <div class="resources-container">
-        <img src="../../pic/frontend/js.png" alt="JavaScript Course" class="course-image">
+        <img src="https://cdn-icons-png.flaticon.com/512/3254/3254939.png" alt="Responsive" class="course-image">
         <div class="video-links">
-          <h4>Video Tutorials</h4>
-          <ul>
-            <li data-link-id="js-netninja">
-              <div class="link-title">
-                <a href="https://youtube.com/playlist?list=PL4cUxeGkcC9haFPT7J25Q9GRB_ZkuaI_V" target="_blank">Modern JavaScript - Net Ninja</a>
-                <i class="fas fa-chevron-down toggle-arrow"></i>
-              </div>
-              <div class="rating-stars">
-                <span class="average-rating">0.0</span>
-                <span class="rating-count">(0 ratings)</span>
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-              </div>
-              <div class="features-list">
-                <p>ES6+ features</p>
-                <p>Very clear audio</p>
-                <p>Step by step</p>
-              </div>
-            </li>
-            <li data-link-id="js-fcc">
-              <div class="link-title">
-                <a href="https://youtu.be/PkZNo7MFNFg" target="_blank">Learn JS - FreeCodeCamp</a>
-                <i class="fas fa-chevron-down toggle-arrow"></i>
-              </div>
-              <div class="rating-stars">
-                <span class="average-rating">0.0</span>
-                <span class="rating-count">(0 ratings)</span>
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-              </div>
-              <div class="features-list">
-                <p>Complete course</p>
-                <p>Free resource</p>
-                <p>Interactive challenges</p>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <div class="book-links">
-          <h4>Resources</h4>
-          <ul>
-            <li data-link-id="js-mdn">
-              <div class="link-title">
-                <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">MDN JavaScript</a>
-                <i class="fas fa-chevron-down toggle-arrow"></i>
-              </div>
-              <div class="rating-stars">
-                <span class="average-rating">0.0</span>
-                <span class="rating-count">(0 ratings)</span>
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-              </div>
-              <div class="features-list">
-                <p>Official Reference</p>
-                <p>Guides & Tutorials</p>
-                <p>Interactive examples</p>
-              </div>
-            </li>
-            <li data-link-id="js-info">
-              <div class="link-title">
-                <a href="https://javascript.info/" target="_blank">JavaScript.info</a>
-                <i class="fas fa-chevron-down toggle-arrow"></i>
-              </div>
-              <div class="rating-stars">
-                <span class="average-rating">0.0</span>
-                <span class="rating-count">(0 ratings)</span>
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-              </div>
-              <div class="features-list">
-                <p>From basics to advanced</p>
-                <p>Text-based</p>
-                <p>Very detailed</p>
-              </div>
-            </li>
-          </ul>
+            <h4>Video Tutorials</h4>
+             <ul>
+              <li data-link-id="responsive-kevin">
+                <div class="link-title">
+                  <a href="https://youtu.be/vqVwfecD2Kc" target="_blank">Conquering Responsive Layouts - Kevin Powell</a>
+                  <i class="fas fa-chevron-down toggle-arrow"></i>
+                </div>
+                 <div class="rating-stars"><span class="average-rating">0.0</span><span class="rating-count">(0)</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                <div class="features-list"><p>Flexbox & Grid</p><p>Media Queries</p></div>
+              </li>
+            </ul>
         </div>
       </div>
     </div>
 
-    <div class="language-section" id="frameworks-section">
-      <h3><i class="fas fa-cubes"></i> React.js</h3>
+    <div class="language-section" id="js-section" data-skill="JavaScript">
+      <h3>4. JavaScript</h3>
       <div class="resources-container">
-        <img src="https://images-cdn.openxcell.com/wp-content/uploads/2024/07/25085005/reactjs-inner.svg" alt="Frameworks Course" class="course-image">
+        <img src="../../pic/frontend/js.png" alt="JS" class="course-image">
         <div class="video-links">
-          <h4>Video Tutorials</h4>
-          <ul>
-            <li data-link-id="react-netninja">
-              <div class="link-title">
-                <a href="https://youtube.com/playlist?list=PL4cUxeGkcC9gZD-Tvwfod2GaISupNJnoa" target="_blank">React Tutorial - Net Ninja</a>
-                <i class="fas fa-chevron-down toggle-arrow"></i>
-              </div>
-              <div class="rating-stars">
-                <span class="average-rating">0.0</span>
-                <span class="rating-count">(0 ratings)</span>
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-              </div>
-              <div class="features-list">
-                <p>Modern React</p>
-                <p>Hooks explained</p>
-                <p>Project based</p>
-              </div>
-            </li>
-            <li data-link-id="react-scrimba">
-              <div class="link-title">
-                <a href="https://scrimba.com/learn/learnreact" target="_blank">Learn React - Scrimba</a>
-                <i class="fas fa-chevron-down toggle-arrow"></i>
-              </div>
-              <div class="rating-stars">
-                <span class="average-rating">0.0</span>
-                <span class="rating-count">(0 ratings)</span>
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-              </div>
-              <div class="features-list">
-                <p>Interactive Code</p>
-                <p>Free course</p>
-                <p>Highly recommended</p>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <div class="book-links">
-          <h4>Resources</h4>
-          <ul>
-            <li data-link-id="react-docs">
-              <div class="link-title">
-                <a href="https://react.dev" target="_blank">React.dev - Official Docs</a>
-                <i class="fas fa-chevron-down toggle-arrow"></i>
-              </div>
-              <div class="rating-stars">
-                <span class="average-rating">0.0</span>
-                <span class="rating-count">(0 ratings)</span>
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-              </div>
-              <div class="features-list">
-                <p>Official Docs</p>
-                <p>New interactive examples</p>
-                <p>Best practices</p>
-              </div>
-            </li>
-          </ul>
+            <h4>Video Tutorials</h4>
+             <ul>
+              <li data-link-id="js-netninja">
+                <div class="link-title">
+                  <a href="https://youtube.com/playlist?list=PL4cUxeGkcC9haFPT7J25Q9GRB_ZkuaI_V" target="_blank">Modern JS - Net Ninja</a>
+                  <i class="fas fa-chevron-down toggle-arrow"></i>
+                </div>
+                 <div class="rating-stars"><span class="average-rating">0.0</span><span class="rating-count">(0)</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                <div class="features-list"><p>ES6+</p><p>DOM Manipulation</p></div>
+              </li>
+            </ul>
         </div>
       </div>
     </div>
 
-    <div class="language-section" id="figma-section">
-      <h3><i class="fab fa-figma"></i> Figma & UI/UX</h3>
+    <div class="language-section" id="git-section" data-skill="Git & GitHub">
+      <h3>5. Git & GitHub</h3>
       <div class="resources-container">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/3/33/Figma-logo.svg" alt="Figma & UI/UX Course" class="course-image">
+        <img src="https://git-scm.com/images/logos/downloads/Git-Icon-1788C.png" alt="Git" class="course-image">
         <div class="video-links">
-          <h4>Video Tutorials</h4>
-          <ul>
-            <li data-link-id="figma-official">
-              <div class="link-title">
-                <a href="https://www.youtube.com/c/Figmadesign" target="_blank">Figma Official Channel</a>
-                <i class="fas fa-chevron-down toggle-arrow"></i>
-              </div>
-              <div class="rating-stars">
-                <span class="average-rating">0.0</span>
-                <span class="rating-count">(0 ratings)</span>
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-              </div>
-              <div class="features-list">
-                <p>Official tutorials</p>
-                <p>Feature updates</p>
-                <p>Design systems</p>
-              </div>
-            </li>
-            <li data-link-id="figma-envato">
-              <div class="link-title">
-                <a href="https://youtu.be/kbZejINveDY" target="_blank">Figma Course - Envato Tuts</a>
-                <i class="fas fa-chevron-down toggle-arrow"></i>
-              </div>
-              <div class="rating-stars">
-                <span class="average-rating">0.0</span>
-                <span class="rating-count">(0 ratings)</span>
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-              </div>
-              <div class="features-list">
-                <p>Beginner guide</p>
-                <p>UI design</p>
-                <p>Prototyping</p>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <div class="book-links">
-          <h4>Important Resources</h4>
-          <ul>
-            <li data-link-id="figma-docs">
-              <div class="link-title">
-                <a href="https://help.figma.com/hc/en-us" target="_blank">Figma Help Center</a>
-                <i class="fas fa-chevron-down toggle-arrow"></i>
-              </div>
-              <div class="rating-stars">
-                <span class="average-rating">0.0</span>
-                <span class="rating-count">(0 ratings)</span>
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-              </div>
-              <div class="features-list">
-                <p>Manuals</p>
-                <p>Shortcuts</p>
-                <p>Community</p>
-              </div>
-            </li>
-          </ul>
+             <ul>
+              <li data-link-id="git-crash">
+                <div class="link-title">
+                  <a href="https://youtu.be/RGOj5yH7evk" target="_blank">Git & GitHub Crash Course</a>
+                  <i class="fas fa-chevron-down toggle-arrow"></i>
+                </div>
+                 <div class="rating-stars"><span class="average-rating">0.0</span><span class="rating-count">(0)</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                <div class="features-list"><p>Version Control</p><p>Collaboration</p></div>
+              </li>
+            </ul>
         </div>
       </div>
     </div>
 
-   <div class="chat-popup" id="chatPopup" aria-hidden="true">
-      <div class="chat-content">
-        <i class="fas fa-times close-chat" id="closeChat" aria-label="Close Chat"></i>
-        <h2>Student Chat</h2>
-        <div class="chat-loading" id="chatLoading">Loading...</div>
-        
-        <div class="chat-messages" id="chatMessages"></div>
-        <div class="chat-input">
-          <input type="text" id="messageInput" placeholder="Type your message here..." aria-label="Type message">
-          <button class="send-message-btn" id="sendMessageBtn">
-            <i class="fas fa-paper-plane"></i> Send
-          </button>
+    <div class="language-section" id="uiux-section" data-skill="UI/UX Basics">
+      <h3>6. UI/UX Basics</h3>
+      <div class="resources-container">
+        <img src="https://cdn-icons-png.flaticon.com/512/1260/1260206.png" alt="UI/UX" class="course-image">
+        <div class="video-links">
+             <ul>
+              <li data-link-id="uiux-crash">
+                <div class="link-title">
+                  <a href="https://youtu.be/c9Wg6Cb_YlU" target="_blank">UI/UX Design Crash Course</a>
+                  <i class="fas fa-chevron-down toggle-arrow"></i>
+                </div>
+                 <div class="rating-stars"><span class="average-rating">0.0</span><span class="rating-count">(0)</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                <div class="features-list"><p>Design Principles</p><p>User Research</p></div>
+              </li>
+            </ul>
         </div>
       </div>
+    </div>
+
+    <div class="language-section" id="figma-section" data-skill="Figma">
+      <h3>7. Figma</h3>
+      <div class="resources-container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/33/Figma-logo.svg" alt="Figma" class="course-image">
+        <div class="video-links">
+             <ul>
+              <li data-link-id="figma-envato">
+                <div class="link-title">
+                  <a href="https://youtu.be/kbZejINveDY" target="_blank">Figma Course - Envato</a>
+                  <i class="fas fa-chevron-down toggle-arrow"></i>
+                </div>
+                 <div class="rating-stars"><span class="average-rating">0.0</span><span class="rating-count">(0)</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                <div class="features-list"><p>Prototyping</p><p>Design Systems</p></div>
+              </li>
+            </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="level-header">Level 2: Intermediate</div>
+
+    <div class="language-section" id="api-section" data-skill="REST APIs & HTTP">
+      <h3>1. REST APIs & HTTP</h3>
+      <div class="resources-container">
+        <img src="https://cdn-icons-png.flaticon.com/512/8297/8297437.png" alt="API" class="course-image">
+        <div class="video-links">
+             <ul>
+              <li data-link-id="api-course">
+                <div class="link-title">
+                  <a href="#" target="_blank">HTTP & REST APIs Guide</a>
+                  <i class="fas fa-chevron-down toggle-arrow"></i>
+                </div>
+                 <div class="rating-stars"><span class="average-rating">0.0</span><span class="rating-count">(0)</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                <div class="features-list"><p>Requests/Responses</p><p>Status Codes</p></div>
+              </li>
+            </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="language-section" id="frameworks-section" data-skill="Frontend Framework">
+      <h3>2. Frontend Framework (React)</h3>
+      <div class="resources-container">
+        <img src="https://images-cdn.openxcell.com/wp-content/uploads/2024/07/25085005/reactjs-inner.svg" alt="React" class="course-image">
+        <div class="video-links">
+             <ul>
+              <li data-link-id="react-netninja">
+                <div class="link-title">
+                  <a href="https://youtube.com/playlist?list=PL4cUxeGkcC9gZD-Tvwfod2GaISupNJnoa" target="_blank">React Tutorial - Net Ninja</a>
+                  <i class="fas fa-chevron-down toggle-arrow"></i>
+                </div>
+                 <div class="rating-stars"><span class="average-rating">0.0</span><span class="rating-count">(0)</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                <div class="features-list"><p>Hooks</p><p>Components</p></div>
+              </li>
+            </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="language-section" id="state-section" data-skill="State Management">
+      <h3>3. State Management (Context/Redux)</h3>
+      <div class="resources-container">
+        <img src="https://raw.githubusercontent.com/reduxjs/redux/master/logo/logo.png" alt="Redux" class="course-image">
+        <div class="video-links">
+             <ul>
+              <li data-link-id="redux-course">
+                <div class="link-title">
+                  <a href="#" target="_blank">Redux & Context API</a>
+                  <i class="fas fa-chevron-down toggle-arrow"></i>
+                </div>
+                 <div class="rating-stars"><span class="average-rating">0.0</span><span class="rating-count">(0)</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                <div class="features-list"><p>Global State</p><p>Redux Toolkit</p></div>
+              </li>
+            </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="language-section" id="build-section" data-skill="Build Tools">
+      <h3>4. Build Tools (Vite/Webpack)</h3>
+      <div class="resources-container">
+        <img src="https://vitejs.dev/logo.svg" alt="Vite" class="course-image">
+        <div class="video-links">
+             <ul>
+              <li data-link-id="vite-course">
+                <div class="link-title">
+                  <a href="#" target="_blank">Vite & Webpack Basics</a>
+                  <i class="fas fa-chevron-down toggle-arrow"></i>
+                </div>
+                 <div class="rating-stars"><span class="average-rating">0.0</span><span class="rating-count">(0)</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                <div class="features-list"><p>Bundling</p><p>Dev Server</p></div>
+              </li>
+            </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="language-section" id="perf-section" data-skill="Performance">
+      <h3>5. Performance Basics</h3>
+      <div class="resources-container">
+        <img src="https://cdn-icons-png.flaticon.com/512/3050/3050525.png" alt="Performance" class="course-image">
+        <div class="video-links">
+             <ul>
+              <li data-link-id="perf-course">
+                <div class="link-title">
+                  <a href="#" target="_blank">Web Performance Guide</a>
+                  <i class="fas fa-chevron-down toggle-arrow"></i>
+                </div>
+                 <div class="rating-stars"><span class="average-rating">0.0</span><span class="rating-count">(0)</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                <div class="features-list"><p>Lighthouse</p><p>Lazy Loading</p></div>
+              </li>
+            </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="language-section" id="sec-section" data-skill="Security">
+      <h3>6. Security Basics</h3>
+      <div class="resources-container">
+        <img src="https://cdn-icons-png.flaticon.com/512/2092/2092663.png" alt="Security" class="course-image">
+        <div class="video-links">
+             <ul>
+              <li data-link-id="sec-course">
+                <div class="link-title">
+                  <a href="#" target="_blank">Web Security Fundamentals</a>
+                  <i class="fas fa-chevron-down toggle-arrow"></i>
+                </div>
+                 <div class="rating-stars"><span class="average-rating">0.0</span><span class="rating-count">(0)</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                <div class="features-list"><p>XSS & CSRF</p><p>HTTPS/CORS</p></div>
+              </li>
+            </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="language-section" id="webapi-section" data-skill="Web APIs">
+      <h3>7. Web APIs (Storage/Fetch)</h3>
+      <div class="resources-container">
+        <img src="https://cdn-icons-png.flaticon.com/512/8059/8059346.png" alt="WebAPI" class="course-image">
+        <div class="video-links">
+             <ul>
+              <li data-link-id="webapi-course">
+                <div class="link-title">
+                  <a href="#" target="_blank">Browser APIs Guide</a>
+                  <i class="fas fa-chevron-down toggle-arrow"></i>
+                </div>
+                 <div class="rating-stars"><span class="average-rating">0.0</span><span class="rating-count">(0)</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                <div class="features-list"><p>LocalStorage</p><p>Geolocation</p></div>
+              </li>
+            </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-popup" id="chatPopup" aria-hidden="true">
+        <div class="chat-content">
+          <i class="fas fa-times close-chat" id="closeChat"></i>
+          <h2>Student Chat</h2>
+          <div class="chat-loading" id="chatLoading">Loading...</div>
+          <div class="chat-messages" id="chatMessages"></div>
+          <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Type your message...">
+            <button class="send-message-btn" id="sendMessageBtn"><i class="fas fa-paper-plane"></i> Send</button>
+          </div>
+        </div>
     </div>
 
     <div class="survey-modal" id="surveyModal" aria-hidden="true">
-      <div class="survey-content">
-        <span class="close-survey" id="closeSurvey">&times;</span>
-        <h3>Welcome to Community Chat</h3>
-        <p class="survey-intro">Before you start, please complete your profile and agree to our community guidelines.</p>
-        
-        <div class="survey-form">
-            <div class="form-group">
-                <label for="surveyNameInput">Display Name:</label>
-                <input type="text" id="surveyNameInput" placeholder="Enter your name (e.g., Ahmed Ali)">
-            </div>
-
-            <div class="survey-terms-box">
-                <label class="checkbox-container">
-                    <input type="checkbox" id="surveyTermsCheck">
-                    <span class="checkmark"></span>
-                    <span class="terms-text">
-                        I agree to the <a href="../../legal/terms-of-use.html" target="_blank">Terms of Use</a> and <a href="../../legal/privacy-policy.html" target="_blank">Privacy Policy</a>.
-                    </span>
-                </label>
-                
-                <label class="checkbox-container">
-                    <input type="checkbox" id="surveyConductCheck">
-                    <span class="checkmark"></span>
-                    <span class="terms-text">
-                        I pledge not to misuse the chat for advertising, insults, spreading misinformation, or any illegal activities.
-                    </span>
-                </label>
-            </div>
-
-            <button id="startChattingBtn" class="btn start-chat-btn" disabled>
-                Agree & Start Chatting
-            </button>
+        <div class="survey-content">
+          <span class="close-survey" id="closeSurvey">&times;</span>
+          <h3>Welcome to Community Chat</h3>
+          <p class="survey-intro">Please complete your profile.</p>
+          <div class="survey-form">
+              <div class="form-group">
+                  <label for="surveyNameInput">Display Name:</label>
+                  <input type="text" id="surveyNameInput" placeholder="Enter your name">
+              </div>
+              <div class="survey-terms-box">
+                  <label class="checkbox-container">
+                      <input type="checkbox" id="surveyTermsCheck">
+                      <span class="checkmark"></span>
+                      <span class="terms-text">I agree to Terms & Privacy Policy.</span>
+                  </label>
+                  <label class="checkbox-container">
+                      <input type="checkbox" id="surveyConductCheck">
+                      <span class="checkmark"></span>
+                      <span class="terms-text">I pledge to use chat respectfully.</span>
+                  </label>
+              </div>
+              <button id="startChattingBtn" class="btn start-chat-btn" disabled>Agree & Start Chatting</button>
+          </div>
         </div>
-      </div>
     </div>
+
   </section>
-  <footer class="site-footer">
-    <div class="footer-container">
-      <div class="footer-brand">
-        <h2 class="footer-logo">Edumates</h2>
-        <p class="footer-description">Interactive learning platform helping you develop skills and achieve your goals.</p>
-        <div class="social-links">
-          <a href="https://www.facebook.com/profile.php?id=61573714877124" class="social-link" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-          <a href="https://x.com/edumates_?t=7uVsGeKx1uNor4VjoeSAzg&s=09" class="social-link" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-          <a href="https://www.linkedin.com/in/mostafa-edumates-2ba076378" class="social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-        </div>
-      </div>
-      <div class="footer-links">
-        <div class="footer-column">
-          <h3 class="footer-title">Help</h3>
-          <ul>
-           <li><a href="../../legal/privacy-policy.html" class="footer-link"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
-           <li><a href="../../legal/terms-of-use.html" class="footer-link"><i class="fas fa-chevron-right"></i> Terms of Use</a></li>
-           <li><a href="../../legal/about.html" class="footer-link"><i class="fas fa-chevron-right"></i> About Us</a></li>
-          </ul>
-        </div>
-        <div class="footer-column">
-          <h3 class="footer-title">Contact Us</h3>
-          <ul>
-            <li><a href="https://wa.me/+201055415811" class="footer-link"><i class="fas fa-phone"></i> WhatsApp</a></li>
-            <li><a href="mailto:m41940147@gmail.com" class="footer-link"><i class="fas fa-envelope"></i> Email Us</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p class="copyright">© <span class="current-year"></span> Edumates. All rights reserved.</p>
-    </div>
+  
+  <footer class="site-footer" id="footer">
+     <div class="footer-bottom"><p class="copyright">© <span class="current-year"></span> Edumates.</p></div>
   </footer>
   
   <script type="module" src="../../feedback.js"></script> 
-  <script type="module" src="../../roadmap.js"></script>
   <script type="module" src="courses-det-script.js"></script>
 </body>
-
 </html>
-
-
