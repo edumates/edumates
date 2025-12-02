@@ -350,24 +350,40 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     // --- RATING SYSTEM (FIXED) ---
+   // --- RATING SYSTEM (SECURE) ---
     async function submitRating(linkId, rating) {
         const user = auth.currentUser;
         if (!user) { alert('Please login to rate'); return; }
 
-        try {
-            // Check previous rating
-            const q = query(collection(db, 'frontend-ratings'), where('linkId', '==', linkId), where('userId', '==', user.uid));
-            const snap = await getDocs(q);
-            if (!snap.empty) { alert('You have already rated this.'); return; }
+        // إنشاء معرف فريد يدمج بين المستخدم والرابط (UserUID_LinkID)
+        const uniqueDocId = `${user.uid}_${linkId}`;
+        const ratingDocRef = doc(db, 'frontend-ratings', uniqueDocId);
 
-            await addDoc(collection(db, 'frontend-ratings'), {
-                linkId, userId: user.uid, rating, timestamp: serverTimestamp()
+        try {
+            // التحقق المباشر مما إذا كانت الوثيقة موجودة
+            const docSnap = await getDoc(ratingDocRef);
+            
+            if (docSnap.exists()) { 
+                alert('You have already rated this resource!'); 
+                return; 
+            }
+
+            // الحفظ باستخدام setDoc ومعرف فريد لمنع التكرار نهائياً
+            await setDoc(ratingDocRef, {
+                linkId: linkId, 
+                userId: user.uid, 
+                rating: rating, 
+                timestamp: serverTimestamp()
             });
+            
+            // تحديث الواجهة فورياً للمستخدم (اختياري، لتحسين التجربة)
+            alert('Thanks for your rating!');
+
         } catch (error) {
-            console.error(error);
+            console.error("Error submitting rating:", error);
+            alert('An error occurred. Please try again.');
         }
     }
-
     // 3. FIX: SEPARATE AVERAGE FROM USER SELECTION
     function updateStarDisplay(starsContainer, averageRating, count, userRating) {
         const stars = starsContainer.querySelectorAll('i');
@@ -467,3 +483,4 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     });
 });
+
