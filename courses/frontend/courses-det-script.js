@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Dynamic Imports
     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js");
     const { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js");
-    const { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, where, getDocs, doc, setDoc, getDoc, updateDoc } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js");
+    const { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, where, getDocs, doc, setDoc, getDoc } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js");
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -36,29 +36,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         roadmapPopup: document.querySelector('#roadmapModal'),
         closeRoadmap: document.querySelector('#closeRoadmap'),
         roadmapTasks: document.querySelectorAll('.roadmap-task'),
-        
-        // Chat
-        chatBtn: document.getElementById('chatBtn'),
-        chatPopup: document.getElementById('chatPopup'),
-        closeChat: document.getElementById('closeChat'),
-        chatMessages: document.getElementById('chatMessages'),
-        messageInput: document.getElementById('messageInput'),
-        sendMessageBtn: document.getElementById('sendMessageBtn'),
-        chatLoading: document.getElementById('chatLoading'),
-
-        // Survey
-        surveyModal: document.getElementById('surveyModal'),
-        closeSurvey: document.getElementById('closeSurvey'),
-        surveyNameInput: document.getElementById('surveyNameInput'),
-        surveyTermsCheck: document.getElementById('surveyTermsCheck'),
-        surveyConductCheck: document.getElementById('surveyConductCheck'),
-        startChattingBtn: document.getElementById('startChattingBtn')
     };
 
     if (elements.currentYear) elements.currentYear.textContent = new Date().getFullYear();
 
     // Global Unsubscribe functions (to stop listening when logged out)
-    let unsubscribeMessages = null;
     let unsubscribeRatings = {};
 
     // ---------------------------------------------------------
@@ -70,7 +52,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (user) {
             console.log("User Logged In:", user.uid);
             updateUIAfterLogin(user);
-            await loadUserProfileData(user); // Load Roadmap & Chat Profile
+            await loadUserProfileData(user); // Load Roadmap Profile
             refreshRatings(user); // Load User Ratings
         } else {
             console.log("User Logged Out");
@@ -133,10 +115,6 @@ document.addEventListener('DOMContentLoaded', async function() {
             const btn = item.querySelector('.mark-done');
             if(btn) btn.textContent = 'Check';
         });
-
-        // Clear Chat
-        if (elements.chatMessages) elements.chatMessages.innerHTML = '';
-        if (unsubscribeMessages) { unsubscribeMessages(); unsubscribeMessages = null; }
     }
 
     // ---------------------------------------------------------
@@ -155,9 +133,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                 if (data.roadmap) {
                     applyRoadmapUI(data.roadmap);
                 }
-                
-                // 2. Check Chat Profile (Stored for later use)
-                // We don't open chat automatically, but we know if they registered
             }
         } catch (error) {
             console.error("Error fetching user profile:", error);
@@ -234,153 +209,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     // ---------------------------------------------------------
-    // 5. Chat System & Survey Logic (DB: user-profiles & frontend-chat)
-    // ---------------------------------------------------------
-
-    async function handleChatButtonClick() {
-        const user = auth.currentUser;
-        
-        // SECURITY CHECK
-        if (!user) {
-            alert("Please login first to join the community chat!");
-            return;
-        }
-
-        // Check DB if user has filled survey
-        try {
-            const docRef = doc(db, 'user-profiles', user.uid);
-            const docSnap = await getDoc(docRef);
-            
-            if (docSnap.exists() && docSnap.data().chatInfo) {
-                // User already registered for chat
-                openChatPopup();
-            } else {
-                // First time -> Open Survey
-                openSurveyModal(user);
-            }
-        } catch (error) {
-            console.error("Error checking chat profile:", error);
-            // Fallback: Open survey if error
-            openSurveyModal(user);
-        }
-    }
-
-    function openSurveyModal(user) {
-        if(elements.surveyModal) {
-            elements.surveyModal.classList.add('active');
-            if(elements.surveyNameInput && !elements.surveyNameInput.value) {
-                elements.surveyNameInput.value = user.displayName || '';
-            }
-            validateSurveyForm();
-        }
-    }
-
-    async function handleStartChatting() {
-        const user = auth.currentUser;
-        if (!user) return;
-
-        const name = elements.surveyNameInput.value.trim();
-        const terms = elements.surveyTermsCheck.checked;
-        const conduct = elements.surveyConductCheck.checked;
-
-        if (name && terms && conduct) {
-            elements.startChattingBtn.disabled = true;
-            elements.startChattingBtn.textContent = "Saving...";
-
-            try {
-                // SAVE TO USER PROFILE
-                await setDoc(doc(db, 'user-profiles', user.uid), {
-                    chatInfo: {
-                        displayName: name,
-                        termsAccepted: true,
-                        joinedAt: serverTimestamp()
-                    }
-                }, { merge: true });
-
-                closeSurveyModal();
-                openChatPopup();
-            } catch (error) {
-                console.error("Error saving chat profile:", error);
-                alert("Error saving profile. Please try again.");
-            } finally {
-                elements.startChattingBtn.disabled = false;
-                elements.startChattingBtn.textContent = "Agree & Start Chatting";
-            }
-        }
-    }
-
-    function openChatPopup() {
-        if (elements.chatPopup) {
-            elements.chatPopup.classList.add('active');
-            loadChatMessages();
-            elements.messageInput.focus();
-        }
-    }
-
-    function loadChatMessages() {
-        if (unsubscribeMessages) return; // Already listening
-
-        elements.chatLoading.classList.add('active');
-        const q = query(collection(db, 'frontend-chat'), orderBy('timestamp', 'asc'));
-
-        unsubscribeMessages = onSnapshot(q, (snapshot) => {
-            elements.chatMessages.innerHTML = '';
-            elements.chatLoading.classList.remove('active');
-            
-            snapshot.forEach((docSnap) => {
-                const msg = docSnap.data();
-                renderMessage(msg);
-            });
-            scrollToBottom();
-        });
-    }
-
-    function renderMessage(msg) {
-        if (!msg.text) return;
-        const isMe = auth.currentUser && msg.userId === auth.currentUser.uid;
-        
-        const div = document.createElement('div');
-        div.className = `message ${isMe ? 'user-message' : ''}`;
-        div.innerHTML = `
-            <div class="message-header">
-                <img src="${msg.userPhoto}" class="message-avatar">
-                <span class="message-sender">${sanitizeHTML(msg.userName)}</span>
-            </div>
-            <p class="message-text">${sanitizeHTML(msg.text)}</p>
-        `;
-        elements.chatMessages.appendChild(div);
-    }
-
-    async function sendMessage() {
-        const user = auth.currentUser;
-        if (!user) return;
-
-        const text = elements.messageInput.value.trim();
-        if (!text) return;
-
-        try {
-            // Get user custom name from profile, fallback to auth name
-            let chatName = user.displayName;
-            const profileSnap = await getDoc(doc(db, 'user-profiles', user.uid));
-            if (profileSnap.exists() && profileSnap.data().chatInfo) {
-                chatName = profileSnap.data().chatInfo.displayName;
-            }
-
-            await addDoc(collection(db, 'frontend-chat'), {
-                text: text,
-                userId: user.uid,
-                userName: chatName,
-                userPhoto: user.photoURL || 'https://via.placeholder.com/30',
-                timestamp: serverTimestamp()
-            });
-            elements.messageInput.value = '';
-        } catch (error) {
-            console.error("Send Error:", error);
-        }
-    }
-
-    // ---------------------------------------------------------
-    // 6. Rating System (DB: frontend-ratings)
+    // 5. Rating System (DB: frontend-ratings)
     // ---------------------------------------------------------
 
     async function submitRating(linkId, ratingValue) {
@@ -415,7 +244,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                 timestamp: serverTimestamp()
             });
             
-            // Optional: Provide feedback (e.g., toast message)
             // UI updates automatically via listener
 
         } catch (error) {
@@ -423,9 +251,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
 
-    function refreshRatings(user) {
+    function refreshRatings() {
         // Re-attach listeners to ensure they have current user context if needed
-        // mainly to update the stars visual immediately if we wanted to
         document.querySelectorAll('.rating-stars').forEach(container => {
             const linkId = container.parentElement.getAttribute('data-link-id');
             setupRatingListener(linkId, container);
@@ -487,7 +314,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     // ---------------------------------------------------------
-    // 7. General UI & Helpers
+    // 6. General UI & Helpers
     // ---------------------------------------------------------
 
     function toggleMobileMenu() {
@@ -508,29 +335,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (elements.roadmapPopup) elements.roadmapPopup.classList.toggle('active');
     }
 
-    function closeSurveyModal() {
-        if (elements.surveyModal) elements.surveyModal.classList.remove('active');
-    }
-
-    function validateSurveyForm() {
-        if (!elements.startChattingBtn) return;
-        const name = elements.surveyNameInput ? elements.surveyNameInput.value.trim() : '';
-        const terms = elements.surveyTermsCheck ? elements.surveyTermsCheck.checked : false;
-        const conduct = elements.surveyConductCheck ? elements.surveyConductCheck.checked : false;
-
-        if (name && terms && conduct) {
-            elements.startChattingBtn.disabled = false;
-            elements.startChattingBtn.classList.add('ready');
-        } else {
-            elements.startChattingBtn.disabled = true;
-            elements.startChattingBtn.classList.remove('ready');
-        }
-    }
-
-    function scrollToBottom() {
-        if (elements.chatMessages) elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
-    }
-
     function sanitizeHTML(str) {
         if (!str) return '';
         const temp = document.createElement('div');
@@ -539,7 +343,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     // ---------------------------------------------------------
-    // 8. Event Listeners Setup
+    // 7. Event Listeners Setup
     // ---------------------------------------------------------
     
     // Auth
@@ -552,19 +356,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Roadmap
     if (elements.viewRoadmapBtn) elements.viewRoadmapBtn.addEventListener('click', toggleRoadmapPopup);
     if (elements.closeRoadmap) elements.closeRoadmap.addEventListener('click', toggleRoadmapPopup);
-
-    // Chat
-    if (elements.chatBtn) elements.chatBtn.addEventListener('click', handleChatButtonClick);
-    if (elements.closeChat) elements.closeChat.addEventListener('click', () => elements.chatPopup.classList.remove('active'));
-    if (elements.sendMessageBtn) elements.sendMessageBtn.addEventListener('click', sendMessage);
-    if (elements.messageInput) elements.messageInput.addEventListener('keypress', (e) => { if(e.key==='Enter') sendMessage(); });
-
-    // Survey
-    if (elements.closeSurvey) elements.closeSurvey.addEventListener('click', closeSurveyModal);
-    if (elements.surveyNameInput) elements.surveyNameInput.addEventListener('input', validateSurveyForm);
-    if (elements.surveyTermsCheck) elements.surveyTermsCheck.addEventListener('change', validateSurveyForm);
-    if (elements.surveyConductCheck) elements.surveyConductCheck.addEventListener('change', validateSurveyForm);
-    if (elements.startChattingBtn) elements.startChattingBtn.addEventListener('click', handleStartChatting);
 
     // Initial Ratings Load
     document.querySelectorAll('.rating-stars').forEach(starsContainer => {
