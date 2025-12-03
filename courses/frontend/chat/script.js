@@ -1,9 +1,7 @@
-// 1. استيراد دوال Firebase (نفس الإصدار المستخدم في ملفاتك)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, updateDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
-// 2. إعدادات Firebase (من ملفك courses-det-script.js)
+// إعدادات Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyBhCxGjQOQ88b2GynL515ZYQXqfiLPhjw4",
     authDomain: "edumates-983dd.firebaseapp.com",
@@ -14,79 +12,144 @@ const firebaseConfig = {
     measurementId: "G-L1KCZTW8R9"
 };
 
-// تهيئة التطبيق
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
-const CHAT_COLLECTION = 'community-messages'; // اسم المجموعة الجديدة في قاعدة البيانات
+const CHAT_COLLECTION = 'frontend-chat-secure'; 
 
-// 3. عناصر DOM
+// === عناصر الواجهة ===
 const elements = {
-    loginBtn: document.getElementById('loginBtn'),
-    logoutBtn: document.getElementById('logoutBtn'),
+    modal: document.getElementById('consentModal'),
+    guestInput: document.getElementById('guestNameInput'),
+    acceptBtn: document.getElementById('acceptBtn'),
+    loginError: document.getElementById('loginError'),
+    
     userInfo: document.getElementById('userInfo'),
     userAvatar: document.getElementById('userAvatar'),
     userName: document.getElementById('userName'),
+    logoutBtn: document.getElementById('logoutBtn'),
+    
     messagesList: document.getElementById('messagesList'),
+    inputArea: document.getElementById('inputArea'),
     messageForm: document.getElementById('messageForm'),
     msgInput: document.getElementById('msgInput'),
-    sendBtn: document.getElementById('sendBtn'),
+    securityWarning: document.getElementById('securityWarning'),
+    
     replyPreview: document.getElementById('replyPreview'),
     replyToUser: document.getElementById('replyToUser'),
     replyToText: document.getElementById('replyToText'),
     cancelReplyBtn: document.getElementById('cancelReplyBtn')
 };
 
-// متغير لتخزين حالة الرد الحالية
-let currentReplyTo = null; // { id: "msgId", name: "Ahmed", text: "hello" }
+// === متغيرات المستخدم ===
+let currentUser = null; // { id: "unique-id", name: "Guest" }
+let currentReplyTo = null;
 
-// 4. إدارة المصادقة (Authentication)
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        // حالة تسجيل الدخول
-        elements.loginBtn.classList.add('hidden');
-        elements.userInfo.classList.remove('hidden');
-        elements.userAvatar.src = user.photoURL;
-        elements.userName.textContent = user.displayName.split(' ')[0]; // الاسم الأول فقط
-        
-        elements.msgInput.disabled = false;
-        elements.sendBtn.disabled = false;
-        
-        loadMessages(); // بدء تحميل الرسائل
+// === قائمة الكلمات المحظورة (عينة تعليمية، يجب توسيعها) ===
+const BANNED_WORDS = [
+    "شتم", "قذر", "حيوان", "غبي", "حقير", "سكس", "sex", "porn", "xxx", "احمق", "تافه", "كلب"
+    // يمكن إضافة المزيد هنا
+];
+
+// === 1. إدارة الدخول (بدون تسجيل دخول حقيقي) ===
+
+// التحقق عند التحميل
+window.addEventListener('DOMContentLoaded', () => {
+    const storedUser = localStorage.getItem('chatUser');
+    if (storedUser) {
+        currentUser = JSON.parse(storedUser);
+        initializeChat();
     } else {
-        // حالة تسجيل الخروج
-        elements.loginBtn.classList.remove('hidden');
-        elements.userInfo.classList.add('hidden');
-        elements.messagesList.innerHTML = '<div class="loading-spinner">يرجى تسجيل الدخول لرؤية المحادثة</div>';
-        elements.msgInput.disabled = true;
-        elements.sendBtn.disabled = true;
+        elements.modal.classList.remove('hidden');
     }
 });
 
-elements.loginBtn.addEventListener('click', () => signInWithPopup(auth, new GoogleAuthProvider()));
-elements.logoutBtn.addEventListener('click', () => signOut(auth));
+elements.acceptBtn.addEventListener('click', () => {
+    const name = elements.guestInput.value.trim();
+    
+    if (name.length < 3) {
+        elements.loginError.textContent = "الاسم يجب أن يكون 3 أحرف على الأقل";
+        return;
+    }
+    
+    // إنشاء مستخدم جديد
+    currentUser = {
+        id: 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        name: name
+    };
+    
+    localStorage.setItem('chatUser', JSON.stringify(currentUser));
+    initializeChat();
+});
 
-// 5. تحميل الرسائل وعرضها (Real-time)
+elements.logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('chatUser');
+    location.reload();
+});
+
+function initializeChat() {
+    elements.modal.classList.add('hidden');
+    elements.userInfo.classList.remove('hidden');
+    elements.inputArea.classList.remove('hidden');
+    
+    elements.userName.textContent = currentUser.name;
+    elements.userAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
+    
+    loadMessages();
+}
+
+// === 2. التحقق من المحتوى (الأمان) ===
+
+function validateContent(text) {
+    elements.securityWarning.textContent = "";
+
+    // 1. منع الروابط (Links)
+    const urlPattern = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|(\.[a-z]{2,}\/)/i;
+    if (urlPattern.test(text)) {
+        return "⛔ يمنع نشر الروابط الخارجية لأسباب أمنية.";
+    }
+
+    // 2. منع السوشيال ميديا (Social Media handles)
+    const socialPattern = /(@[\w]+)|(facebook|instagram|snapchat|tiktok|telegram|whatsapp)/i;
+    if (socialPattern.test(text)) {
+        return "⛔ يمنع نشر حسابات التواصل الاجتماعي. المحادثة للتعليم فقط.";
+    }
+
+    // 3. منع الأرقام (أكثر من 3 أرقام متتالية - لمنع الهواتف)
+    const numberPattern = /\d{4,}/; 
+    // ملاحظة: نسمح بـ 3 أرقام (مثل 100، 360) ولكن نمنع 4 فأكثر (مثل 0100...)
+    if (numberPattern.test(text)) {
+        return "⛔ يمنع نشر الأرقام الطويلة أو أرقام الهواتف.";
+    }
+
+    // 4. منع الكلمات البذيئة
+    const lowerText = text.toLowerCase();
+    for (let word of BANNED_WORDS) {
+        if (lowerText.includes(word)) {
+            return "⛔ تحتوي الرسالة على كلمات غير لائقة.";
+        }
+    }
+
+    return null; // النص سليم
+}
+
+// === 3. إدارة الرسائل ===
+
 function loadMessages() {
     const q = query(collection(db, CHAT_COLLECTION), orderBy('timestamp', 'asc'));
 
     onSnapshot(q, (snapshot) => {
-        elements.messagesList.innerHTML = ''; // مسح القائمة لإعادة بنائها (يمكن تحسين الأداء لاحقاً)
-        
+        elements.messagesList.innerHTML = '';
         snapshot.forEach((docSnap) => {
             const msg = docSnap.data();
             msg.id = docSnap.id;
             renderMessage(msg);
         });
-
         scrollToBottom();
     });
 }
 
-// دالة عرض الرسالة الواحدة
 function renderMessage(msg) {
-    const currentUser = auth.currentUser;
-    const isMe = currentUser && msg.userId === currentUser.uid;
+    const isMe = currentUser && msg.userId === currentUser.id;
     const isDeleted = msg.isDeleted === true;
 
     const div = document.createElement('div');
@@ -97,121 +160,119 @@ function renderMessage(msg) {
     let timeString = '';
     if (msg.timestamp) {
         const date = msg.timestamp.toDate();
-        timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        timeString = date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
     }
 
-    // محتوى الرد (إذا كانت الرسالة رداً على أخرى)
+    // الرد
     let replyHTML = '';
     if (msg.replyTo && !isDeleted) {
         replyHTML = `
             <div class="reply-context" onclick="scrollToMessage('${msg.replyTo.id}')">
                 <small>رد على <b>${sanitize(msg.replyTo.name)}</b></small><br>
-                <span style="opacity:0.8">${sanitize(msg.replyTo.text)}</span>
+                <span>${sanitize(msg.replyTo.text)}</span>
             </div>
         `;
     }
 
-    // محتوى النص (محذوف أم عادي)
+    // المحتوى
     let contentHTML = '';
     if (isDeleted) {
-        contentHTML = `<div class="msg-content deleted"><i class="fas fa-ban"></i> تم حذف هذه الرسالة</div>`;
+        contentHTML = `<div class="msg-content deleted"><i class="fas fa-ban"></i> تم حذف الرسالة</div>`;
     } else {
         contentHTML = `
             <div class="msg-content">
                 ${replyHTML}
                 ${sanitize(msg.text)}
-                <div style="text-align: left; font-size: 0.65rem; opacity: 0.6; margin-top: 5px;">${timeString}</div>
+                <div style="text-align: left; font-size: 0.6rem; opacity: 0.6; margin-top: 5px;">${timeString}</div>
             </div>
         `;
     }
 
-    // أزرار التحكم (رد / حذف)
+    // الأزرار
     let actionsHTML = '';
     if (!isDeleted) {
         actionsHTML = `
             <div class="msg-actions">
-                <button class="action-btn reply-btn" title="رد"><i class="fas fa-reply"></i></button>
-                ${isMe ? `<button class="action-btn delete-btn" title="حذف"><i class="fas fa-trash"></i></button>` : ''}
+                <button class="action-btn reply-btn"><i class="fas fa-reply"></i></button>
+                ${isMe ? `<button class="action-btn delete-btn"><i class="fas fa-trash"></i></button>` : ''}
             </div>
         `;
     }
 
+    const initial = msg.userName ? msg.userName.charAt(0).toUpperCase() : '?';
+    
     div.innerHTML = `
-        ${!isMe ? `<div class="msg-header"><img src="${msg.userPhoto}" class="msg-avatar"> <span>${sanitize(msg.userName)}</span></div>` : ''}
+        ${!isMe ? `
+            <div class="msg-header">
+                <div class="msg-avatar-small">${initial}</div>
+                <span>${sanitize(msg.userName)}</span>
+            </div>` : ''}
         ${contentHTML}
         ${actionsHTML}
     `;
 
-    // تفعيل أزرار الرد والحذف
     if (!isDeleted) {
         const replyBtn = div.querySelector('.reply-btn');
         const deleteBtn = div.querySelector('.delete-btn');
-
-        if (replyBtn) {
-            replyBtn.addEventListener('click', () => initiateReply(msg));
-        }
-        if (deleteBtn) {
-            deleteBtn.addEventListener('click', () => deleteMessage(msg.id));
-        }
+        if (replyBtn) replyBtn.addEventListener('click', () => initiateReply(msg));
+        if (deleteBtn) deleteBtn.addEventListener('click', () => deleteMessage(msg.id));
     }
 
     elements.messagesList.appendChild(div);
 }
 
-// 6. إرسال الرسالة
 elements.messageForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const text = elements.msgInput.value.trim();
     if (!text) return;
 
-    const user = auth.currentUser;
-    
+    // 🔒 التحقق الأمني قبل الإرسال
+    const error = validateContent(text);
+    if (error) {
+        elements.securityWarning.textContent = error;
+        elements.msgInput.classList.add('error-shake');
+        setTimeout(() => elements.msgInput.classList.remove('error-shake'), 500);
+        return;
+    }
+
     try {
         const messageData = {
             text: text,
-            userId: user.uid,
-            userName: user.displayName,
-            userPhoto: user.photoURL,
+            userId: currentUser.id,
+            userName: currentUser.name,
             timestamp: serverTimestamp(),
             isDeleted: false
         };
 
-        // إذا كان هناك رد
         if (currentReplyTo) {
             messageData.replyTo = {
                 id: currentReplyTo.id,
                 name: currentReplyTo.userName,
-                text: currentReplyTo.text.substring(0, 50) + (currentReplyTo.text.length > 50 ? '...' : '')
+                text: currentReplyTo.text.substring(0, 30) + '...'
             };
         }
 
         await addDoc(collection(db, CHAT_COLLECTION), messageData);
-        
-        // إعادة تعيين الحقول
         elements.msgInput.value = '';
         cancelReply(); 
     } catch (error) {
-        console.error("خطأ في الإرسال:", error);
+        console.error("Error:", error);
     }
 });
 
-// 7. منطق الحذف (Soft Delete)
+// === بقية الدوال (نفس المنطق السابق مع تحديثات طفيفة) ===
+
 async function deleteMessage(msgId) {
-    if (confirm("هل أنت متأكد من أنك تريد حذف هذه الرسالة؟ سيبقى مكانها محفوظاً.")) {
+    if (confirm("حذف الرسالة؟")) {
         try {
-            const msgRef = doc(db, CHAT_COLLECTION, msgId);
-            await updateDoc(msgRef, {
+            await updateDoc(doc(db, CHAT_COLLECTION, msgId), {
                 isDeleted: true,
-                text: "" // نمسح النص الأصلي للحماية
+                text: ""
             });
-        } catch (error) {
-            console.error("فشل الحذف:", error);
-            alert("حدث خطأ أثناء الحذف");
-        }
+        } catch (e) { console.error(e); }
     }
 }
 
-// 8. منطق الرد
 function initiateReply(msg) {
     currentReplyTo = msg;
     elements.replyPreview.classList.remove('hidden');
@@ -224,29 +285,23 @@ function cancelReply() {
     currentReplyTo = null;
     elements.replyPreview.classList.add('hidden');
 }
-
 elements.cancelReplyBtn.addEventListener('click', cancelReply);
 
-// 9. دوال مساعدة
 function scrollToBottom() {
     elements.messagesList.scrollTop = elements.messagesList.scrollHeight;
 }
 
-// دالة لتمرير الشاشة إلى الرسالة الأصلية عند الضغط على الرد
 window.scrollToMessage = function(msgId) {
     const el = document.getElementById(`msg-${msgId}`);
-    if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.style.backgroundColor = '#ffffff20'; // ومضة بسيطة للتمييز
-        setTimeout(() => el.style.backgroundColor = 'transparent', 1000);
-    } else {
-        alert("الرسالة الأصلية قديمة جداً ولم تعد ظاهرة في الشاشة الحالية");
-    }
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 };
 
+// دالة التعقيم لمنع HTML Injection (مهمة جداً)
 function sanitize(str) {
     if (!str) return '';
-    const temp = document.createElement('div');
-    temp.textContent = str;
-    return temp.innerHTML;
+    return str.replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;')
+              .replace(/'/g, '&#039;');
 }
