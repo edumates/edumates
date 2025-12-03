@@ -1402,15 +1402,29 @@ body { font-family: 'Inter', sans-serif; background: #f8fafc; color: var(--text-
 .roadmap-task.done { text-decoration: line-through; color: #aaa; }
 .mark-done { background: var(--primary-light); color: #fff; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; }
 .done .mark-done { background: var(--accent-green); }
+/* أنماط للزر الجديد */
+.action-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--primary-blue); /* أو أي لون تختاره من الألوان المحددة في :root */
+    color: var(--white);
+    border: none;
+    border-radius: 50px;
+    padding: 15px 25px;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    z-index: 1000;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
-/* Chat & Survey Modals (Copy basic structure from original) */
-.chat-popup, .survey-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
-.chat-popup.active, .survey-modal.active { display: flex; }
-.chat-content, .survey-content { background: #fff; width: 90%; max-width: 500px; padding: 20px; border-radius: 10px; position: relative; }
-.chat-messages { height: 300px; overflow-y: auto; border: 1px solid #eee; margin: 10px 0; padding: 10px; }
-.message-header { display: flex; gap: 10px; align-items: center; font-size: 0.8rem; margin-bottom: 4px; }
-.message-avatar { width: 24px; height: 24px; border-radius: 50%; }
-
+.action-btn:hover {
+    background: var(--hover-blue);
+}
 /* Responsive */
 @media (max-width: 768px) {
     .resources-split { grid-template-columns: 1fr; gap: 1rem; }
@@ -1418,3 +1432,4 @@ body { font-family: 'Inter', sans-serif; background: #f8fafc; color: var(--text-
     .mobile-menu-btn { display: block; }
     .nav-links.active { display: flex; flex-direction: column; position: fixed; top: 60px; left: 0; width: 100%; background: #fff; padding: 2rem; border-bottom: 1px solid #ddd; }
 }
+
