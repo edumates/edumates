@@ -3,49 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edumates - مجتمع الطلاب</title>
+    <title>Frontend Chat - مجتمع تعليمي</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <div id="consentModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title"><i class="fas fa-shield-alt"></i> بوابة الدخول الآمن</h2>
+            <div class="modal-body">
+                <p>مرحباً بك في <strong>Frontend Chat</strong>. للمتابعة، يجب الموافقة على التالي:</p>
+                <ul class="terms-list">
+                    <li><i class="fas fa-check"></i> عمري أكبر من 13 عاماً.</li>
+                    <li><i class="fas fa-check"></i> وافقت على <span>سياسة الخصوصية</span> و <span>شروط الاستخدام</span>.</li>
+                    <li><i class="fas fa-check"></i> هذا الشات للغرض <strong>التعليمي فقط</strong>.</li>
+                    <li><i class="fas fa-ban"></i> يمنع نشر الروابط، أرقام الهواتف، أو حسابات التواصل الاجتماعي.</li>
+                    <li><i class="fas fa-ban"></i> يمنع استخدام الألفاظ النابية أو المسيئة.</li>
+                </ul>
+                <div class="input-group">
+                    <label>اختر اسماً مستعاراً (للعرض فقط):</label>
+                    <input type="text" id="guestNameInput" placeholder="اكتب اسمك هنا..." maxlength="15">
+                </div>
+                <p id="loginError" class="error-msg"></p>
+            </div>
+            <button id="acceptBtn" class="btn-agree">موافق ودخول</button>
+        </div>
+    </div>
+
     <nav class="navbar">
-        <div class="nav-brand">Edumates Chat</div>
+        <div class="nav-brand">Frontend Chat <span class="badge">Education Only</span></div>
         <div class="user-controls">
-            <button id="loginBtn" class="btn-primary">
-                <i class="fab fa-google"></i> تسجيل الدخول
-            </button>
-            <div id="userInfo" class="hidden">
-                <img id="userAvatar" src="" alt="Avatar">
-                <span id="userName">المستخدم</span>
-                <button id="logoutBtn" class="btn-icon"><i class="fas fa-sign-out-alt"></i></button>
+            <div id="userInfo" class="user-badge hidden">
+                <div class="avatar-circle" id="userAvatar"></div>
+                <span id="userName">زائر</span>
+                <button id="logoutBtn" class="btn-icon" title="خروج"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
     </nav>
 
     <main class="chat-wrapper">
-        
         <div class="messages-container" id="messagesList">
-            <div class="loading-spinner">جاري تحميل المحادثة...</div>
-        </div>
+            </div>
 
-        <div class="input-area">
-            
+        <div class="input-area hidden" id="inputArea">
             <div id="replyPreview" class="reply-preview hidden">
                 <div class="reply-info">
                     <span class="replying-to-label">الرد على:</span>
                     <span id="replyToUser" class="reply-target-name">اسم المستخدم</span>
-                    <p id="replyToText" class="reply-target-text">نص الرسالة...</p>
+                    <p id="replyToText" class="reply-target-text">...</p>
                 </div>
                 <button id="cancelReplyBtn"><i class="fas fa-times"></i></button>
             </div>
 
             <form id="messageForm" class="message-form">
-                <input type="text" id="msgInput" placeholder="اكتب رسالتك هنا..." autocomplete="off" disabled>
-                <button type="submit" id="sendBtn" disabled>
+                <input type="text" id="msgInput" placeholder="اكتب سؤالك التعليمي هنا..." autocomplete="off">
+                <button type="submit" id="sendBtn">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </form>
+            <div id="securityWarning" class="security-warning"></div>
         </div>
     </main>
 
