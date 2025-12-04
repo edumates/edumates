@@ -1,9 +1,9 @@
-// 1. استيراد دوال Firebase
+// 1. Firebase Imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, updateDoc, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
-// 2. إعدادات Firebase (نفس الإعدادات المستخدمة في courses-det-script.js)
+// 2. Firebase Configuration (Kept the same)
 const firebaseConfig = {
     apiKey: "AIzaSyBhCxGjQOQ88b2GynL515ZYQXqfiLPhjw4",
     authDomain: "edumates-983dd.firebaseapp.com",
@@ -14,15 +14,27 @@ const firebaseConfig = {
     measurementId: "G-L1KCZTW8R9"
 };
 
-// تهيئة التطبيق
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// اسم المجموعة تم تغييره ليتطابق مع طلبك
 const CHAT_COLLECTION = 'frontend-chat'; 
 
-// 3. عناصر DOM
+// 3. Profanity List and Regex (English Focus)
+// This list is illustrative. For a truly robust app, use an external library.
+const PROFANITY_LIST = [
+    "asshole", "bitch", "cunt", "damn", "fuck", "hell", "shit", "wank", "pussy", 
+    "dick", "cock", "vagina", "retard", "spastic", "nigger", "kike", // Strong profanity/slurs
+    "whore", "slut", "jerkoff", "motherfucker", "fucker", "bastard"
+];
+
+// URLs and Social Media Handles (Blocking common links and non-educational platforms)
+const URL_PATTERN = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|(\.[a-z]{2,}(\/|\s|$))/i;
+const NUMBER_PATTERN = /\d{5,}/; // Blocking 5 or more consecutive digits (stricter than 3)
+const SOCIAL_MEDIA_PATTERN = /(facebook|instagram|tiktok|snapchat|twitter|whatsapp|tele\s*gram)/i; 
+
+
+// 4. DOM Elements (Updated for English Text)
 const elements = {
     loginBtn: document.getElementById('loginBtn'),
     logoutBtn: document.getElementById('logoutBtn'),
@@ -34,13 +46,11 @@ const elements = {
     msgInput: document.getElementById('msgInput'),
     sendBtn: document.getElementById('sendBtn'),
     
-    // عناصر الرد
     replyPreview: document.getElementById('replyPreview'),
     replyToUser: document.getElementById('replyToUser'),
     replyToText: document.getElementById('replyToText'),
     cancelReplyBtn: document.getElementById('cancelReplyBtn'),
 
-    // عناصر التنبيهات والنافذة المنبثقة
     securityAlert: document.getElementById('securityAlert'),
     alertMessage: document.getElementById('alertMessage'),
     
@@ -52,23 +62,19 @@ const elements = {
     completeSetupBtn: document.getElementById('completeSetupBtn')
 };
 
-// متغيرات عامة
 let currentReplyTo = null;
-let chatDisplayName = null; // سيتم جلبه من البروفايل
-let unsubscribeChat = null; // لإيقاف الاستماع عند الخروج
+let chatDisplayName = null; 
+let unsubscribeChat = null; 
 
-// 4. إدارة المصادقة (Authentication Logic)
+// --- 5. Authentication and Setup Logic (Similar to before) ---
+
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        // المستخدم مسجل دخوله (سواء من هنا أو من صفحة الكورسات)
         elements.loginBtn.classList.add('hidden');
         elements.userInfo.classList.remove('hidden');
         elements.userAvatar.src = user.photoURL || 'https://via.placeholder.com/35';
-        
-        // التحقق من البروفايل في user-profiles
         await checkUserProfile(user);
     } else {
-        // حالة تسجيل الخروج
         handleLogoutUI();
     }
 });
@@ -86,55 +92,46 @@ elements.logoutBtn.addEventListener('click', () => signOut(auth));
 function handleLogoutUI() {
     elements.loginBtn.classList.remove('hidden');
     elements.userInfo.classList.add('hidden');
-    elements.messagesList.innerHTML = '<div class="loading-spinner">يرجى تسجيل الدخول لرؤية المحادثة</div>';
+    elements.messagesList.innerHTML = '<div class="loading-spinner">Please Sign In to View the Chat</div>';
     elements.msgInput.disabled = true;
     elements.sendBtn.disabled = true;
     elements.setupModal.classList.add('hidden');
-    
     if (unsubscribeChat) {
         unsubscribeChat();
         unsubscribeChat = null;
     }
 }
 
-// 5. التحقق من البروفايل والموافقة (Profile Check)
 async function checkUserProfile(user) {
     try {
         const docRef = doc(db, 'user-profiles', user.uid);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists() && docSnap.data().chatInfo) {
-            // المستخدم لديه بروفايل وموافق على الشروط
             const data = docSnap.data().chatInfo;
             chatDisplayName = data.displayName;
             elements.userName.textContent = chatDisplayName;
             enableChat();
         } else {
-            // مستخدم جديد أو لم يوافق بعد -> إظهار النافذة
             elements.setupDisplayName.value = user.displayName || '';
             elements.setupModal.classList.remove('hidden');
         }
     } catch (error) {
         console.error("Profile Error:", error);
-        alert("حدث خطأ أثناء تحميل البيانات");
+        alert("An error occurred while loading your profile.");
     }
 }
 
-// 6. منطق نافذة الإعداد (Setup Modal)
+// Setup Modal Logic
 function validateSetupForm() {
     const name = elements.setupDisplayName.value.trim();
     const isAge = elements.checkAge.checked;
     const isTerms = elements.checkTerms.checked;
     const isConduct = elements.checkConduct.checked;
 
-    if (name.length >= 3 && isAge && isTerms && isConduct) {
-        elements.completeSetupBtn.disabled = false;
-    } else {
-        elements.completeSetupBtn.disabled = true;
-    }
+    elements.completeSetupBtn.disabled = !(name.length >= 3 && isAge && isTerms && isConduct);
 }
 
-// تفعيل التحقق عند تغيير المدخلات
 [elements.setupDisplayName, elements.checkAge, elements.checkTerms, elements.checkConduct].forEach(el => {
     el.addEventListener('input', validateSetupForm);
     el.addEventListener('change', validateSetupForm);
@@ -144,11 +141,10 @@ elements.completeSetupBtn.addEventListener('click', async () => {
     const user = auth.currentUser;
     if (!user) return;
 
-    elements.completeSetupBtn.textContent = "جاري الحفظ...";
+    elements.completeSetupBtn.textContent = "Saving...";
     const name = elements.setupDisplayName.value.trim();
 
     try {
-        // حفظ البيانات في user-profiles
         await setDoc(doc(db, 'user-profiles', user.uid), {
             chatInfo: {
                 displayName: name,
@@ -164,11 +160,10 @@ elements.completeSetupBtn.addEventListener('click', async () => {
         enableChat();
     } catch (error) {
         console.error("Save Error:", error);
-        alert("فشل حفظ البيانات");
+        alert("Failed to save profile data.");
     }
 });
 
-// 7. تفعيل المحادثة وتحميل الرسائل
 function enableChat() {
     elements.msgInput.disabled = false;
     elements.sendBtn.disabled = false;
@@ -180,7 +175,6 @@ function loadMessages() {
 
     unsubscribeChat = onSnapshot(q, (snapshot) => {
         elements.messagesList.innerHTML = '';
-        
         snapshot.forEach((docSnap) => {
             const msg = docSnap.data();
             msg.id = docSnap.id;
@@ -190,53 +184,50 @@ function loadMessages() {
     });
 }
 
-// 8. نظام الفلاتر والأمان (Security Filters)
+// --- 6. Advanced Filtering Logic (English Profanity) ---
+
 function containsForbiddenContent(text) {
-    // 1. منع الروابط (com, net, http, www, etc)
-    const urlPattern = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|(\.[a-z]{2,}(\/|\s|$))/i;
-    
-    // 2. منع أكثر من 3 أرقام متتالية
-    const numberPattern = /\d{4,}/; 
-
-    // 3. كلمات بذيئة أو سوشال ميديا (قائمة مصغرة كمثال)
-    const badWords = [
-        "facebook", "instagram", "tiktok", "snapchat", "twitter", "whatsapp",
-        "sex", "xxx", "porn", "quack", "stupid", // أمثلة إنجليزية
-        "غبي", "حقير", "سافل", "رقمي", "تعال خاص" // أمثلة عربية
-    ];
-
-    if (urlPattern.test(text)) return "يمنع إرسال الروابط الخارجية.";
-    if (numberPattern.test(text)) return "يمنع كتابة سلاسل أرقام طويلة (أرقام الهواتف).";
-    
     const lowerText = text.toLowerCase();
-    for (let word of badWords) {
-        if (lowerText.includes(word)) return "تحتوي الرسالة على كلمات أو منصات محظورة.";
+    
+    // 1. Check for URLs
+    if (URL_PATTERN.test(lowerText)) return "Links are not allowed in this chat.";
+    
+    // 2. Check for Social Media and Non-Educational Keywords
+    if (SOCIAL_MEDIA_PATTERN.test(lowerText)) return "Social media names and non-educational terms are prohibited.";
+    
+    // 3. Check for 5+ Consecutive Numbers (Phone numbers)
+    if (NUMBER_PATTERN.test(lowerText)) return "Using too many consecutive numbers is prohibited (e.g., phone numbers).";
+
+    // 4. Check for Profanity
+    for (let word of PROFANITY_LIST) {
+        // Use a regex to check for the whole word or common variations (e.g., f**k)
+        const wordRegex = new RegExp(`\\b${word}\\b|${word.replace(/(\w)/g, '$1\\*?')}`, 'i');
+        if (wordRegex.test(lowerText)) return "Profanity and sexually explicit words are strictly forbidden.";
     }
 
-    return null; // آمن
+    return null; // Safe
 }
 
 function showSecurityAlert(message) {
     elements.alertMessage.textContent = message;
     elements.securityAlert.classList.remove('hidden');
     
-    // إخفاء الشريط بعد 3 ثواني
     setTimeout(() => {
         elements.securityAlert.classList.add('hidden');
     }, 3000);
 }
 
-// 9. إرسال الرسالة
+// --- 7. Sending Message ---
 elements.messageForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const text = elements.msgInput.value.trim();
     if (!text) return;
 
-    // فحص الأمان قبل الإرسال
     const violation = containsForbiddenContent(text);
     if (violation) {
         showSecurityAlert(violation);
-        return; // توقف، لا ترسل
+        elements.msgInput.value = ''; // Clear input on failure
+        return; 
     }
 
     const user = auth.currentUser;
@@ -245,7 +236,7 @@ elements.messageForm.addEventListener('submit', async (e) => {
         const messageData = {
             text: text,
             userId: user.uid,
-            userName: chatDisplayName || user.displayName, // استخدام الاسم المختار
+            userName: chatDisplayName || user.displayName,
             userPhoto: user.photoURL || 'https://via.placeholder.com/35',
             timestamp: serverTimestamp(),
             isDeleted: false
@@ -268,7 +259,7 @@ elements.messageForm.addEventListener('submit', async (e) => {
     }
 });
 
-// 10. عرض الرسائل
+// --- 8. Rendering Messages (Same as before) ---
 function renderMessage(msg) {
     const currentUser = auth.currentUser;
     const isMe = currentUser && msg.userId === currentUser.uid;
@@ -278,7 +269,6 @@ function renderMessage(msg) {
     div.className = `message ${isMe ? 'me' : 'others'}`;
     div.id = `msg-${msg.id}`;
 
-    // معالجة الوقت
     let timeString = '';
     if (msg.timestamp) {
         const date = msg.timestamp.toDate();
@@ -287,14 +277,13 @@ function renderMessage(msg) {
 
     let contentHTML = '';
     if (isDeleted) {
-        contentHTML = `<div class="msg-content deleted"><i class="fas fa-ban"></i> تم حذف هذه الرسالة من قبل المرسل</div>`;
+        contentHTML = `<div class="msg-content deleted"><i class="fas fa-ban"></i> This message has been deleted by the user.</div>`;
     } else {
-        // إذا كان هناك رد
         let replyHTML = '';
         if (msg.replyTo) {
             replyHTML = `
                 <div class="reply-context" onclick="scrollToMessage('${msg.replyTo.id}')">
-                    <small>رد على <b>${sanitize(msg.replyTo.name)}</b></small><br>
+                    <small>Replying to <b>${sanitize(msg.replyTo.name)}</b></small><br>
                     <span style="opacity:0.8">${sanitize(msg.replyTo.text)}</span>
                 </div>
             `;
@@ -309,13 +298,12 @@ function renderMessage(msg) {
         `;
     }
 
-    // أزرار التحكم
     let actionsHTML = '';
     if (!isDeleted) {
         actionsHTML = `
             <div class="msg-actions">
-                <button class="action-btn reply-btn" title="رد"><i class="fas fa-reply"></i></button>
-                ${isMe ? `<button class="action-btn delete-btn" title="حذف"><i class="fas fa-trash"></i></button>` : ''}
+                <button class="action-btn reply-btn" title="Reply"><i class="fas fa-reply"></i></button>
+                ${isMe ? `<button class="action-btn delete-btn" title="Delete"><i class="fas fa-trash"></i></button>` : ''}
             </div>
         `;
     }
@@ -326,7 +314,6 @@ function renderMessage(msg) {
         ${actionsHTML}
     `;
 
-    // تفعيل الأزرار
     if (!isDeleted) {
         const replyBtn = div.querySelector('.reply-btn');
         const deleteBtn = div.querySelector('.delete-btn');
@@ -338,9 +325,10 @@ function renderMessage(msg) {
     elements.messagesList.appendChild(div);
 }
 
-// 11. وظائف إضافية (الحذف، الرد، التنظيف)
+// --- 9. Utility Functions (Reply, Delete, Scroll, Sanitize) ---
+
 async function deleteMessage(msgId) {
-    if (confirm("حذف الرسالة؟")) {
+    if (confirm("Are you sure you want to delete this message?")) {
         try {
             await updateDoc(doc(db, CHAT_COLLECTION, msgId), {
                 isDeleted: true,
@@ -383,3 +371,24 @@ function sanitize(str) {
     temp.textContent = str;
     return temp.innerHTML;
 }
+
+// Ensure elements are available when script runs
+document.addEventListener('DOMContentLoaded', () => {
+    // Initial UI text setup (English)
+    elements.loginBtn.innerHTML = '<i class="fab fa-google"></i> Sign in with Google';
+    elements.messagesList.innerHTML = '<div class="loading-spinner">Checking Security and Loading Chat...</div>';
+    if(elements.msgInput) elements.msgInput.placeholder = 'Type your message here...';
+    
+    // Update Modal text to English
+    if(elements.setupModal) {
+        elements.setupModal.querySelector('h2').innerHTML = '<i class="fas fa-shield-alt"></i> Secure Entry Setup';
+        elements.setupModal.querySelector('.modal-desc').textContent = 'To ensure a safe educational environment, please complete your profile and accept the terms.';
+        elements.setupDisplayName.previousElementSibling.textContent = 'Display Name in Chat:';
+        
+        elements.checkAge.nextElementSibling.textContent = 'I confirm that I am at least 13 years old.';
+        elements.checkTerms.nextElementSibling.textContent = 'I agree to the Privacy Policy and Terms of Use.';
+        elements.checkConduct.nextElementSibling.textContent = 'I pledge to use this chat for educational purposes only.';
+        
+        elements.completeSetupBtn.textContent = 'Accept and Enter';
+    }
+});
