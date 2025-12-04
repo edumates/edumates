@@ -9,13 +9,15 @@
 </head>
 <body>
 
-    <div id="alertBar" class="alert-bar">
-        <span id="alertText"></span>
+    <div id="securityAlert" class="security-alert hidden">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span id="alertMessage">نص التحذير هنا</span>
     </div>
 
     <nav class="navbar">
-        <div class="nav-brand">Frontend Chat</div> <div class="user-controls">
-            <button id="loginBtn" class="btn-primary">
+        <div class="nav-brand">Frontend Chat</div>
+        <div class="user-controls">
+            <button id="loginBtn" class="btn-primary hidden">
                 <i class="fab fa-google"></i> تسجيل الدخول
             </button>
             <div id="userInfo" class="hidden">
@@ -29,7 +31,7 @@
     <main class="chat-wrapper">
         
         <div class="messages-container" id="messagesList">
-            <div class="loading-spinner">جاري تحميل المحادثة...</div>
+            <div class="loading-spinner">جاري التحقق من الأمان وتحميل المحادثة...</div>
         </div>
 
         <div class="input-area">
@@ -52,31 +54,37 @@
         </div>
     </main>
 
-    <dialog id="privacyModal" class="privacy-modal">
-        <h2>شروط الاستخدام وسياسة الخصوصية</h2>
-        <p>مرحباً بك في مجتمع <strong>Frontend Chat</strong>. قبل المتابعة، يرجى الموافقة على الشروط التالية:</p>
-        
-        <ul>
-            <li>هذه المحادثة مخصصة **للأغراض التعليمية** المتعلقة بتطوير الواجهات الأمامية (Frontend) فقط.</li>
-            <li>يُمنع كتابة أي روابط أو كلمات سب أو عبارات بذيئة أو معلومات شخصية.</li>
-            <li>يجب أن لا يقل عمرك عن **13 عامًا** للمشاركة.</li>
-            <li>أنت توافق على أن يتم حفظ رسائلك واسم العرض الذي تختاره في قاعدة بيانات التطبيق.</li>
-        </ul>
-
-        <form id="modalForm">
-            <div class="form-group">
-                <label for="displayNameInput">اسم العرض (الذي سيظهر في المحادثة):</label>
-                <input type="text" id="displayNameInput" required minlength="3" maxlength="20" placeholder="مثال: مبرمج_مبتدئ">
-            </div>
+    <div id="setupModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2><i class="fas fa-shield-alt"></i> إعداد الدخول الآمن</h2>
+            <p class="modal-desc">لضمان بيئة تعليمية آمنة، يرجى إكمال بياناتك والموافقة على الشروط.</p>
             
-            <div class="form-group checkbox-group">
-                <input type="checkbox" id="agreeCheckbox" required>
-                <label for="agreeCheckbox">أوافق على شروط الاستخدام وسياسة الخصوصية المذكورة أعلاه.</label>
+            <div class="form-group">
+                <label>الاسم المعروض في المحادثة:</label>
+                <input type="text" id="setupDisplayName" placeholder="مثال: أحمد محمد" maxlength="20">
             </div>
 
-            <button type="submit" class="btn-primary">المتابعة إلى المحادثة</button>
-        </form>
-    </dialog>
+            <div class="terms-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="checkAge">
+                    <span class="checkmark"></span>
+                    أقر أن عمري لا يقل عن 13 عاماً.
+                </label>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="checkTerms">
+                    <span class="checkmark"></span>
+                    أوافق على سياسة الخصوصية وشروط الاستخدام.
+                </label>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="checkConduct">
+                    <span class="checkmark"></span>
+                    أتعهد باستخدام المحادثة للغرض التعليمي فقط.
+                </label>
+            </div>
+
+            <button id="completeSetupBtn" class="btn-primary full-width" disabled>موافق ودخول</button>
+        </div>
+    </div>
 
     <script type="module" src="script.js"></script>
 </body>
