@@ -9,46 +9,41 @@
 </head>
 <body>
 
+    <div id="alertBar" class="alert-bar hidden">
+        <i class="fas fa-exclamation-circle"></i> <span id="alertText">رسالة تنبيه</span>
+    </div>
+
     <div id="termsModal" class="modal-overlay">
         <div class="modal-content">
-            <h2><i class="fas fa-shield-alt"></i> بوابة Frontend Chat الآمنة</h2>
-            <p>مرحباً بك في المجتمع التعليمي. للدخول، يجب الموافقة على الشروط التالية:</p>
-            
-            <ul class="terms-list">
-                <li><i class="fas fa-check-circle"></i> أوافق على <strong>سياسة الخصوصية</strong> وشروط الاستخدام.</li>
-                <li><i class="fas fa-check-circle"></i> عمري لا يقل عن <strong>13 عاماً</strong>.</li>
-                <li><i class="fas fa-check-circle"></i> هذا المحادثة للغرض <strong>التعليمي والبرمجي فقط</strong>.</li>
-                <li><i class="fas fa-check-circle"></i> يمنع تبادل أرقام الهواتف أو الروابط الخارجية.</li>
-            </ul>
-
-            <div class="input-group">
-                <label>اختر اسماً مستعاراً للمحادثة:</label>
-                <input type="text" id="guestNameInput" placeholder="اكتب اسمك هنا (مثال: مبرمج مبتدئ)" maxlength="15">
+            <div class="modal-header">
+                <h2><i class="fas fa-shield-alt"></i> بوابة الدخول</h2>
             </div>
-
-            <button id="agreeBtn" class="btn-agree" disabled>موافق ودخول</button>
+            <div class="modal-body">
+                <p>مرحباً بك في <strong>Frontend Chat</strong>. للمتابعة، يجب أن توافق على التالي:</p>
+                <ul class="terms-list">
+                    <li><i class="fas fa-check"></i> عمري أكبر من 13 عاماً.</li>
+                    <li><i class="fas fa-check"></i> المحادثة للغرض التعليمي والدراسي فقط.</li>
+                    <li><i class="fas fa-check"></i> أوافق على سياسة الخصوصية وشروط الاستخدام.</li>
+                    <li><i class="fas fa-check"></i> التزم بالأخلاق العامة وعدم نشر معلومات اتصال.</li>
+                </ul>
+            </div>
+            <button id="acceptTermsBtn" class="btn-primary full-width">موافق وأتعهد بالالتزام</button>
         </div>
     </div>
 
     <nav class="navbar">
-        <div class="nav-brand"><i class="fas fa-code"></i> Frontend Chat</div>
+        <div class="nav-brand">Frontend Chat</div>
         <div class="user-controls">
             <div id="userInfo" class="hidden">
-                <div class="avatar-placeholder" id="userAvatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <span id="userName">زائر</span>
-                <button id="logoutBtn" class="btn-icon" title="خروج"><i class="fas fa-sign-out-alt"></i></button>
+                <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=random" alt="Avatar">
+                <span id="userName">طالب جديد</span>
             </div>
         </div>
     </nav>
 
     <main class="chat-wrapper">
         <div class="messages-container" id="messagesList">
-            <div class="welcome-msg">
-                <i class="fas fa-comments"></i>
-                <p>أهلاً بك في الشات التعليمي. تذكر أن تلتزم بالاحترام.</p>
-            </div>
+            <div class="loading-spinner">جاري الاتصال بالمجتمع التعليمي...</div>
         </div>
 
         <div class="input-area">
@@ -56,14 +51,14 @@
                 <div class="reply-info">
                     <span class="replying-to-label">الرد على:</span>
                     <span id="replyToUser" class="reply-target-name">اسم المستخدم</span>
-                    <p id="replyToText" class="reply-target-text">...</p>
+                    <p id="replyToText" class="reply-target-text">نص الرسالة...</p>
                 </div>
                 <button id="cancelReplyBtn"><i class="fas fa-times"></i></button>
             </div>
 
             <form id="messageForm" class="message-form">
-                <input type="text" id="msgInput" placeholder="اكتب رسالة تعليمية..." autocomplete="off" disabled>
-                <button type="submit" id="sendBtn" disabled>
+                <input type="text" id="msgInput" placeholder="اكتب رسالة تعليمية..." autocomplete="off">
+                <button type="submit" id="sendBtn">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </form>
