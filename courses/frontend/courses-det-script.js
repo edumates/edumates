@@ -1,394 +1,374 @@
-// 1. Firebase Imports
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, updateDoc, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+document.addEventListener('DOMContentLoaded', async function() {
+    // ---------------------------------------------------------
+    // 1. Firebase Configuration & Imports
+    // ---------------------------------------------------------
+    const firebaseConfig = {
+        apiKey: "AIzaSyBhCxGjQOQ88b2GynL515ZYQXqfiLPhjw4",
+        authDomain: "edumates-983dd.firebaseapp.com",
+        projectId: "edumates-983dd",
+        storageBucket: "edumates-983dd.firebasestorage.app",
+        messagingSenderId: "172548876353",
+        appId: "1:172548876353:web:955b1f41283d26c44c3ec0",
+        measurementId: "G-L1KCZTW8R9"
+    };
 
-// 2. Firebase Configuration (Kept the same)
-const firebaseConfig = {
-    apiKey: "AIzaSyBhCxGjQOQ88b2GynL515ZYQXqfiLPhjw4",
-    authDomain: "edumates-983dd.firebaseapp.com",
-    projectId: "edumates-983dd",
-    storageBucket: "edumates-983dd.firebasestorage.app",
-    messagingSenderId: "172548876353",
-    appId: "1:172548876353:web:955b1f41283d26c44c3ec0",
-    measurementId: "G-L1KCZTW8R9"
-};
+    // Dynamic Imports
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js");
+    const { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js");
+    const { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, where, getDocs, doc, setDoc, getDoc } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js");
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    const db = getFirestore(app);
 
-const CHAT_COLLECTION = 'frontend-chat'; 
+    // ---------------------------------------------------------
+    // 2. DOM Elements
+    // ---------------------------------------------------------
+    const elements = {
+        currentYear: document.querySelector('.current-year'),
+        mobileMenuBtn: document.querySelector('.mobile-menu-btn'),
+        navLinks: document.querySelector('.nav-links'),
+        googleLoginBtn: document.getElementById('googleLoginBtn'),
+        
+        // Roadmap
+        viewRoadmapBtn: document.querySelector('#viewRoadmapBtn'),
+        roadmapPopup: document.querySelector('#roadmapModal'),
+        closeRoadmap: document.querySelector('#closeRoadmap'),
+        roadmapTasks: document.querySelectorAll('.roadmap-task'),
+    };
 
-// 3. Profanity List and Regex (English Focus)
-// This list is illustrative. For a truly robust app, use an external library.
-const PROFANITY_LIST = [
-    "asshole", "bitch", "cunt", "damn", "fuck", "hell", "shit", "wank", "pussy", 
-    "dick", "cock", "vagina", "retard", "spastic", "nigger", "kike", // Strong profanity/slurs
-    "whore", "slut", "jerkoff", "motherfucker", "fucker", "bastard"
-];
+    if (elements.currentYear) elements.currentYear.textContent = new Date().getFullYear();
 
-// URLs and Social Media Handles (Blocking common links and non-educational platforms)
-const URL_PATTERN = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|(\.[a-z]{2,}(\/|\s|$))/i;
-const NUMBER_PATTERN = /\d{5,}/; // Blocking 5 or more consecutive digits (stricter than 3)
-const SOCIAL_MEDIA_PATTERN = /(facebook|instagram|tiktok|snapchat|twitter|whatsapp|tele\s*gram)/i; 
+    // Global Unsubscribe functions (to stop listening when logged out)
+    let unsubscribeRatings = {};
 
-
-// 4. DOM Elements (Updated for English Text)
-const elements = {
-    loginBtn: document.getElementById('loginBtn'),
-    logoutBtn: document.getElementById('logoutBtn'),
-    userInfo: document.getElementById('userInfo'),
-    userAvatar: document.getElementById('userAvatar'),
-    userName: document.getElementById('userName'),
-    messagesList: document.getElementById('messagesList'),
-    messageForm: document.getElementById('messageForm'),
-    msgInput: document.getElementById('msgInput'),
-    sendBtn: document.getElementById('sendBtn'),
+    // ---------------------------------------------------------
+    // 3. Authentication Logic
+    // ---------------------------------------------------------
     
-    replyPreview: document.getElementById('replyPreview'),
-    replyToUser: document.getElementById('replyToUser'),
-    replyToText: document.getElementById('replyToText'),
-    cancelReplyBtn: document.getElementById('cancelReplyBtn'),
-
-    securityAlert: document.getElementById('securityAlert'),
-    alertMessage: document.getElementById('alertMessage'),
-    
-    setupModal: document.getElementById('setupModal'),
-    setupDisplayName: document.getElementById('setupDisplayName'),
-    checkAge: document.getElementById('checkAge'),
-    checkTerms: document.getElementById('checkTerms'),
-    checkConduct: document.getElementById('checkConduct'),
-    completeSetupBtn: document.getElementById('completeSetupBtn')
-};
-
-let currentReplyTo = null;
-let chatDisplayName = null; 
-let unsubscribeChat = null; 
-
-// --- 5. Authentication and Setup Logic (Similar to before) ---
-
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        elements.loginBtn.classList.add('hidden');
-        elements.userInfo.classList.remove('hidden');
-        elements.userAvatar.src = user.photoURL || 'https://via.placeholder.com/35';
-        await checkUserProfile(user);
-    } else {
-        handleLogoutUI();
-    }
-});
-
-elements.loginBtn.addEventListener('click', async () => {
-    try {
-        await signInWithPopup(auth, new GoogleAuthProvider());
-    } catch (error) {
-        console.error("Login Error:", error);
-    }
-});
-
-elements.logoutBtn.addEventListener('click', () => signOut(auth));
-
-function handleLogoutUI() {
-    elements.loginBtn.classList.remove('hidden');
-    elements.userInfo.classList.add('hidden');
-    elements.messagesList.innerHTML = '<div class="loading-spinner">Please Sign In to View the Chat</div>';
-    elements.msgInput.disabled = true;
-    elements.sendBtn.disabled = true;
-    elements.setupModal.classList.add('hidden');
-    if (unsubscribeChat) {
-        unsubscribeChat();
-        unsubscribeChat = null;
-    }
-}
-
-async function checkUserProfile(user) {
-    try {
-        const docRef = doc(db, 'user-profiles', user.uid);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists() && docSnap.data().chatInfo) {
-            const data = docSnap.data().chatInfo;
-            chatDisplayName = data.displayName;
-            elements.userName.textContent = chatDisplayName;
-            enableChat();
+    // Listen to Auth State Changes
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            console.log("User Logged In:", user.uid);
+            updateUIAfterLogin(user);
+            await loadUserProfileData(user); // Load Roadmap Profile
+            refreshRatings(user); // Load User Ratings
         } else {
-            elements.setupDisplayName.value = user.displayName || '';
-            elements.setupModal.classList.remove('hidden');
+            console.log("User Logged Out");
+            updateUIAfterLogout();
         }
-    } catch (error) {
-        console.error("Profile Error:", error);
-        alert("An error occurred while loading your profile.");
-    }
-}
-
-// Setup Modal Logic
-function validateSetupForm() {
-    const name = elements.setupDisplayName.value.trim();
-    const isAge = elements.checkAge.checked;
-    const isTerms = elements.checkTerms.checked;
-    const isConduct = elements.checkConduct.checked;
-
-    elements.completeSetupBtn.disabled = !(name.length >= 3 && isAge && isTerms && isConduct);
-}
-
-[elements.setupDisplayName, elements.checkAge, elements.checkTerms, elements.checkConduct].forEach(el => {
-    el.addEventListener('input', validateSetupForm);
-    el.addEventListener('change', validateSetupForm);
-});
-
-elements.completeSetupBtn.addEventListener('click', async () => {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    elements.completeSetupBtn.textContent = "Saving...";
-    const name = elements.setupDisplayName.value.trim();
-
-    try {
-        await setDoc(doc(db, 'user-profiles', user.uid), {
-            chatInfo: {
-                displayName: name,
-                termsAccepted: true,
-                ageConfirmed: true,
-                joinedAt: serverTimestamp()
-            }
-        }, { merge: true });
-
-        elements.setupModal.classList.add('hidden');
-        chatDisplayName = name;
-        elements.userName.textContent = name;
-        enableChat();
-    } catch (error) {
-        console.error("Save Error:", error);
-        alert("Failed to save profile data.");
-    }
-});
-
-function enableChat() {
-    elements.msgInput.disabled = false;
-    elements.sendBtn.disabled = false;
-    loadMessages();
-}
-
-function loadMessages() {
-    const q = query(collection(db, CHAT_COLLECTION), orderBy('timestamp', 'asc'));
-
-    unsubscribeChat = onSnapshot(q, (snapshot) => {
-        elements.messagesList.innerHTML = '';
-        snapshot.forEach((docSnap) => {
-            const msg = docSnap.data();
-            msg.id = docSnap.id;
-            renderMessage(msg);
-        });
-        scrollToBottom();
     });
-}
 
-// --- 6. Advanced Filtering Logic (English Profanity) ---
-
-function containsForbiddenContent(text) {
-    const lowerText = text.toLowerCase();
-    
-    // 1. Check for URLs
-    if (URL_PATTERN.test(lowerText)) return "Links are not allowed in this chat.";
-    
-    // 2. Check for Social Media and Non-Educational Keywords
-    if (SOCIAL_MEDIA_PATTERN.test(lowerText)) return "Social media names and non-educational terms are prohibited.";
-    
-    // 3. Check for 5+ Consecutive Numbers (Phone numbers)
-    if (NUMBER_PATTERN.test(lowerText)) return "Using too many consecutive numbers is prohibited (e.g., phone numbers).";
-
-    // 4. Check for Profanity
-    for (let word of PROFANITY_LIST) {
-        // Use a regex to check for the whole word or common variations (e.g., f**k)
-        const wordRegex = new RegExp(`\\b${word}\\b|${word.replace(/(\w)/g, '$1\\*?')}`, 'i');
-        if (wordRegex.test(lowerText)) return "Profanity and sexually explicit words are strictly forbidden.";
-    }
-
-    return null; // Safe
-}
-
-function showSecurityAlert(message) {
-    elements.alertMessage.textContent = message;
-    elements.securityAlert.classList.remove('hidden');
-    
-    setTimeout(() => {
-        elements.securityAlert.classList.add('hidden');
-    }, 3000);
-}
-
-// --- 7. Sending Message ---
-elements.messageForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const text = elements.msgInput.value.trim();
-    if (!text) return;
-
-    const violation = containsForbiddenContent(text);
-    if (violation) {
-        showSecurityAlert(violation);
-        elements.msgInput.value = ''; // Clear input on failure
-        return; 
-    }
-
-    const user = auth.currentUser;
-    
-    try {
-        const messageData = {
-            text: text,
-            userId: user.uid,
-            userName: chatDisplayName || user.displayName,
-            userPhoto: user.photoURL || 'https://via.placeholder.com/35',
-            timestamp: serverTimestamp(),
-            isDeleted: false
-        };
-
-        if (currentReplyTo) {
-            messageData.replyTo = {
-                id: currentReplyTo.id,
-                name: currentReplyTo.userName,
-                text: currentReplyTo.text.substring(0, 50) + (currentReplyTo.text.length > 50 ? '...' : '')
-            };
-        }
-
-        await addDoc(collection(db, CHAT_COLLECTION), messageData);
-        
-        elements.msgInput.value = '';
-        cancelReply(); 
-    } catch (error) {
-        console.error("Send Error:", error);
-    }
-});
-
-// --- 8. Rendering Messages (Same as before) ---
-function renderMessage(msg) {
-    const currentUser = auth.currentUser;
-    const isMe = currentUser && msg.userId === currentUser.uid;
-    const isDeleted = msg.isDeleted === true;
-
-    const div = document.createElement('div');
-    div.className = `message ${isMe ? 'me' : 'others'}`;
-    div.id = `msg-${msg.id}`;
-
-    let timeString = '';
-    if (msg.timestamp) {
-        const date = msg.timestamp.toDate();
-        timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
-
-    let contentHTML = '';
-    if (isDeleted) {
-        contentHTML = `<div class="msg-content deleted"><i class="fas fa-ban"></i> This message has been deleted by the user.</div>`;
-    } else {
-        let replyHTML = '';
-        if (msg.replyTo) {
-            replyHTML = `
-                <div class="reply-context" onclick="scrollToMessage('${msg.replyTo.id}')">
-                    <small>Replying to <b>${sanitize(msg.replyTo.name)}</b></small><br>
-                    <span style="opacity:0.8">${sanitize(msg.replyTo.text)}</span>
-                </div>
-            `;
-        }
-
-        contentHTML = `
-            <div class="msg-content">
-                ${replyHTML}
-                ${sanitize(msg.text)}
-                <div style="text-align: left; font-size: 0.65rem; opacity: 0.6; margin-top: 5px;">${timeString}</div>
-            </div>
-        `;
-    }
-
-    let actionsHTML = '';
-    if (!isDeleted) {
-        actionsHTML = `
-            <div class="msg-actions">
-                <button class="action-btn reply-btn" title="Reply"><i class="fas fa-reply"></i></button>
-                ${isMe ? `<button class="action-btn delete-btn" title="Delete"><i class="fas fa-trash"></i></button>` : ''}
-            </div>
-        `;
-    }
-
-    div.innerHTML = `
-        ${!isMe ? `<div class="msg-header"><img src="${msg.userPhoto}" class="msg-avatar"> <span>${sanitize(msg.userName)}</span></div>` : ''}
-        ${contentHTML}
-        ${actionsHTML}
-    `;
-
-    if (!isDeleted) {
-        const replyBtn = div.querySelector('.reply-btn');
-        const deleteBtn = div.querySelector('.delete-btn');
-
-        if (replyBtn) replyBtn.addEventListener('click', () => initiateReply(msg));
-        if (deleteBtn) deleteBtn.addEventListener('click', () => deleteMessage(msg.id));
-    }
-
-    elements.messagesList.appendChild(div);
-}
-
-// --- 9. Utility Functions (Reply, Delete, Scroll, Sanitize) ---
-
-async function deleteMessage(msgId) {
-    if (confirm("Are you sure you want to delete this message?")) {
+    async function handleGoogleLogin() {
         try {
-            await updateDoc(doc(db, CHAT_COLLECTION, msgId), {
-                isDeleted: true,
-                text: ""
+            elements.googleLoginBtn.disabled = true;
+            await signInWithPopup(auth, provider);
+            // Page will react to onAuthStateChanged
+        } catch (error) {
+            console.error("Login Error:", error);
+            alert("Login failed: " + error.message);
+        } finally {
+            elements.googleLoginBtn.disabled = false;
+        }
+    }
+
+    async function handleLogout() {
+        try {
+            await signOut(auth);
+            // Page will react to onAuthStateChanged
+        } catch (error) {
+            console.error("Logout Error:", error);
+        }
+    }
+
+    function updateUIAfterLogin(user) {
+        if (elements.googleLoginBtn) {
+            elements.googleLoginBtn.innerHTML = `
+                <img src="${user.photoURL || 'https://via.placeholder.com/30'}" class="user-avatar" style="border-radius:50%; width:25px; margin-right:5px;">
+                <span>${sanitizeHTML(user.displayName || 'User')}</span>
+                <i class="fas fa-sign-out-alt logout-icon" title="Logout" style="margin-left:10px; cursor:pointer;"></i>
+            `;
+            // Add Logout Event
+            const logoutIcon = elements.googleLoginBtn.querySelector('.logout-icon');
+            if (logoutIcon) {
+                logoutIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const confirmLogout = confirm("Are you sure you want to logout?");
+                    if (confirmLogout) handleLogout();
+                });
+            }
+            // Remove default click from main button to prevent re-login trigger on container
+            elements.googleLoginBtn.onclick = null; 
+        }
+    }
+
+    function updateUIAfterLogout() {
+        if (elements.googleLoginBtn) {
+            elements.googleLoginBtn.innerHTML = '<i class="fab fa-google"></i> Sign in with Google';
+            elements.googleLoginBtn.addEventListener('click', handleGoogleLogin);
+        }
+        
+        // Reset Roadmap UI
+        document.querySelectorAll('.roadmap-task').forEach(item => {
+            item.classList.remove('done');
+            const btn = item.querySelector('.mark-done');
+            if(btn) btn.textContent = 'Check';
+        });
+    }
+
+    // ---------------------------------------------------------
+    // 4. User Profile & Roadmap Logic (DB: user-profiles)
+    // ---------------------------------------------------------
+
+    async function loadUserProfileData(user) {
+        try {
+            const docRef = doc(db, 'user-profiles', user.uid);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                
+                // 1. Apply Roadmap Status
+                if (data.roadmap) {
+                    applyRoadmapUI(data.roadmap);
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching user profile:", error);
+        }
+    }
+
+    function applyRoadmapUI(roadmapData) {
+        document.querySelectorAll('.roadmap-task').forEach(item => {
+            const skillKey = item.getAttribute('data-skill');
+            const checkBtn = item.querySelector('.mark-done');
+            
+            if (roadmapData[skillKey] === true) {
+                item.classList.add('done');
+                if(checkBtn) checkBtn.textContent = 'Done ✔';
+            } else {
+                item.classList.remove('done');
+                if(checkBtn) checkBtn.textContent = 'Check';
+            }
+        });
+    }
+
+    // Attach Listeners to Roadmap Buttons
+    document.querySelectorAll('.roadmap-task').forEach(item => {
+        const checkBtn = item.querySelector('.mark-done');
+        if (!checkBtn) return;
+
+        // Clone to remove old listeners
+        const newBtn = checkBtn.cloneNode(true);
+        checkBtn.parentNode.replaceChild(newBtn, checkBtn);
+
+        newBtn.addEventListener('click', async () => {
+            const user = auth.currentUser;
+            
+            // SECURITY CHECK: Must be logged in
+            if (!user) {
+                alert("Please login first to save your progress!");
+                return;
+            }
+
+            const skillName = item.childNodes[0].textContent.trim();
+            const skillKey = item.getAttribute('data-skill');
+            const isDone = item.classList.contains('done');
+
+            if (!isDone) {
+                // Mark as Done
+                const confirmAction = confirm(`Have you finished learning ${skillName}?`);
+                if (confirmAction) {
+                    item.classList.add('done');
+                    newBtn.textContent = 'Done ✔';
+                    await saveRoadmapToDB(user.uid, skillKey, true);
+                }
+            } else {
+                // Uncheck
+                item.classList.remove('done');
+                newBtn.textContent = 'Check';
+                await saveRoadmapToDB(user.uid, skillKey, false);
+            }
+        });
+    });
+
+    async function saveRoadmapToDB(uid, skillKey, status) {
+        const userRef = doc(db, 'user-profiles', uid);
+        try {
+            // Merge allows updating just the specific skill in the map
+            await setDoc(userRef, {
+                roadmap: {
+                    [skillKey]: status
+                }
+            }, { merge: true });
+        } catch (error) {
+            console.error("Error saving roadmap:", error);
+            alert("Failed to save progress to database. Check connection.");
+        }
+    }
+
+    // ---------------------------------------------------------
+    // 5. Rating System (DB: frontend-ratings)
+    // ---------------------------------------------------------
+
+    async function submitRating(linkId, ratingValue) {
+        const user = auth.currentUser;
+        
+        // SECURITY CHECK
+        if (!user) {
+            alert("Please login to rate this resource.");
+            return;
+        }
+
+        try {
+            // Check if user already rated this specific link
+            const q = query(
+                collection(db, 'frontend-ratings'), 
+                where('linkId', '==', linkId), 
+                where('userId', '==', user.uid)
+            );
+            
+            const snapshot = await getDocs(q);
+            
+            if (!snapshot.empty) {
+                alert("You have already rated this resource!");
+                return;
+            }
+
+            // Save new rating
+            await addDoc(collection(db, 'frontend-ratings'), {
+                linkId: linkId,
+                userId: user.uid,
+                rating: ratingValue,
+                timestamp: serverTimestamp()
             });
-        } catch (error) { console.error(error); }
+            
+            // UI updates automatically via listener
+
+        } catch (error) {
+            console.error("Rating Error:", error);
+        }
     }
-}
 
-function initiateReply(msg) {
-    currentReplyTo = msg;
-    elements.replyPreview.classList.remove('hidden');
-    elements.replyToUser.textContent = msg.userName;
-    elements.replyToText.textContent = msg.text;
-    elements.msgInput.focus();
-}
-
-function cancelReply() {
-    currentReplyTo = null;
-    elements.replyPreview.classList.add('hidden');
-}
-if(elements.cancelReplyBtn) elements.cancelReplyBtn.addEventListener('click', cancelReply);
-
-function scrollToBottom() {
-    elements.messagesList.scrollTop = elements.messagesList.scrollHeight;
-}
-
-window.scrollToMessage = function(msgId) {
-    const el = document.getElementById(`msg-${msgId}`);
-    if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.style.backgroundColor = '#ffffff20';
-        setTimeout(() => el.style.backgroundColor = 'transparent', 1000);
+    function refreshRatings() {
+        // Re-attach listeners to ensure they have current user context if needed
+        document.querySelectorAll('.rating-stars').forEach(container => {
+            const linkId = container.parentElement.getAttribute('data-link-id');
+            setupRatingListener(linkId, container);
+        });
     }
-};
 
-function sanitize(str) {
-    if (!str) return '';
-    const temp = document.createElement('div');
-    temp.textContent = str;
-    return temp.innerHTML;
-}
+    function setupRatingListener(linkId, container) {
+        if (unsubscribeRatings[linkId]) unsubscribeRatings[linkId](); // Clear old listener
 
-// Ensure elements are available when script runs
-document.addEventListener('DOMContentLoaded', () => {
-    // Initial UI text setup (English)
-    elements.loginBtn.innerHTML = '<i class="fab fa-google"></i> Sign in with Google';
-    elements.messagesList.innerHTML = '<div class="loading-spinner">Checking Security and Loading Chat...</div>';
-    if(elements.msgInput) elements.msgInput.placeholder = 'Type your message here...';
+        const q = query(collection(db, 'frontend-ratings'), where('linkId', '==', linkId));
+        
+        unsubscribeRatings[linkId] = onSnapshot(q, (snapshot) => {
+            let total = 0;
+            let count = 0;
+            let userRatedValue = null;
+            const currentUser = auth.currentUser;
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                total += data.rating;
+                count++;
+                if (currentUser && data.userId === currentUser.uid) {
+                    userRatedValue = data.rating;
+                }
+            });
+
+            const avg = count > 0 ? (total / count).toFixed(1) : "0.0";
+            updateStarsUI(container, avg, userRatedValue);
+        });
+    }
+
+    function updateStarsUI(container, average, userRating) {
+        const avgDisplay = container.querySelector('.average-rating');
+        if(avgDisplay) avgDisplay.textContent = average;
+
+        const stars = container.querySelectorAll('i');
+        stars.forEach(star => {
+            const val = parseInt(star.getAttribute('data-value'));
+            
+            // Reset
+            star.style.color = 'var(--text-light)'; 
+            star.classList.remove('fas', 'far');
+            star.classList.add('fas'); // Solid star
+
+            // Coloring Logic:
+            // If user has rated, color GOLD up to their rating
+            // If not, color ORANGE up to average
+            
+            if (userRating) {
+                if (val <= userRating) {
+                    star.style.color = '#FFD700'; // Gold for "My Rating"
+                }
+            } else {
+                if (val <= Math.round(average)) {
+                    star.style.color = '#f97316'; // Orange for "Average"
+                }
+            }
+        });
+    }
+
+    // ---------------------------------------------------------
+    // 6. General UI & Helpers
+    // ---------------------------------------------------------
+
+    function toggleMobileMenu() {
+        if (!elements.navLinks) return;
+        const isOpen = elements.navLinks.classList.contains('active');
+        elements.navLinks.classList.toggle('active');
+        elements.mobileMenuBtn.innerHTML = isOpen ? '<i class="fas fa-bars"></i>' : '<i class="fas fa-times"></i>';
+    }
+
+    function closeMobileMenu() {
+        if (window.innerWidth <= 768 && elements.navLinks) {
+            elements.navLinks.classList.remove('active');
+            elements.mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+        }
+    }
+
+    function toggleRoadmapPopup() {
+        if (elements.roadmapPopup) elements.roadmapPopup.classList.toggle('active');
+    }
+
+    function sanitizeHTML(str) {
+        if (!str) return '';
+        const temp = document.createElement('div');
+        temp.textContent = str;
+        return temp.innerHTML;
+    }
+
+    // ---------------------------------------------------------
+    // 7. Event Listeners Setup
+    // ---------------------------------------------------------
     
-    // Update Modal text to English
-    if(elements.setupModal) {
-        elements.setupModal.querySelector('h2').innerHTML = '<i class="fas fa-shield-alt"></i> Secure Entry Setup';
-        elements.setupModal.querySelector('.modal-desc').textContent = 'To ensure a safe educational environment, please complete your profile and accept the terms.';
-        elements.setupDisplayName.previousElementSibling.textContent = 'Display Name in Chat:';
+    // Auth
+    if (elements.googleLoginBtn) elements.googleLoginBtn.addEventListener('click', handleGoogleLogin);
+
+    // Nav
+    if (elements.mobileMenuBtn) elements.mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+    document.querySelectorAll('.nav-link').forEach(l => l.addEventListener('click', closeMobileMenu));
+
+    // Roadmap
+    if (elements.viewRoadmapBtn) elements.viewRoadmapBtn.addEventListener('click', toggleRoadmapPopup);
+    if (elements.closeRoadmap) elements.closeRoadmap.addEventListener('click', toggleRoadmapPopup);
+
+    // Initial Ratings Load
+    document.querySelectorAll('.rating-stars').forEach(starsContainer => {
+        const linkId = starsContainer.parentElement.getAttribute('data-link-id');
         
-        elements.checkAge.nextElementSibling.textContent = 'I confirm that I am at least 13 years old.';
-        elements.checkTerms.nextElementSibling.textContent = 'I agree to the Privacy Policy and Terms of Use.';
-        elements.checkConduct.nextElementSibling.textContent = 'I pledge to use this chat for educational purposes only.';
-        
-        elements.completeSetupBtn.textContent = 'Accept and Enter';
-    }
+        // 1. Listen for updates (Average)
+        setupRatingListener(linkId, starsContainer);
+
+        // 2. Click events for voting
+        starsContainer.querySelectorAll('i').forEach(star => {
+            star.addEventListener('click', () => {
+                submitRating(linkId, parseInt(star.getAttribute('data-value')));
+            });
+        });
+    });
 });
