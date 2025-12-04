@@ -1,14 +1,11 @@
-// 1. استيراد دوال Firebase (نفس الإصدار المستخدم في ملفاتك)
+// 1. استيراد دوال Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
-import { 
-    getFirestore, collection, addDoc, onSnapshot, query, orderBy, 
-    serverTimestamp, updateDoc, doc, getDoc, setDoc 
-} from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, updateDoc, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
-// 2. إعدادات Firebase (من ملفك courses-det-script.js)
+// 2. إعدادات Firebase (نفس الإعدادات المستخدمة في courses-det-script.js)
 const firebaseConfig = {
-    apiKey: "AIzaSyBhCxGjQOQ88b2GynL515ZYQXQOQfiLPhjw4", // يجب تغيير هذا إلى مفتاحك الصحيح
+    apiKey: "AIzaSyBhCxGjQOQ88b2GynL515ZYQXqfiLPhjw4",
     authDomain: "edumates-983dd.firebaseapp.com",
     projectId: "edumates-983dd",
     storageBucket: "edumates-983dd.firebasestorage.app",
@@ -21,8 +18,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const CHAT_COLLECTION = 'frontend-chat-messages'; // اسم المجموعة الجديدة في قاعدة البيانات
-const USER_PROFILES_COLLECTION = 'user-profiles'; // مجموعة حفظ أسماء المستخدمين والموافقة
+
+// اسم المجموعة تم تغييره ليتطابق مع طلبك
+const CHAT_COLLECTION = 'frontend-chat'; 
 
 // 3. عناصر DOM
 const elements = {
@@ -30,140 +28,247 @@ const elements = {
     logoutBtn: document.getElementById('logoutBtn'),
     userInfo: document.getElementById('userInfo'),
     userAvatar: document.getElementById('userAvatar'),
-    userNameDisplay: document.getElementById('userName'), // تم تغيير الاسم لتجنب التعارض
+    userName: document.getElementById('userName'),
     messagesList: document.getElementById('messagesList'),
     messageForm: document.getElementById('messageForm'),
     msgInput: document.getElementById('msgInput'),
     sendBtn: document.getElementById('sendBtn'),
+    
+    // عناصر الرد
     replyPreview: document.getElementById('replyPreview'),
     replyToUser: document.getElementById('replyToUser'),
     replyToText: document.getElementById('replyToText'),
     cancelReplyBtn: document.getElementById('cancelReplyBtn'),
-    
-    // عناصر النافذة المشروطة (الـ Modal)
-    privacyModal: document.getElementById('privacyModal'),
-    modalForm: document.getElementById('modalForm'),
-    displayNameInput: document.getElementById('displayNameInput'),
-    agreeCheckbox: document.getElementById('agreeCheckbox'),
 
-    // شريط التنبيهات
-    alertBar: document.getElementById('alertBar'),
-    alertText: document.getElementById('alertText')
+    // عناصر التنبيهات والنافذة المنبثقة
+    securityAlert: document.getElementById('securityAlert'),
+    alertMessage: document.getElementById('alertMessage'),
+    
+    setupModal: document.getElementById('setupModal'),
+    setupDisplayName: document.getElementById('setupDisplayName'),
+    checkAge: document.getElementById('checkAge'),
+    checkTerms: document.getElementById('checkTerms'),
+    checkConduct: document.getElementById('checkConduct'),
+    completeSetupBtn: document.getElementById('completeSetupBtn')
 };
 
-// متغير لتخزين حالة الرد الحالية
-let currentReplyTo = null; // { id: "msgId", name: "Ahmed", text: "hello" }
-let currentUserProfile = null; // لتخزين بيانات المستخدم (الاسم والموافقة)
+// متغيرات عامة
+let currentReplyTo = null;
+let chatDisplayName = null; // سيتم جلبه من البروفايل
+let unsubscribeChat = null; // لإيقاف الاستماع عند الخروج
 
-// 4. إدارة المصادقة (Authentication)
+// 4. إدارة المصادقة (Authentication Logic)
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        // 1. محاولة تحميل ملف المستخدم
-        const userProfileRef = doc(db, USER_PROFILES_COLLECTION, user.uid);
-        const profileSnap = await getDoc(userProfileRef);
-
-        if (profileSnap.exists() && profileSnap.data().agreed) {
-            // حالة تسجيل الدخول والموافقة المسبقة
-            currentUserProfile = profileSnap.data();
-            
-            elements.privacyModal.close(); // إغلاق النافذة إذا كانت مفتوحة
-            elements.loginBtn.classList.add('hidden');
-            elements.userInfo.classList.remove('hidden');
-            elements.userAvatar.src = user.photoURL;
-            elements.userNameDisplay.textContent = currentUserProfile.displayName; 
-            
-            elements.msgInput.disabled = false;
-            elements.sendBtn.disabled = false;
-            
-            loadMessages(); // بدء تحميل الرسائل
-        } else {
-            // حالة تسجيل الدخول ولكن لم يوافق بعد / أو لم يحدد الاسم
-            elements.privacyModal.showModal();
-            // إخفاء عناصر الدردشة مؤقتاً
-            elements.loginBtn.classList.add('hidden');
-            elements.userInfo.classList.remove('hidden');
-            elements.userAvatar.src = user.photoURL;
-            elements.userNameDisplay.textContent = user.displayName.split(' ')[0];
-        }
-
+        // المستخدم مسجل دخوله (سواء من هنا أو من صفحة الكورسات)
+        elements.loginBtn.classList.add('hidden');
+        elements.userInfo.classList.remove('hidden');
+        elements.userAvatar.src = user.photoURL || 'https://via.placeholder.com/35';
+        
+        // التحقق من البروفايل في user-profiles
+        await checkUserProfile(user);
     } else {
         // حالة تسجيل الخروج
-        currentUserProfile = null;
-        elements.privacyModal.close(); // التأكد من إغلاق النافذة
-        elements.loginBtn.classList.remove('hidden');
-        elements.userInfo.classList.add('hidden');
-        elements.messagesList.innerHTML = '<div class="loading-spinner">يرجى تسجيل الدخول والموافقة على سياسة الخصوصية لرؤية المحادثة</div>';
-        elements.msgInput.disabled = true;
-        elements.sendBtn.disabled = true;
+        handleLogoutUI();
     }
 });
 
-// معالجة إرسال نموذج سياسة الخصوصية
-elements.modalForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const displayName = elements.displayNameInput.value.trim();
-    const agreed = elements.agreeCheckbox.checked;
-    const user = auth.currentUser;
-
-    if (!displayName) {
-        showAlert('الرجاء إدخال اسم العرض الخاص بك.', 'error');
-        return;
-    }
-
-    if (!agreed) {
-        showAlert('يجب الموافقة على شروط الاستخدام وسياسة الخصوصية.', 'error');
-        return;
-    }
-
-    if (displayName.length < 3 || displayName.length > 20) {
-        showAlert('يجب أن يكون الاسم بين 3 و 20 حرفاً.', 'error');
-        return;
-    }
-
+elements.loginBtn.addEventListener('click', async () => {
     try {
-        const userProfileRef = doc(db, USER_PROFILES_COLLECTION, user.uid);
-        await setDoc(userProfileRef, {
-            displayName: displayName,
-            agreed: true,
-            email: user.email,
-            createdAt: serverTimestamp()
-        }, { merge: true }); // نستخدم merge لتجنب مسح البيانات الأخرى إن وجدت
-
-        // إعادة تشغيل حالة المصادقة لتحديث الواجهة
-        // هذا سيؤدي إلى إعادة تشغيل onAuthStateChanged و loadMessages
-        window.location.reload(); 
-
+        await signInWithPopup(auth, new GoogleAuthProvider());
     } catch (error) {
-        console.error("خطأ في حفظ ملف المستخدم:", error);
-        showAlert("فشل حفظ البيانات. حاول مرة أخرى.", 'error');
+        console.error("Login Error:", error);
     }
 });
 
-elements.loginBtn.addEventListener('click', () => signInWithPopup(auth, new GoogleAuthProvider()));
 elements.logoutBtn.addEventListener('click', () => signOut(auth));
 
+function handleLogoutUI() {
+    elements.loginBtn.classList.remove('hidden');
+    elements.userInfo.classList.add('hidden');
+    elements.messagesList.innerHTML = '<div class="loading-spinner">يرجى تسجيل الدخول لرؤية المحادثة</div>';
+    elements.msgInput.disabled = true;
+    elements.sendBtn.disabled = true;
+    elements.setupModal.classList.add('hidden');
+    
+    if (unsubscribeChat) {
+        unsubscribeChat();
+        unsubscribeChat = null;
+    }
+}
 
-// 5. تحميل الرسائل وعرضها (Real-time)
+// 5. التحقق من البروفايل والموافقة (Profile Check)
+async function checkUserProfile(user) {
+    try {
+        const docRef = doc(db, 'user-profiles', user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists() && docSnap.data().chatInfo) {
+            // المستخدم لديه بروفايل وموافق على الشروط
+            const data = docSnap.data().chatInfo;
+            chatDisplayName = data.displayName;
+            elements.userName.textContent = chatDisplayName;
+            enableChat();
+        } else {
+            // مستخدم جديد أو لم يوافق بعد -> إظهار النافذة
+            elements.setupDisplayName.value = user.displayName || '';
+            elements.setupModal.classList.remove('hidden');
+        }
+    } catch (error) {
+        console.error("Profile Error:", error);
+        alert("حدث خطأ أثناء تحميل البيانات");
+    }
+}
+
+// 6. منطق نافذة الإعداد (Setup Modal)
+function validateSetupForm() {
+    const name = elements.setupDisplayName.value.trim();
+    const isAge = elements.checkAge.checked;
+    const isTerms = elements.checkTerms.checked;
+    const isConduct = elements.checkConduct.checked;
+
+    if (name.length >= 3 && isAge && isTerms && isConduct) {
+        elements.completeSetupBtn.disabled = false;
+    } else {
+        elements.completeSetupBtn.disabled = true;
+    }
+}
+
+// تفعيل التحقق عند تغيير المدخلات
+[elements.setupDisplayName, elements.checkAge, elements.checkTerms, elements.checkConduct].forEach(el => {
+    el.addEventListener('input', validateSetupForm);
+    el.addEventListener('change', validateSetupForm);
+});
+
+elements.completeSetupBtn.addEventListener('click', async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    elements.completeSetupBtn.textContent = "جاري الحفظ...";
+    const name = elements.setupDisplayName.value.trim();
+
+    try {
+        // حفظ البيانات في user-profiles
+        await setDoc(doc(db, 'user-profiles', user.uid), {
+            chatInfo: {
+                displayName: name,
+                termsAccepted: true,
+                ageConfirmed: true,
+                joinedAt: serverTimestamp()
+            }
+        }, { merge: true });
+
+        elements.setupModal.classList.add('hidden');
+        chatDisplayName = name;
+        elements.userName.textContent = name;
+        enableChat();
+    } catch (error) {
+        console.error("Save Error:", error);
+        alert("فشل حفظ البيانات");
+    }
+});
+
+// 7. تفعيل المحادثة وتحميل الرسائل
+function enableChat() {
+    elements.msgInput.disabled = false;
+    elements.sendBtn.disabled = false;
+    loadMessages();
+}
+
 function loadMessages() {
     const q = query(collection(db, CHAT_COLLECTION), orderBy('timestamp', 'asc'));
 
-    onSnapshot(q, (snapshot) => {
-        elements.messagesList.innerHTML = ''; // مسح القائمة لإعادة بنائها 
+    unsubscribeChat = onSnapshot(q, (snapshot) => {
+        elements.messagesList.innerHTML = '';
         
         snapshot.forEach((docSnap) => {
             const msg = docSnap.data();
             msg.id = docSnap.id;
             renderMessage(msg);
         });
-
         scrollToBottom();
-    }, (error) => {
-        console.error("خطأ في تحميل الرسائل:", error);
-        elements.messagesList.innerHTML = '<div class="loading-spinner danger">فشل تحميل المحادثة.</div>';
     });
 }
 
-// دالة عرض الرسالة الواحدة
+// 8. نظام الفلاتر والأمان (Security Filters)
+function containsForbiddenContent(text) {
+    // 1. منع الروابط (com, net, http, www, etc)
+    const urlPattern = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|(\.[a-z]{2,}(\/|\s|$))/i;
+    
+    // 2. منع أكثر من 3 أرقام متتالية
+    const numberPattern = /\d{4,}/; 
+
+    // 3. كلمات بذيئة أو سوشال ميديا (قائمة مصغرة كمثال)
+    const badWords = [
+        "facebook", "instagram", "tiktok", "snapchat", "twitter", "whatsapp",
+        "sex", "xxx", "porn", "quack", "stupid", // أمثلة إنجليزية
+        "غبي", "حقير", "سافل", "رقمي", "تعال خاص" // أمثلة عربية
+    ];
+
+    if (urlPattern.test(text)) return "يمنع إرسال الروابط الخارجية.";
+    if (numberPattern.test(text)) return "يمنع كتابة سلاسل أرقام طويلة (أرقام الهواتف).";
+    
+    const lowerText = text.toLowerCase();
+    for (let word of badWords) {
+        if (lowerText.includes(word)) return "تحتوي الرسالة على كلمات أو منصات محظورة.";
+    }
+
+    return null; // آمن
+}
+
+function showSecurityAlert(message) {
+    elements.alertMessage.textContent = message;
+    elements.securityAlert.classList.remove('hidden');
+    
+    // إخفاء الشريط بعد 3 ثواني
+    setTimeout(() => {
+        elements.securityAlert.classList.add('hidden');
+    }, 3000);
+}
+
+// 9. إرسال الرسالة
+elements.messageForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const text = elements.msgInput.value.trim();
+    if (!text) return;
+
+    // فحص الأمان قبل الإرسال
+    const violation = containsForbiddenContent(text);
+    if (violation) {
+        showSecurityAlert(violation);
+        return; // توقف، لا ترسل
+    }
+
+    const user = auth.currentUser;
+    
+    try {
+        const messageData = {
+            text: text,
+            userId: user.uid,
+            userName: chatDisplayName || user.displayName, // استخدام الاسم المختار
+            userPhoto: user.photoURL || 'https://via.placeholder.com/35',
+            timestamp: serverTimestamp(),
+            isDeleted: false
+        };
+
+        if (currentReplyTo) {
+            messageData.replyTo = {
+                id: currentReplyTo.id,
+                name: currentReplyTo.userName,
+                text: currentReplyTo.text.substring(0, 50) + (currentReplyTo.text.length > 50 ? '...' : '')
+            };
+        }
+
+        await addDoc(collection(db, CHAT_COLLECTION), messageData);
+        
+        elements.msgInput.value = '';
+        cancelReply(); 
+    } catch (error) {
+        console.error("Send Error:", error);
+    }
+});
+
+// 10. عرض الرسائل
 function renderMessage(msg) {
     const currentUser = auth.currentUser;
     const isMe = currentUser && msg.userId === currentUser.uid;
@@ -180,22 +285,21 @@ function renderMessage(msg) {
         timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
-    // محتوى الرد (إذا كانت الرسالة رداً على أخرى)
-    let replyHTML = '';
-    if (msg.replyTo && !isDeleted) {
-        replyHTML = `
-            <div class="reply-context" onclick="scrollToMessage('${msg.replyTo.id}')">
-                <small>رد على <b>${sanitize(msg.replyTo.name)}</b></small><br>
-                <span style="opacity:0.8">${sanitize(msg.replyTo.text)}</span>
-            </div>
-        `;
-    }
-
-    // محتوى النص (محذوف أم عادي)
     let contentHTML = '';
     if (isDeleted) {
-        contentHTML = `<div class="msg-content deleted"><i class="fas fa-ban"></i> تم حذف هذه الرسالة</div>`;
+        contentHTML = `<div class="msg-content deleted"><i class="fas fa-ban"></i> تم حذف هذه الرسالة من قبل المرسل</div>`;
     } else {
+        // إذا كان هناك رد
+        let replyHTML = '';
+        if (msg.replyTo) {
+            replyHTML = `
+                <div class="reply-context" onclick="scrollToMessage('${msg.replyTo.id}')">
+                    <small>رد على <b>${sanitize(msg.replyTo.name)}</b></small><br>
+                    <span style="opacity:0.8">${sanitize(msg.replyTo.text)}</span>
+                </div>
+            `;
+        }
+
         contentHTML = `
             <div class="msg-content">
                 ${replyHTML}
@@ -205,7 +309,7 @@ function renderMessage(msg) {
         `;
     }
 
-    // أزرار التحكم (رد / حذف)
+    // أزرار التحكم
     let actionsHTML = '';
     if (!isDeleted) {
         actionsHTML = `
@@ -216,140 +320,36 @@ function renderMessage(msg) {
         `;
     }
 
-    // نستخدم msg.userName المخزن في قاعدة البيانات (الذي هو اسم العرض الذي اختاره المستخدم)
     div.innerHTML = `
         ${!isMe ? `<div class="msg-header"><img src="${msg.userPhoto}" class="msg-avatar"> <span>${sanitize(msg.userName)}</span></div>` : ''}
         ${contentHTML}
         ${actionsHTML}
     `;
 
-    // تفعيل أزرار الرد والحذف
+    // تفعيل الأزرار
     if (!isDeleted) {
         const replyBtn = div.querySelector('.reply-btn');
         const deleteBtn = div.querySelector('.delete-btn');
 
-        if (replyBtn) {
-            replyBtn.addEventListener('click', () => initiateReply(msg));
-        }
-        if (deleteBtn) {
-            deleteBtn.addEventListener('click', () => deleteMessage(msg.id));
-        }
+        if (replyBtn) replyBtn.addEventListener('click', () => initiateReply(msg));
+        if (deleteBtn) deleteBtn.addEventListener('click', () => deleteMessage(msg.id));
     }
 
     elements.messagesList.appendChild(div);
 }
 
-// 6. إرسال الرسالة
-elements.messageForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const text = elements.msgInput.value.trim();
-    if (!text) return;
-
-    const user = auth.currentUser;
-    if (!user || !currentUserProfile) return; // تأمين إضافي
-
-    // ** التحقق من أمان المحتوى قبل الإرسال **
-    const validationResult = validateMessage(text);
-    if (!validationResult.isValid) {
-        showAlert(validationResult.reason, 'error');
-        elements.msgInput.value = ''; // مسح الإدخال
-        return;
-    }
-    // **********************************
-    
-    try {
-        const messageData = {
-            text: text,
-            userId: user.uid,
-            // نستخدم الاسم الذي اختاره المستخدم
-            userName: currentUserProfile.displayName, 
-            userPhoto: user.photoURL,
-            timestamp: serverTimestamp(),
-            isDeleted: false
-        };
-
-        // إذا كان هناك رد
-        if (currentReplyTo) {
-            messageData.replyTo = {
-                id: currentReplyTo.id,
-                name: currentReplyTo.userName,
-                text: currentReplyTo.text.substring(0, 50) + (currentReplyTo.text.length > 50 ? '...' : '')
-            };
-        }
-
-        await addDoc(collection(db, CHAT_COLLECTION), messageData);
-        
-        // إعادة تعيين الحقول
-        elements.msgInput.value = '';
-        cancelReply(); 
-    } catch (error) {
-        console.error("خطأ في الإرسال:", error);
-        showAlert("فشل إرسال الرسالة. حاول مرة أخرى.", 'error');
-    }
-});
-
-
-// ** 7. دوال التحقق من المحتوى (الأمان والرقابة) **
-const bannedTerms = [
-    'www.', 'http', '.com', '.net', '.org', '.info', '.biz', 'tiktok', 'facebook', 'instagram', 
-    'twitter', 'snapchat', 'porn', 'sex', 'fuck', 'shit', 'motherfucker', 'asshole', 'bitch',
-    'كسمك', 'خول', 'شراميط', 'عرص', 'قحبة', 'نيك', 'احا', 'طيز', 'كس', 'زب'
-    // يمكن إضافة المزيد من الكلمات والعبارات هنا
-];
-
-function validateMessage(text) {
-    // التحويل إلى حروف صغيرة للتحقق السهل
-    const lowerText = text.toLowerCase();
-
-    // 1. منع الروابط وبعض الدومينات
-    for (const term of ['.com', '.net', '.org', '.info', '.biz', 'www.', 'http']) {
-        if (lowerText.includes(term)) {
-            return { isValid: false, reason: 'يُمنع إرسال روابط الإنترنت.' };
-        }
-    }
-
-    // 2. منع أدوات السوشيال ميديا التي لا علاقة لها بالتعليم
-    for (const term of ['tiktok', 'facebook', 'instagram', 'twitter', 'snapchat']) {
-        if (lowerText.includes(term)) {
-            return { isValid: false, reason: 'يُمنع ذكر أدوات السوشيال ميديا غير التعليمية.' };
-        }
-    }
-
-    // 3. منع تكرار الأرقام المتتالية (أكثر من ثلاث)
-    if (/\d{3,}/.test(text)) {
-        return { isValid: false, reason: 'يُمنع إرسال أكثر من ثلاث أرقام متتالية.' };
-    }
-
-    // 4. منع كلمات السب والجنسية والبذيئة
-    for (const term of bannedTerms) {
-        // نستخدم تعبير نمطي للبحث عن الكلمة سواء كانت جزء من كلمة أو كلمة منفردة
-        const regex = new RegExp(`\\b${term}\\b|${term}`, 'i');
-        if (regex.test(text)) {
-             return { isValid: false, reason: 'يُمنع إرسال كلمات سب أو عبارات بذيئة.' };
-        }
-    }
-
-    return { isValid: true };
-}
-
-// 8. منطق الحذف (Soft Delete)
+// 11. وظائف إضافية (الحذف، الرد، التنظيف)
 async function deleteMessage(msgId) {
-    if (confirm("هل أنت متأكد من أنك تريد حذف هذه الرسالة؟ سيبقى مكانها محفوظاً.")) {
+    if (confirm("حذف الرسالة؟")) {
         try {
-            const msgRef = doc(db, CHAT_COLLECTION, msgId);
-            await updateDoc(msgRef, {
+            await updateDoc(doc(db, CHAT_COLLECTION, msgId), {
                 isDeleted: true,
-                text: "تم حذف الرسالة بواسطة المستخدم." // نترك نصاً احتياطياً
+                text: ""
             });
-            showAlert("تم حذف الرسالة بنجاح.", 'success');
-        } catch (error) {
-            console.error("فشل الحذف:", error);
-            showAlert("حدث خطأ أثناء الحذف", 'error');
-        }
+        } catch (error) { console.error(error); }
     }
 }
 
-// 9. منطق الرد
 function initiateReply(msg) {
     currentReplyTo = msg;
     elements.replyPreview.classList.remove('hidden');
@@ -362,10 +362,8 @@ function cancelReply() {
     currentReplyTo = null;
     elements.replyPreview.classList.add('hidden');
 }
+if(elements.cancelReplyBtn) elements.cancelReplyBtn.addEventListener('click', cancelReply);
 
-elements.cancelReplyBtn.addEventListener('click', cancelReply);
-
-// 10. دوال مساعدة وشريط التنبيهات
 function scrollToBottom() {
     elements.messagesList.scrollTop = elements.messagesList.scrollHeight;
 }
@@ -374,27 +372,10 @@ window.scrollToMessage = function(msgId) {
     const el = document.getElementById(`msg-${msgId}`);
     if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.style.backgroundColor = 'rgba(74, 144, 226, 0.2)'; // ومضة بسيطة للتمييز
+        el.style.backgroundColor = '#ffffff20';
         setTimeout(() => el.style.backgroundColor = 'transparent', 1000);
-    } else {
-        showAlert("الرسالة الأصلية قديمة جداً ولم تعد ظاهرة في الشاشة الحالية", 'warning');
     }
 };
-
-let alertTimeout;
-function showAlert(message, type = 'info') {
-    elements.alertText.textContent = message;
-    
-    // إعادة تعيين الفئات
-    elements.alertBar.className = 'alert-bar';
-    elements.alertBar.classList.add(type);
-    elements.alertBar.classList.add('visible');
-
-    clearTimeout(alertTimeout);
-    alertTimeout = setTimeout(() => {
-        elements.alertBar.classList.remove('visible');
-    }, 3000);
-}
 
 function sanitize(str) {
     if (!str) return '';
