@@ -226,3 +226,70 @@ body {
 
 .full-width { width: 100%; padding: 12px; font-size: 1rem; }
 .full-width:disabled { background: #555; cursor: not-allowed; opacity: 0.7; }
+
+/* --- New Additions for Likes & Badges --- */
+
+/* Badge Styles */
+.user-badge {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.badge-helper { background-color: #3498db; color: white; } /* Blue */
+.badge-active { background-color: #2ecc71; color: white; } /* Green */
+.badge-solver { background-color: #f1c40f; color: #333; } /* Yellow */
+.badge-trusted { background-color: #e67e22; color: white; } /* Orange */
+.badge-mentor { background-color: #9b59b6; color: white; border: 1px solid #fff; } /* Purple */
+
+/* Like Button Styles */
+.like-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.like-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    padding: 2px 5px;
+    transition: transform 0.2s, color 0.2s;
+}
+
+.like-btn:hover { transform: scale(1.2); }
+.like-btn.liked { color: #ff4757; } /* Red heart when liked */
+
+.like-count {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    min-width: 15px;
+}
+
+/* Active Users Panel (Sidebar or Top) */
+.active-users-bar {
+    background-color: var(--bg-secondary);
+    padding: 10px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.online-dot {
+    height: 10px;
+    width: 10px;
+    background-color: #2ecc71;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 5px #2ecc71;
+}
