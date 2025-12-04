@@ -1,7 +1,6 @@
 // 1. استيراد دوال Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-// استخدام signInAnonymously بدلاً من Google لعدم الحاجة لحساب
-import { getAuth, signInAnonymously, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
 // 2. إعدادات Firebase
@@ -18,165 +17,96 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const CHAT_COLLECTION = 'frontend-chat-messages'; // اسم جديد للمجموعة
+const CHAT_COLLECTION = 'frontend-chat'; // الاسم الجديد للمجموعة
 
-// ==========================================
-// إعدادات الأمان والفلترة (Safety Filters)
-// ==========================================
-
-// قائمة الكلمات الممنوعة (مثال بسيط، يجب توسيعها)
-const FORBIDDEN_WORDS = [
-    "غباء", "غبي", "حقير", "تافه", "سكس", "جنس", "اباحي", 
-    "شتيمة", "احمق", "زفت", "كلب", "حيوان", "قتل", "موت", 
-    "انتحار", "عنصري", "سافل"
-];
-
-// منصات التواصل الممنوعة (لإبقاء الشات تعليمي)
-const SOCIAL_MEDIA_KEYWORDS = [
-    "facebook", "instagram", "snapchat", "tiktok", "twitter", 
-    "whatsapp", "telegram", "inst", "face", "snap", "تيك توك", 
-    "فيس", "انستا", "سناب", "واتس"
-];
-
-function validateMessage(text) {
-    const lowerText = text.toLowerCase();
-
-    // 1. منع الروابط (URLs)
-    const urlPattern = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|(\.[a-z]{2,}\/)/i;
-    if (urlPattern.test(text)) {
-        return { valid: false, reason: "يمنع إرسال الروابط لأسباب أمنية." };
-    }
-
-    // 2. منع أرقام الهواتف (أكثر من 3 أرقام متتالية)
-    // يسمح بـ 123 (مثلاً إصدار) لكن يمنع 1234
-    const phonePattern = /\d{4,}/; 
-    if (phonePattern.test(text)) {
-        return { valid: false, reason: "يمنع كتابة أكثر من 3 أرقام متتالية لمنع تبادل الهواتف." };
-    }
-
-    // 3. منع الكلمات البذيئة
-    for (let word of FORBIDDEN_WORDS) {
-        if (lowerText.includes(word)) {
-            return { valid: false, reason: "تحتوي الرسالة على كلمات غير لائقة." };
-        }
-    }
-
-    // 4. منع السوشيال ميديا
-    for (let social of SOCIAL_MEDIA_KEYWORDS) {
-        if (lowerText.includes(social)) {
-            return { valid: false, reason: "يرجى عدم نشر حسابات تواصل اجتماعي، الشات تعليمي فقط." };
-        }
-    }
-
-    return { valid: true };
-}
-
-// ==========================================
-// عناصر DOM
-// ==========================================
+// 3. عناصر DOM
 const elements = {
-    termsModal: document.getElementById('termsModal'),
-    agreeBtn: document.getElementById('agreeBtn'),
-    guestNameInput: document.getElementById('guestNameInput'),
-    
-    logoutBtn: document.getElementById('logoutBtn'),
     userInfo: document.getElementById('userInfo'),
+    userAvatar: document.getElementById('userAvatar'),
     userName: document.getElementById('userName'),
-    
     messagesList: document.getElementById('messagesList'),
     messageForm: document.getElementById('messageForm'),
     msgInput: document.getElementById('msgInput'),
     sendBtn: document.getElementById('sendBtn'),
-    
     replyPreview: document.getElementById('replyPreview'),
     replyToUser: document.getElementById('replyToUser'),
     replyToText: document.getElementById('replyToText'),
-    cancelReplyBtn: document.getElementById('cancelReplyBtn')
+    cancelReplyBtn: document.getElementById('cancelReplyBtn'),
+    alertBar: document.getElementById('alertBar'),
+    alertText: document.getElementById('alertText'),
+    termsModal: document.getElementById('termsModal'),
+    acceptTermsBtn: document.getElementById('acceptTermsBtn')
 };
 
+// متغيرات الحالة
 let currentReplyTo = null;
+let localUserData = JSON.parse(localStorage.getItem('chatUser')) || null;
 
-// ==========================================
-// إدارة الدخول والشروط (Authentication)
-// ==========================================
-
-// تفعيل زر الموافقة فقط عند كتابة اسم
-elements.guestNameInput.addEventListener('input', (e) => {
-    elements.agreeBtn.disabled = e.target.value.trim().length < 3;
-});
-
-// عند الضغط على موافقة
-elements.agreeBtn.addEventListener('click', () => {
-    const nickname = elements.guestNameInput.value.trim();
-    if (nickname.length < 3) return;
-
-    // تسجيل الدخول المجهول
-    signInAnonymously(auth)
-        .then((result) => {
-            // تحديث اسم المستخدم في Firebase Profile (مؤقتاً للجلسة)
-            updateProfile(result.user, { displayName: nickname })
-                .then(() => {
-                    elements.termsModal.classList.add('hidden'); // إخفاء النافذة
-                });
-        })
-        .catch((error) => {
-            console.error(error);
-            alert("حدث خطأ في الاتصال، حاول مرة أخرى.");
-        });
-});
-
-// مراقبة حالة المستخدم
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        // المستخدم وافق ودخل
-        elements.termsModal.classList.add('hidden'); // تأكيد الإخفاء
-        elements.userInfo.classList.remove('hidden');
-        elements.userName.textContent = user.displayName || "زائر";
-        
-        elements.msgInput.disabled = false;
-        elements.sendBtn.disabled = false;
-        
-        loadMessages();
+// 4. إدارة شاشة الترحيب والشروط
+function checkTerms() {
+    if (!localStorage.getItem('termsAccepted')) {
+        elements.termsModal.classList.remove('hidden');
     } else {
-        // المستخدم خرج أو لم يدخل بعد
-        elements.termsModal.classList.remove('hidden'); // إظهار الشروط
-        elements.userInfo.classList.add('hidden');
-        elements.msgInput.disabled = true;
-        elements.sendBtn.disabled = true;
-        elements.messagesList.innerHTML = '<div class="welcome-msg"><i class="fas fa-lock"></i><p>يجب الموافقة على الشروط للدخول</p></div>';
+        elements.termsModal.classList.add('hidden');
+        initChat();
     }
+}
+
+elements.acceptTermsBtn.addEventListener('click', () => {
+    localStorage.setItem('termsAccepted', 'true');
+    elements.termsModal.classList.add('hidden');
+    initChat();
 });
 
-elements.logoutBtn.addEventListener('click', () => {
-    if(confirm("هل تريد الخروج؟ ستحتاج للموافقة على الشروط مرة أخرى عند الدخول.")) {
-        signOut(auth);
-        location.reload(); // إعادة تحميل الصفحة لإظهار الشروط من جديد
+// بدء التشغيل
+checkTerms();
+
+// 5. تهيئة الدردشة والمستخدم
+function initChat() {
+    // تسجيل الدخول بشكل مجهول في الخلفية للاتصال بقاعدة البيانات
+    signInAnonymously(auth).catch((error) => {
+        console.error("خطأ في الاتصال:", error);
+    });
+
+    // توليد بيانات مستخدم عشوائية إذا لم تكن موجودة
+    if (!localUserData) {
+        const randomNum = Math.floor(Math.random() * 10000);
+        localUserData = {
+            displayName: `طالب ${randomNum}`,
+            photoURL: `https://ui-avatars.com/api/?name=St+${randomNum}&background=random&color=fff`,
+            uid: 'user_' + Date.now() + '_' + Math.floor(Math.random() * 1000)
+        };
+        localStorage.setItem('chatUser', JSON.stringify(localUserData));
     }
-});
 
-// ==========================================
-// إدارة الرسائل (Chat Logic)
-// ==========================================
+    // عرض بيانات المستخدم
+    elements.userInfo.classList.remove('hidden');
+    elements.userName.textContent = localUserData.displayName;
+    elements.userAvatar.src = localUserData.photoURL;
 
+    // تشغيل الاستماع للرسائل
+    loadMessages();
+}
+
+// 6. تحميل الرسائل
 function loadMessages() {
     const q = query(collection(db, CHAT_COLLECTION), orderBy('timestamp', 'asc'));
 
     onSnapshot(q, (snapshot) => {
         elements.messagesList.innerHTML = ''; 
-        
         snapshot.forEach((docSnap) => {
             const msg = docSnap.data();
             msg.id = docSnap.id;
             renderMessage(msg);
         });
-
         scrollToBottom();
     });
 }
 
+// عرض الرسالة
 function renderMessage(msg) {
-    const currentUser = auth.currentUser;
-    const isMe = currentUser && msg.userId === currentUser.uid;
+    // نستخدم المعرف المخزن محلياً لتحديد ما إذا كانت الرسالة لي
+    const isMe = localUserData && msg.localUid === localUserData.uid;
     const isDeleted = msg.isDeleted === true;
 
     const div = document.createElement('div');
@@ -186,7 +116,7 @@ function renderMessage(msg) {
     let timeString = '';
     if (msg.timestamp) {
         const date = msg.timestamp.toDate();
-        timeString = date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+        timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
     let replyHTML = '';
@@ -199,67 +129,91 @@ function renderMessage(msg) {
         `;
     }
 
-    let contentHTML = '';
-    if (isDeleted) {
-        contentHTML = `<div class="msg-content deleted"><i class="fas fa-ban"></i> تم حذف هذه الرسالة</div>`;
-    } else {
-        contentHTML = `
-            <div class="msg-content">
-                ${replyHTML}
-                ${sanitize(msg.text)}
-                <div style="text-align: left; font-size: 0.65rem; opacity: 0.6; margin-top: 5px;">${timeString}</div>
-            </div>
-        `;
-    }
+    let contentHTML = isDeleted 
+        ? `<div class="msg-content deleted"><i class="fas fa-ban"></i> تم حذف الرسالة</div>` 
+        : `<div class="msg-content">${replyHTML} ${sanitize(msg.text)} 
+           <div style="text-align: left; font-size: 0.65rem; opacity: 0.6; margin-top: 5px;">${timeString}</div></div>`;
 
-    let actionsHTML = '';
-    if (!isDeleted) {
-        actionsHTML = `
-            <div class="msg-actions">
-                <button class="action-btn reply-btn" title="رد"><i class="fas fa-reply"></i></button>
-                ${isMe ? `<button class="action-btn delete-btn" title="حذف"><i class="fas fa-trash"></i></button>` : ''}
-            </div>
-        `;
-    }
+    let actionsHTML = (!isDeleted) ? `
+        <div class="msg-actions">
+            <button class="action-btn reply-btn" title="رد"><i class="fas fa-reply"></i></button>
+            ${isMe ? `<button class="action-btn delete-btn" title="حذف"><i class="fas fa-trash"></i></button>` : ''}
+        </div>` : '';
 
     div.innerHTML = `
-        ${!isMe ? `<div class="msg-header"><span>${sanitize(msg.userName)}</span></div>` : ''}
+        ${!isMe ? `<div class="msg-header"><img src="${msg.userPhoto}" class="msg-avatar"> <span>${sanitize(msg.userName)}</span></div>` : ''}
         ${contentHTML}
         ${actionsHTML}
     `;
 
     if (!isDeleted) {
-        const replyBtn = div.querySelector('.reply-btn');
-        const deleteBtn = div.querySelector('.delete-btn');
-
-        if (replyBtn) replyBtn.addEventListener('click', () => initiateReply(msg));
-        if (deleteBtn) deleteBtn.addEventListener('click', () => deleteMessage(msg.id));
+        div.querySelector('.reply-btn').addEventListener('click', () => initiateReply(msg));
+        if (isMe) div.querySelector('.delete-btn').addEventListener('click', () => deleteMessage(msg.id));
     }
 
     elements.messagesList.appendChild(div);
 }
 
-// إرسال الرسالة مع التحقق الأمني
+// 7. نظام الحماية والفلترة (Validation System)
+function validateMessage(text) {
+    // 1. منع الروابط (com, net, http, www, etc)
+    const urlPattern = /(\.com|\.net|\.org|\.io|\.gov|http:\/\/|https:\/\/|www\.)/i;
+    if (urlPattern.test(text)) {
+        return "يُمنع إرسال الروابط الخارجية.";
+    }
+
+    // 2. منع أرقام الهواتف (أكثر من 3 أرقام متتالية)
+    // \d{4,} تعني 4 أرقام أو أكثر
+    const phonePattern = /\d{4,}/;
+    if (phonePattern.test(text)) {
+        return "يُمنع كتابة أكثر من 3 أرقام متتالية.";
+    }
+
+    // 3. منع كلمات السوشيال ميديا
+    const socialWords = ['facebook', 'instagram', 'twitter', 'snapchat', 'tiktok', 'whatsapp', 'telegram', 'فيسبوك', 'انستجرام', 'تويتر', 'سناب', 'تيك توك', 'واتس', 'تيليجرام'];
+    if (new RegExp(socialWords.join("|"), "i").test(text)) {
+        return "يُمنع ذكر منصات التواصل الاجتماعي.";
+    }
+
+    // 4. منع الكلمات البذيئة (قائمة قابلة للتوسيع)
+    // ملاحظة: يمكنك إضافة كلمات أخرى هنا حسب الحاجة
+    const badWords = ['كلمة_سيئة_1', 'كلمة_سيئة_2', 'احمق', 'غبي', 'شتيمة']; 
+    if (new RegExp(badWords.join("|"), "i").test(text)) {
+        return "الرسالة تحتوي على ألفاظ غير لائقة.";
+    }
+
+    return null; // لا توجد مخالفات
+}
+
+function showAlert(message) {
+    elements.alertText.textContent = message;
+    elements.alertBar.classList.remove('hidden');
+    
+    // إخفاء التنبيه بعد 3 ثواني
+    setTimeout(() => {
+        elements.alertBar.classList.add('hidden');
+    }, 3000);
+}
+
+// 8. إرسال الرسالة
 elements.messageForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const text = elements.msgInput.value.trim();
     if (!text) return;
 
-    // 1. التحقق من الأمان
-    const validation = validateMessage(text);
-    if (!validation.valid) {
-        alert("⚠️ تنبيه أمني:\n" + validation.reason);
+    // التحقق من الأمان قبل الإرسال
+    const validationError = validateMessage(text);
+    if (validationError) {
+        showAlert(validationError);
         return; // إيقاف الإرسال
     }
-
-    const user = auth.currentUser;
-    if (!user) return;
 
     try {
         const messageData = {
             text: text,
-            userId: user.uid,
-            userName: user.displayName || "مستخدم",
+            localUid: localUserData.uid, // نستخدم المعرف المحلي للمقارنة
+            userName: localUserData.displayName,
+            userPhoto: localUserData.photoURL,
             timestamp: serverTimestamp(),
             isDeleted: false
         };
@@ -268,7 +222,7 @@ elements.messageForm.addEventListener('submit', async (e) => {
             messageData.replyTo = {
                 id: currentReplyTo.id,
                 name: currentReplyTo.userName,
-                text: currentReplyTo.text.substring(0, 50) + (currentReplyTo.text.length > 50 ? '...' : '')
+                text: currentReplyTo.text.substring(0, 50) + '...'
             };
         }
 
@@ -277,16 +231,17 @@ elements.messageForm.addEventListener('submit', async (e) => {
         elements.msgInput.value = '';
         cancelReply(); 
     } catch (error) {
-        console.error("Error:", error);
+        console.error("خطأ:", error);
     }
 });
 
+// 9. وظائف مساعدة
 async function deleteMessage(msgId) {
     if (confirm("حذف الرسالة؟")) {
         try {
             const msgRef = doc(db, CHAT_COLLECTION, msgId);
             await updateDoc(msgRef, { isDeleted: true, text: "" });
-        } catch (error) { console.error(error); }
+        } catch (e) { console.error(e); }
     }
 }
 
@@ -311,11 +266,7 @@ function scrollToBottom() {
 
 window.scrollToMessage = function(msgId) {
     const el = document.getElementById(`msg-${msgId}`);
-    if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.style.backgroundColor = 'rgba(0, 210, 211, 0.2)';
-        setTimeout(() => el.style.backgroundColor = 'transparent', 1000);
-    }
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 };
 
 function sanitize(str) {
