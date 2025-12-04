@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Frontend Chat - مجتمع الطلاب</title>
+    <title>Frontend Chat - Students Community</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -11,19 +11,19 @@
 
     <div id="securityAlert" class="security-alert hidden">
         <i class="fas fa-exclamation-triangle"></i>
-        <span id="alertMessage">نص التحذير هنا</span>
+        <span id="alertMessage">Violation Message Here</span>
     </div>
 
     <nav class="navbar">
         <div class="nav-brand">Frontend Chat</div>
         <div class="user-controls">
             <button id="loginBtn" class="btn-primary hidden">
-                <i class="fab fa-google"></i> تسجيل الدخول
+                <i class="fab fa-google"></i> Sign in with Google
             </button>
             <div id="userInfo" class="hidden">
                 <img id="userAvatar" src="" alt="Avatar">
-                <span id="userName">المستخدم</span>
-                <button id="logoutBtn" class="btn-icon"><i class="fas fa-sign-out-alt"></i></button>
+                <span id="userName">User</span>
+                <button id="logoutBtn" class="btn-icon" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
     </nav>
@@ -31,22 +31,22 @@
     <main class="chat-wrapper">
         
         <div class="messages-container" id="messagesList">
-            <div class="loading-spinner">جاري التحقق من الأمان وتحميل المحادثة...</div>
+            <div class="loading-spinner">Checking Security and Loading Chat...</div>
         </div>
 
         <div class="input-area">
             
             <div id="replyPreview" class="reply-preview hidden">
                 <div class="reply-info">
-                    <span class="replying-to-label">الرد على:</span>
-                    <span id="replyToUser" class="reply-target-name">اسم المستخدم</span>
-                    <p id="replyToText" class="reply-target-text">نص الرسالة...</p>
+                    <span class="replying-to-label">Replying to:</span>
+                    <span id="replyToUser" class="reply-target-name">Username</span>
+                    <p id="replyToText" class="reply-target-text">Message text...</p>
                 </div>
-                <button id="cancelReplyBtn"><i class="fas fa-times"></i></button>
+                <button id="cancelReplyBtn" title="Cancel Reply"><i class="fas fa-times"></i></button>
             </div>
 
             <form id="messageForm" class="message-form">
-                <input type="text" id="msgInput" placeholder="اكتب رسالتك هنا..." autocomplete="off" disabled>
+                <input type="text" id="msgInput" placeholder="Type your message here..." autocomplete="off" disabled>
                 <button type="submit" id="sendBtn" disabled>
                     <i class="fas fa-paper-plane"></i>
                 </button>
@@ -56,33 +56,33 @@
 
     <div id="setupModal" class="modal-overlay hidden">
         <div class="modal-content">
-            <h2><i class="fas fa-shield-alt"></i> إعداد الدخول الآمن</h2>
-            <p class="modal-desc">لضمان بيئة تعليمية آمنة، يرجى إكمال بياناتك والموافقة على الشروط.</p>
+            <h2><i class="fas fa-shield-alt"></i> Secure Entry Setup</h2>
+            <p class="modal-desc">To ensure a safe educational environment, please complete your profile and accept the terms.</p>
             
             <div class="form-group">
-                <label>الاسم المعروض في المحادثة:</label>
-                <input type="text" id="setupDisplayName" placeholder="مثال: أحمد محمد" maxlength="20">
+                <label>Display Name in Chat:</label>
+                <input type="text" id="setupDisplayName" placeholder="Example: John Doe" maxlength="20">
             </div>
 
             <div class="terms-group">
                 <label class="checkbox-container">
                     <input type="checkbox" id="checkAge">
                     <span class="checkmark"></span>
-                    أقر أن عمري لا يقل عن 13 عاماً.
+                    I confirm that I am at least 13 years old.
                 </label>
                 <label class="checkbox-container">
                     <input type="checkbox" id="checkTerms">
                     <span class="checkmark"></span>
-                    أوافق على سياسة الخصوصية وشروط الاستخدام.
+                    I agree to the Privacy Policy and Terms of Use.
                 </label>
                 <label class="checkbox-container">
                     <input type="checkbox" id="checkConduct">
                     <span class="checkmark"></span>
-                    أتعهد باستخدام المحادثة للغرض التعليمي فقط.
+                    I pledge to use this chat for educational purposes only.
                 </label>
             </div>
 
-            <button id="completeSetupBtn" class="btn-primary full-width" disabled>موافق ودخول</button>
+            <button id="completeSetupBtn" class="btn-primary full-width" disabled>Accept and Enter</button>
         </div>
     </div>
 
