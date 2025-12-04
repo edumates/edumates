@@ -3,50 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Frontend Chat - مجتمع تعليمي</title>
+    <title>Frontend Chat - مجتمع الطلاب</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="alertBar" class="alert-bar hidden">
-        <i class="fas fa-exclamation-circle"></i> <span id="alertText">رسالة تنبيه</span>
-    </div>
-
-    <div id="termsModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-shield-alt"></i> بوابة الدخول</h2>
-            </div>
-            <div class="modal-body">
-                <p>مرحباً بك في <strong>Frontend Chat</strong>. للمتابعة، يجب أن توافق على التالي:</p>
-                <ul class="terms-list">
-                    <li><i class="fas fa-check"></i> عمري أكبر من 13 عاماً.</li>
-                    <li><i class="fas fa-check"></i> المحادثة للغرض التعليمي والدراسي فقط.</li>
-                    <li><i class="fas fa-check"></i> أوافق على سياسة الخصوصية وشروط الاستخدام.</li>
-                    <li><i class="fas fa-check"></i> التزم بالأخلاق العامة وعدم نشر معلومات اتصال.</li>
-                </ul>
-            </div>
-            <button id="acceptTermsBtn" class="btn-primary full-width">موافق وأتعهد بالالتزام</button>
-        </div>
+    <div id="alertBar" class="alert-bar">
+        <span id="alertText"></span>
     </div>
 
     <nav class="navbar">
-        <div class="nav-brand">Frontend Chat</div>
-        <div class="user-controls">
+        <div class="nav-brand">Frontend Chat</div> <div class="user-controls">
+            <button id="loginBtn" class="btn-primary">
+                <i class="fab fa-google"></i> تسجيل الدخول
+            </button>
             <div id="userInfo" class="hidden">
-                <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=random" alt="Avatar">
-                <span id="userName">طالب جديد</span>
+                <img id="userAvatar" src="" alt="Avatar">
+                <span id="userName">المستخدم</span>
+                <button id="logoutBtn" class="btn-icon"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
     </nav>
 
     <main class="chat-wrapper">
+        
         <div class="messages-container" id="messagesList">
-            <div class="loading-spinner">جاري الاتصال بالمجتمع التعليمي...</div>
+            <div class="loading-spinner">جاري تحميل المحادثة...</div>
         </div>
 
         <div class="input-area">
+            
             <div id="replyPreview" class="reply-preview hidden">
                 <div class="reply-info">
                     <span class="replying-to-label">الرد على:</span>
@@ -57,13 +44,39 @@
             </div>
 
             <form id="messageForm" class="message-form">
-                <input type="text" id="msgInput" placeholder="اكتب رسالة تعليمية..." autocomplete="off">
-                <button type="submit" id="sendBtn">
+                <input type="text" id="msgInput" placeholder="اكتب رسالتك هنا..." autocomplete="off" disabled>
+                <button type="submit" id="sendBtn" disabled>
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </form>
         </div>
     </main>
+
+    <dialog id="privacyModal" class="privacy-modal">
+        <h2>شروط الاستخدام وسياسة الخصوصية</h2>
+        <p>مرحباً بك في مجتمع <strong>Frontend Chat</strong>. قبل المتابعة، يرجى الموافقة على الشروط التالية:</p>
+        
+        <ul>
+            <li>هذه المحادثة مخصصة **للأغراض التعليمية** المتعلقة بتطوير الواجهات الأمامية (Frontend) فقط.</li>
+            <li>يُمنع كتابة أي روابط أو كلمات سب أو عبارات بذيئة أو معلومات شخصية.</li>
+            <li>يجب أن لا يقل عمرك عن **13 عامًا** للمشاركة.</li>
+            <li>أنت توافق على أن يتم حفظ رسائلك واسم العرض الذي تختاره في قاعدة بيانات التطبيق.</li>
+        </ul>
+
+        <form id="modalForm">
+            <div class="form-group">
+                <label for="displayNameInput">اسم العرض (الذي سيظهر في المحادثة):</label>
+                <input type="text" id="displayNameInput" required minlength="3" maxlength="20" placeholder="مثال: مبرمج_مبتدئ">
+            </div>
+            
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="agreeCheckbox" required>
+                <label for="agreeCheckbox">أوافق على شروط الاستخدام وسياسة الخصوصية المذكورة أعلاه.</label>
+            </div>
+
+            <button type="submit" class="btn-primary">المتابعة إلى المحادثة</button>
+        </form>
+    </dialog>
 
     <script type="module" src="script.js"></script>
 </body>
