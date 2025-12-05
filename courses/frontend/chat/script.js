@@ -1,4 +1,4 @@
-// 1. Firebase Imports
+// script.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 import { 
@@ -7,10 +7,7 @@ import {
     arrayUnion, arrayRemove, increment, runTransaction 
 } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
-// --- إصلاح الاستيراد: استخدام jsDelivr مع وضع ESM ---
-import Filter from 'https://cdn.jsdelivr.net/npm/bad-words@3.0.4/+esm';
-
-// 2. Firebase Configuration
+// --- Configuration ---
 const firebaseConfig = {
     apiKey: "AIzaSyBhCxGjQOQ88b2GynL515ZYQXqfiLPhjw4",
     authDomain: "edumates-983dd.firebaseapp.com",
@@ -24,388 +21,271 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
 const CHAT_COLLECTION = 'frontend-chat'; 
 
-// 3. Security Constants & Configuration
-// تهيئة الفلتر (الآن سيعمل بدون أخطاء)
-const filter = new Filter();
+// --- Security Constants ---
+// 1. Language Enforcement (Accepts Latin, Numbers, Common Punctuation)
+const NON_ENGLISH_REGEX = /[^\x00-\x7F\u2000-\u206F\u00A0-\u00FF]/g; 
+// 2. Anti-Spam (Links & Socials)
+const URL_PATTERN = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/i;
+const SOCIAL_MEDIA_PATTERN = /(@|fb\.com|t\.me|whatsapp)/i;
+const PROFANITY_LIST = ["fuck", "shit", "bitch", "asshole", "dick"]; 
 
-// إضافة قائمة كلمات عربية وإنجليزية مخصصة للحظر
-// (المكتبة تحتوي على الإنجليزية، ونحن نضيف العربية والكلمات العامية)
-const CUSTOM_BAD_WORDS = [
-    "احمق", "غبي", "حيوان", "كلب", "زباله", "سافل", "حقير", "تفه",
-    "sexy", "porn", "xxx", "bitch", "fuck"
-];
-filter.addWords(...CUSTOM_BAD_WORDS);
-
-// منع الروابط بجميع أشكالها (com, net, org, http, www, etc)
-const LINK_REGEX = /((https?:\/\/)|(www\.))|(\.[a-z]{2,3}(\/|\s|$))/i;
-const DOMAIN_EXTENSIONS = /\.(com|net|org|edu|gov|io|co|biz|info|me|xyz)\b/i;
-
-// منع الأرقام (أكثر من 3 أرقام متتالية - مثل أرقام الهواتف)
-const PHONE_NUMBER_REGEX = /\d{4,}/; 
-
-// 4. DOM Elements
-const elements = {
-    themeToggle: document.getElementById('themeToggle'),
+// --- DOM Elements ---
+const el = {
+    themeBtn: document.getElementById('themeToggle'),
     loginBtn: document.getElementById('loginBtn'),
-    logoutBtn: document.getElementById('logoutBtn'),
     userInfo: document.getElementById('userInfo'),
-    userAvatar: document.getElementById('userAvatar'),
+    avatar: document.getElementById('userAvatar'),
     userName: document.getElementById('userName'),
-    messagesList: document.getElementById('messagesList'),
-    messageForm: document.getElementById('messageForm'),
-    msgInput: document.getElementById('msgInput'),
+    msgList: document.getElementById('messagesList'),
+    form: document.getElementById('messageForm'),
+    input: document.getElementById('msgInput'),
     sendBtn: document.getElementById('sendBtn'),
     replyPreview: document.getElementById('replyPreview'),
-    replyToUser: document.getElementById('replyToUser'),
-    replyToText: document.getElementById('replyToText'),
-    cancelReplyBtn: document.getElementById('cancelReplyBtn'),
     securityAlert: document.getElementById('securityAlert'),
-    alertMessage: document.getElementById('alertMessage'),
+    alertMsg: document.getElementById('alertMessage'),
     setupModal: document.getElementById('setupModal'),
-    setupDisplayName: document.getElementById('setupDisplayName'),
-    checkAge: document.getElementById('checkAge'),
-    checkTerms: document.getElementById('checkTerms'),
-    checkConduct: document.getElementById('checkConduct'),
-    completeSetupBtn: document.getElementById('completeSetupBtn'),
-    activeUsersBar: document.getElementById('activeUsersBar'),
-    activeCount: document.getElementById('activeCount')
+    setupName: document.getElementById('setupDisplayName'),
+    setupBtn: document.getElementById('completeSetupBtn'),
+    checkboxes: document.querySelectorAll('.setup-checkbox')
 };
 
-let currentReplyTo = null;
-let chatDisplayName = null; 
-let unsubscribeChat = null; 
-let unsubscribeUsers = null;
-let usersCache = {}; 
+// State
+let currentUserData = null;
+let replyContext = null;
+let lastSentTime = 0; // Rate limiting
 
 // --- Theme Logic ---
 function initTheme() {
-    const savedTheme = localStorage.getItem('chatTheme');
-    if (savedTheme === 'light') {
-        document.body.classList.add('light-mode');
-        elements.themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-    } else {
-        elements.themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-    }
+    const theme = localStorage.getItem('chatTheme') || 'dark';
+    if(theme === 'light') document.body.classList.add('light-mode');
+    updateThemeIcon();
 }
-
-if(elements.themeToggle) {
-    elements.themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('light-mode');
-        const isLight = document.body.classList.contains('light-mode');
-        elements.themeToggle.innerHTML = isLight ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-        localStorage.setItem('chatTheme', isLight ? 'light' : 'dark');
-    });
+function updateThemeIcon() {
+    const isLight = document.body.classList.contains('light-mode');
+    el.themeBtn.innerHTML = isLight ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
 }
+el.themeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('light-mode');
+    localStorage.setItem('chatTheme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    updateThemeIcon();
+});
 initTheme();
 
-// --- Auth & Setup ---
+// --- Auth & Profile ---
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        if(elements.loginBtn) elements.loginBtn.classList.add('hidden');
-        if(elements.userInfo) elements.userInfo.classList.remove('hidden');
-        if(elements.userAvatar) elements.userAvatar.src = user.photoURL || 'https://via.placeholder.com/32';
-        await checkUserProfile(user);
-    } else {
-        handleLogoutUI();
-    }
-});
-
-if(elements.loginBtn) {
-    elements.loginBtn.addEventListener('click', async () => {
-        try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch (error) { console.error(error); }
-    });
-}
-
-if(elements.logoutBtn) elements.logoutBtn.addEventListener('click', () => signOut(auth));
-
-function handleLogoutUI() {
-    if(elements.loginBtn) elements.loginBtn.classList.remove('hidden');
-    if(elements.userInfo) elements.userInfo.classList.add('hidden');
-    elements.messagesList.innerHTML = '<div class="loading-spinner">Please Sign In to Join</div>';
-    elements.msgInput.disabled = true;
-    elements.sendBtn.disabled = true;
-    elements.setupModal.classList.add('hidden');
-    elements.activeUsersBar.classList.add('hidden');
-    if (unsubscribeChat) unsubscribeChat();
-    if (unsubscribeUsers) unsubscribeUsers();
-}
-
-async function checkUserProfile(user) {
-    try {
-        const docRef = doc(db, 'user-profiles', user.uid);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists() && docSnap.data().chatInfo) {
-            chatDisplayName = docSnap.data().chatInfo.displayName;
-            elements.userName.textContent = chatDisplayName;
+        el.loginBtn.classList.add('hidden');
+        el.userInfo.classList.remove('hidden');
+        el.avatar.src = user.photoURL;
+        
+        // Load Profile
+        const profile = await getDoc(doc(db, 'user-profiles', user.uid));
+        if (profile.exists() && profile.data().chatInfo) {
+            currentUserData = profile.data();
+            el.userName.textContent = currentUserData.chatInfo.displayName;
             enableChat();
         } else {
-            elements.setupDisplayName.value = user.displayName || '';
-            elements.setupModal.classList.remove('hidden');
+            el.setupModal.classList.remove('hidden');
         }
-    } catch (e) { console.error(e); }
-}
-
-// Setup Form Validation
-function validateSetup() {
-    if(!elements.setupDisplayName) return;
-    
-    // Check profanity in username too
-    const name = elements.setupDisplayName.value.trim();
-    let isProfane = false;
-    try { isProfane = filter.isProfane(name); } catch(e) { console.log("Filter not ready yet"); }
-
-    if(isProfane) {
-        elements.setupDisplayName.style.borderColor = 'red';
-        elements.completeSetupBtn.disabled = true;
-        return;
     } else {
-        elements.setupDisplayName.style.borderColor = '';
+        disableChat();
     }
-
-    const valid = name.length >= 3 && 
-                 elements.checkAge.checked && elements.checkTerms.checked && elements.checkConduct.checked;
-    elements.completeSetupBtn.disabled = !valid;
-}
-
-[elements.setupDisplayName, elements.checkAge, elements.checkTerms, elements.checkConduct].forEach(el => {
-    if(el) el.addEventListener('change', validateSetup);
-});
-if(elements.setupDisplayName) elements.setupDisplayName.addEventListener('input', validateSetup);
-
-if(elements.completeSetupBtn) {
-    elements.completeSetupBtn.addEventListener('click', async () => {
-        const user = auth.currentUser;
-        if (!user) return;
-        const name = elements.setupDisplayName.value.trim();
-        
-        if (filter.isProfane(name)) {
-            alert("Please choose a respectful display name.");
-            return;
-        }
-
-        try {
-            await setDoc(doc(db, 'user-profiles', user.uid), {
-                chatInfo: { displayName: name, joinedAt: serverTimestamp() },
-                totalLikes: 0,
-                lastActive: serverTimestamp()
-            }, { merge: true });
-            
-            elements.setupModal.classList.add('hidden');
-            chatDisplayName = name;
-            elements.userName.textContent = chatDisplayName;
-            enableChat();
-        } catch (e) { alert("Error saving profile"); }
-    });
-}
-
-function enableChat() {
-    elements.msgInput.disabled = false;
-    elements.sendBtn.disabled = false;
-    loadMessages();
-    trackActiveUsers();
-}
-
-// --- Active Users ---
-function trackActiveUsers() {
-    const user = auth.currentUser;
-    if (user) {
-        const update = () => updateDoc(doc(db, 'user-profiles', user.uid), { lastActive: serverTimestamp() }).catch(()=>{});
-        update();
-        setInterval(update, 60000);
-    }
-
-    const q = query(collection(db, 'user-profiles'));
-    unsubscribeUsers = onSnapshot(q, (snapshot) => {
-        let count = 0;
-        const cutoff = new Date(Date.now() - 5 * 60000); 
-        snapshot.forEach(d => {
-            const data = d.data();
-            usersCache[d.id] = data.totalLikes || 0;
-            if (data.lastActive) {
-                const last = data.lastActive.toDate ? data.lastActive.toDate() : new Date(data.lastActive);
-                if (last > cutoff) count++;
-            }
-        });
-        if(elements.activeUsersBar) elements.activeUsersBar.classList.remove('hidden');
-        if(elements.activeCount) elements.activeCount.textContent = count;
-    });
-}
-
-// --- Chat Logic ---
-function loadMessages() {
-    const q = query(collection(db, CHAT_COLLECTION), orderBy('timestamp', 'asc'));
-    unsubscribeChat = onSnapshot(q, (snapshot) => {
-        elements.messagesList.innerHTML = '';
-        snapshot.forEach(doc => renderMessage({ ...doc.data(), id: doc.id }));
-        scrollToBottom();
-    });
-}
-
-// *** SECURITY & SENDING LOGIC ***
-elements.messageForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    let text = elements.msgInput.value.trim();
-    if (!text) return;
-
-    // 1. Check for Profanity
-    if (filter.isProfane(text)) {
-        showSecurityAlert("Respectful language is required. Bad words detected.");
-        return;
-    }
-
-    // 2. Check for Links & Domains
-    if (LINK_REGEX.test(text) || DOMAIN_EXTENSIONS.test(text)) {
-        showSecurityAlert("Links (URLs) are not allowed for security reasons.");
-        return;
-    }
-
-    // 3. Check for Long Numbers (Phone numbers/IDs)
-    if (PHONE_NUMBER_REGEX.test(text)) {
-        showSecurityAlert("Sharing phone numbers or long IDs is strictly prohibited.");
-        return;
-    }
-
-    const user = auth.currentUser;
-    try {
-        const payload = {
-            text, // Text is now clean
-            userId: user.uid, 
-            userName: chatDisplayName, 
-            userPhoto: user.photoURL,
-            timestamp: serverTimestamp(), 
-            isDeleted: false, 
-            likes: 0, 
-            likedBy: []
-        };
-        if (currentReplyTo) {
-            payload.replyTo = { id: currentReplyTo.id, name: currentReplyTo.userName, text: currentReplyTo.text };
-        }
-        await addDoc(collection(db, CHAT_COLLECTION), payload);
-        elements.msgInput.value = '';
-        cancelReply();
-    } catch (e) { console.error(e); }
 });
 
-function renderMessage(msg) {
-    const isMe = auth.currentUser && msg.userId === auth.currentUser.uid;
-    const div = document.createElement('div');
-    div.className = `message ${isMe ? 'me' : 'others'}`;
-    div.id = `msg-${msg.id}`;
+el.loginBtn.onclick = () => signInWithPopup(auth, new GoogleAuthProvider());
+document.getElementById('logoutBtn').onclick = () => signOut(auth);
+
+// --- Setup Form ---
+function checkSetupValidity() {
+    const nameValid = el.setupName.value.trim().length >= 3;
+    const checksValid = Array.from(el.checkboxes).every(cb => cb.checked);
+    el.setupBtn.disabled = !(nameValid && checksValid);
+}
+el.setupName.addEventListener('input', checkSetupValidity);
+el.checkboxes.forEach(cb => cb.addEventListener('change', checkSetupValidity));
+
+el.setupBtn.onclick = async () => {
+    const user = auth.currentUser;
+    if(!user) return;
     
-    if (msg.isDeleted) {
-        div.innerHTML = `<div class="msg-content deleted"><small>Deleted Message</small></div>`;
-        elements.messagesList.appendChild(div);
+    // Enforce English Name
+    if(NON_ENGLISH_REGEX.test(el.setupName.value)) {
+        alert("Please use an English display name.");
         return;
     }
 
-    const likes = msg.likes || 0;
-    const isLiked = auth.currentUser && msg.likedBy && msg.likedBy.includes(auth.currentUser.uid);
-    const badgeHTML = getBadge(usersCache[msg.userId] || 0);
-
-    let replyHTML = '';
-    if (msg.replyTo) {
-        replyHTML = `<div class="reply-context" onclick="scrollToMsg('${msg.replyTo.id}')">
-            <small>Reply to: <b>${sanitize(msg.replyTo.name)}</b></small>
-            <div style="opacity:0.7; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:200px;">${sanitize(msg.replyTo.text)}</div>
-        </div>`;
-    }
-
-    div.innerHTML = `
-        ${!isMe ? `<div class="msg-header"><img src="${msg.userPhoto}" class="msg-avatar"> <b>${sanitize(msg.userName)}</b> ${badgeHTML}</div>` : ''}
-        <div class="msg-content">
-            ${replyHTML}
-            ${sanitize(msg.text)}
-            <div style="display:flex; justify-content:space-between; margin-top:5px; font-size:0.7rem; opacity:0.6; align-items:center;">
-                <span>${msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '...'}</span>
-                <div class="like-container">
-                    <span>${likes || ''}</span>
-                    <button class="like-btn ${isLiked ? 'liked' : ''}"><i class="${isLiked ? 'fas' : 'far'} fa-heart"></i></button>
-                </div>
-            </div>
-        </div>
-        <div class="msg-actions">
-            <button class="action-btn reply-btn"><i class="fas fa-reply"></i></button>
-            ${isMe ? `<button class="action-btn delete-btn"><i class="fas fa-trash"></i></button>` : ''}
-        </div>
-    `;
-
-    // Listeners
-    const replyBtn = div.querySelector('.reply-btn');
-    if(replyBtn) replyBtn.onclick = () => initiateReply(msg);
+    const name = el.setupName.value.trim();
+    await setDoc(doc(db, 'user-profiles', user.uid), {
+        chatInfo: { displayName: name, joined: serverTimestamp() },
+        totalLikes: 0
+    }, { merge: true });
     
-    if(isMe) {
-        const delBtn = div.querySelector('.delete-btn');
-        if(delBtn) delBtn.onclick = () => deleteMsg(msg.id);
-    }
-    
-    const likeBtn = div.querySelector('.like-btn');
-    if(!isMe && likeBtn) likeBtn.onclick = () => toggleLike(msg);
-
-    elements.messagesList.appendChild(div);
-}
-
-// Helpers
-function getBadge(likes) {
-    if (likes > 500) return '<span class="user-badge badge-helper"><i class="fas fa-crown"></i> Expert</span>';
-    if (likes > 100) return '<span class="user-badge badge-helper"><i class="fas fa-star"></i> Active</span>';
-    return '';
-}
-
-function initiateReply(msg) {
-    currentReplyTo = msg;
-    elements.replyPreview.classList.remove('hidden');
-    elements.replyToUser.textContent = msg.userName;
-    elements.replyToText.textContent = msg.text;
-    elements.msgInput.focus();
-}
-
-function cancelReply() {
-    currentReplyTo = null;
-    elements.replyPreview.classList.add('hidden');
-}
-if(elements.cancelReplyBtn) elements.cancelReplyBtn.onclick = cancelReply;
-
-async function toggleLike(msg) {
-    const user = auth.currentUser;
-    if(!user || user.uid === msg.userId) return;
-    const ref = doc(db, CHAT_COLLECTION, msg.id);
-    const profileRef = doc(db, 'user-profiles', msg.userId);
-    const isLiked = msg.likedBy && msg.likedBy.includes(user.uid);
-
-    try {
-        await runTransaction(db, async (t) => {
-            t.update(ref, {
-                likes: increment(isLiked ? -1 : 1),
-                likedBy: isLiked ? arrayRemove(user.uid) : arrayUnion(user.uid)
-            });
-            t.update(profileRef, { totalLikes: increment(isLiked ? -1 : 1) });
-        });
-    } catch(e) { console.error(e); }
-}
-
-async function deleteMsg(id) {
-    if(confirm("Delete this message?")) {
-        await updateDoc(doc(db, CHAT_COLLECTION, id), { isDeleted: true, text: '', likes: 0 });
-    }
-}
-
-function showSecurityAlert(msg) {
-    elements.alertMessage.textContent = msg;
-    elements.securityAlert.classList.remove('hidden');
-    setTimeout(() => elements.securityAlert.classList.add('hidden'), 3000);
-}
-
-function scrollToBottom() { elements.messagesList.scrollTop = elements.messagesList.scrollHeight; }
-
-window.scrollToMsg = (id) => {
-    const el = document.getElementById(`msg-${id}`);
-    if(el) el.scrollIntoView({behavior: "smooth", block: "center"});
+    el.setupModal.classList.add('hidden');
+    el.userName.textContent = name;
+    enableChat();
 };
 
+// --- Chat Functionality ---
+function enableChat() {
+    el.input.disabled = false;
+    el.sendBtn.disabled = false;
+    el.msgList.innerHTML = ''; // Clear loading
+    
+    // Realtime Listener
+    onSnapshot(query(collection(db, CHAT_COLLECTION), orderBy('timestamp', 'asc')), (snap) => {
+        el.msgList.innerHTML = '';
+        snap.forEach(doc => renderMessage(doc));
+        el.msgList.scrollTop = el.msgList.scrollHeight;
+    });
+}
+
+function disableChat() {
+    el.input.disabled = true;
+    el.loginBtn.classList.remove('hidden');
+    el.userInfo.classList.add('hidden');
+    el.msgList.innerHTML = '<div style="text-align:center; padding:20px; opacity:0.6">Please sign in to view the English Class Chat.</div>';
+}
+
+// --- Sending Messages (With Security Checks) ---
+el.form.onsubmit = async (e) => {
+    e.preventDefault();
+    const text = el.input.value.trim();
+    if(!text) return;
+
+    // 1. Rate Limiting (1 message per second)
+    const now = Date.now();
+    if (now - lastSentTime < 1000) {
+        showAlert("Please slow down!");
+        return;
+    }
+    lastSentTime = now;
+
+    // 2. Language Check (English Only)
+    // Counts non-English characters. If user types Arabic, it gets flagged.
+    if (NON_ENGLISH_REGEX.test(text)) {
+        showAlert("English Only! 🇺🇸 Please write in English.");
+        return;
+    }
+
+    // 3. Content Safety
+    if (URL_PATTERN.test(text) || SOCIAL_MEDIA_PATTERN.test(text)) {
+        showAlert("Links and social handles are prohibited.");
+        return;
+    }
+    if (PROFANITY_LIST.some(word => text.toLowerCase().includes(word))) {
+        showAlert("Please maintain academic language.");
+        return;
+    }
+
+    // Send to Firebase
+    try {
+        const user = auth.currentUser;
+        await addDoc(collection(db, CHAT_COLLECTION), {
+            text: text,
+            userId: user.uid,
+            userName: el.userName.textContent,
+            userPhoto: user.photoURL,
+            timestamp: serverTimestamp(),
+            likes: 0,
+            likedBy: [],
+            replyTo: replyContext
+        });
+        
+        el.input.value = '';
+        cancelReply();
+    } catch(err) {
+        console.error("Send Error:", err);
+    }
+};
+
+// --- Rendering ---
+function renderMessage(docItem) {
+    const msg = docItem.data();
+    const id = docItem.id;
+    const isMe = auth.currentUser && msg.userId === auth.currentUser.uid;
+    
+    if(msg.isDeleted) return; 
+
+    const div = document.createElement('div');
+    div.className = `message ${isMe ? 'me' : 'others'}`;
+    
+    // Reply HTML
+    let replyHtml = '';
+    if(msg.replyTo) {
+        replyHtml = `<div class="reply-context"><small><b>${sanitize(msg.replyTo.name)}</b>: ${sanitize(msg.replyTo.text.substring(0,30))}...</small></div>`;
+    }
+
+    // Badge Logic
+    let badge = '';
+    if(msg.likes > 10) badge = `<span class="user-badge"><i class="fas fa-star"></i> Top</span>`;
+
+    div.innerHTML = `
+        ${!isMe ? `<div class="msg-header"><img src="${msg.userPhoto}" class="msg-avatar-small"> ${sanitize(msg.userName)} ${badge}</div>` : ''}
+        <div class="msg-content">
+            ${replyHtml}
+            ${sanitize(msg.text)}
+            <div class="msg-footer">
+                <span>${formatTime(msg.timestamp)}</span>
+                ${!isMe ? `
+                <div style="display:flex; align-items:center; gap:5px;">
+                    <span>${msg.likes || 0}</span>
+                    <button class="like-btn ${msg.likedBy?.includes(auth.currentUser?.uid) ? 'liked' : ''}" onclick="toggleLike('${id}')">
+                        <i class="${msg.likedBy?.includes(auth.currentUser?.uid) ? 'fas' : 'far'} fa-heart"></i>
+                    </button>
+                    <i class="fas fa-reply" style="cursor:pointer; margin-left:5px;" onclick="setReply('${id}', '${sanitize(msg.userName)}', '${sanitize(msg.text)}')"></i>
+                </div>` : ''}
+            </div>
+        </div>
+    `;
+    el.msgList.appendChild(div);
+}
+
+// --- Helpers ---
+window.toggleLike = async (msgId) => {
+    if(!auth.currentUser) return;
+    const ref = doc(db, CHAT_COLLECTION, msgId);
+    const snap = await getDoc(ref);
+    if(!snap.exists()) return;
+    
+    const data = snap.data();
+    const uid = auth.currentUser.uid;
+    if(data.userId === uid) return; // Can't like own msg
+
+    const isLiked = data.likedBy && data.likedBy.includes(uid);
+    updateDoc(ref, {
+        likes: increment(isLiked ? -1 : 1),
+        likedBy: isLiked ? arrayRemove(uid) : arrayUnion(uid)
+    });
+};
+
+window.setReply = (id, name, text) => {
+    replyContext = { id, name, text };
+    el.replyPreview.classList.remove('hidden');
+    document.getElementById('replyToUser').textContent = name;
+    el.input.focus();
+};
+
+function cancelReply() {
+    replyContext = null;
+    el.replyPreview.classList.add('hidden');
+}
+document.getElementById('cancelReplyBtn').onclick = cancelReply;
+
 function sanitize(str) {
-    const d = document.createElement('div'); d.textContent = str; return d.innerHTML;
+    const temp = document.createElement('div');
+    temp.textContent = str;
+    return temp.innerHTML;
+}
+
+function formatTime(ts) {
+    if(!ts) return '...';
+    return ts.toDate().toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+}
+
+function showAlert(msg) {
+    el.alertMsg.textContent = msg;
+    el.securityAlert.classList.add('show');
+    setTimeout(() => el.securityAlert.classList.remove('show'), 3000);
 }
