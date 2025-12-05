@@ -17,8 +17,12 @@
     <nav class="navbar">
         <div class="nav-brand">Frontend Chat</div>
         <div class="user-controls">
+            <button id="themeToggle" class="btn-icon" title="Switch Theme">
+                <i class="fas fa-moon"></i>
+            </button>
+            
             <button id="loginBtn" class="btn-primary hidden">
-                <i class="fab fa-google"></i> Sign in with Google
+                <i class="fab fa-google"></i> Sign in
             </button>
             <div id="userInfo" class="hidden">
                 <img id="userAvatar" src="" alt="Avatar">
@@ -27,12 +31,15 @@
             </div>
         </div>
     </nav>
-<div id="activeUsersBar" class="active-users-bar hidden">
-        <span class="online-dot"></span>
-        <span id="activeCount">0</span> Students Online
+
+    <div id="activeUsersBar" class="active-users-bar hidden">
+        <div class="status-indicator">
+            <span class="online-dot"></span>
+            <span id="activeCount">0</span> Students Online
+        </div>
     </div>
+
     <main class="chat-wrapper">
-        
         <div class="messages-container" id="messagesList">
             <div class="loading-spinner">Checking Security and Loading Chat...</div>
         </div>
@@ -60,7 +67,7 @@
     <div id="setupModal" class="modal-overlay hidden">
         <div class="modal-content">
             <h2><i class="fas fa-shield-alt"></i> Secure Entry Setup</h2>
-            <p class="modal-desc">To ensure a safe educational environment, please complete your profile and accept the terms.</p>
+            <p class="modal-desc">To ensure a safe educational environment, please complete your profile.</p>
             
             <div class="form-group">
                 <label>Display Name in Chat:</label>
@@ -76,12 +83,12 @@
                 <label class="checkbox-container">
                     <input type="checkbox" id="checkTerms">
                     <span class="checkmark"></span>
-                    I agree to the Privacy Policy and Terms of Use.
+                    I agree to the Privacy Policy.
                 </label>
                 <label class="checkbox-container">
                     <input type="checkbox" id="checkConduct">
                     <span class="checkmark"></span>
-                    I pledge to use this chat for educational purposes only.
+                    I pledge to use this chat for education.
                 </label>
             </div>
 
@@ -92,4 +99,3 @@
     <script type="module" src="script.js"></script>
 </body>
 </html>
-
