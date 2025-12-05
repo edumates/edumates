@@ -24,20 +24,14 @@ const db = getFirestore(app);
 
 const CHAT_COLLECTION = 'frontend-chat'; 
 
-// 3. Profanity List and Regex
-const PROFANITY_LIST = [
-    "asshole", "bitch", "cunt", "damn", "fuck", "hell", "shit", "wank", "pussy", 
-    "dick", "cock", "vagina", "retard", "spastic", "nigger", "kike", 
-    "whore", "slut", "jerkoff", "motherfucker", "fucker", "bastard"
-];
-
-const URL_PATTERN = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|(\.[a-z]{2,}(\/|\s|$))/i;
-const NUMBER_PATTERN = /\d{5,}/; 
-const SOCIAL_MEDIA_PATTERN = /(facebook|instagram|tiktok|snapchat|twitter|whatsapp|tele\s*gram)/i; 
-
+// 3. Constants
+const PROFANITY_LIST = ["asshole", "bitch", "cunt", "fuck", "shit", "dick", "pussy", "whore", "slut", "bastard"]; // تم اختصار القائمة للعرض
+const URL_PATTERN = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/i;
+const SOCIAL_MEDIA_PATTERN = /(facebook|instagram|tiktok|snapchat|twitter|whatsapp|telegram)/i; 
 
 // 4. DOM Elements
 const elements = {
+    themeToggle: document.getElementById('themeToggle'), // NEW
     loginBtn: document.getElementById('loginBtn'),
     logoutBtn: document.getElementById('logoutBtn'),
     userInfo: document.getElementById('userInfo'),
@@ -47,23 +41,18 @@ const elements = {
     messageForm: document.getElementById('messageForm'),
     msgInput: document.getElementById('msgInput'),
     sendBtn: document.getElementById('sendBtn'),
-    
     replyPreview: document.getElementById('replyPreview'),
     replyToUser: document.getElementById('replyToUser'),
     replyToText: document.getElementById('replyToText'),
     cancelReplyBtn: document.getElementById('cancelReplyBtn'),
-
     securityAlert: document.getElementById('securityAlert'),
     alertMessage: document.getElementById('alertMessage'),
-    
     setupModal: document.getElementById('setupModal'),
     setupDisplayName: document.getElementById('setupDisplayName'),
     checkAge: document.getElementById('checkAge'),
     checkTerms: document.getElementById('checkTerms'),
     checkConduct: document.getElementById('checkConduct'),
     completeSetupBtn: document.getElementById('completeSetupBtn'),
-
-    // New Elements for Active Users
     activeUsersBar: document.getElementById('activeUsersBar'),
     activeCount: document.getElementById('activeCount')
 };
@@ -72,15 +61,39 @@ let currentReplyTo = null;
 let chatDisplayName = null; 
 let unsubscribeChat = null; 
 let unsubscribeUsers = null;
-let usersCache = {}; // لتخزين عدد لايكات المستخدمين محلياً
+let usersCache = {}; 
 
-// --- 5. Authentication and Setup Logic ---
+// --- Theme Logic (New) ---
+function initTheme() {
+    const savedTheme = localStorage.getItem('chatTheme');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+        elements.themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    } else {
+        elements.themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+    }
+}
+
+elements.themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('light-mode');
+    const isLight = document.body.classList.contains('light-mode');
+    
+    // Update Icon
+    elements.themeToggle.innerHTML = isLight ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    
+    // Save Preference
+    localStorage.setItem('chatTheme', isLight ? 'light' : 'dark');
+});
+
+initTheme();
+
+// --- Auth & Setup ---
 
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         elements.loginBtn.classList.add('hidden');
         elements.userInfo.classList.remove('hidden');
-        elements.userAvatar.src = user.photoURL || 'https://via.placeholder.com/35';
+        elements.userAvatar.src = user.photoURL || 'https://via.placeholder.com/32';
         await checkUserProfile(user);
     } else {
         handleLogoutUI();
@@ -88,11 +101,7 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 elements.loginBtn.addEventListener('click', async () => {
-    try {
-        await signInWithPopup(auth, new GoogleAuthProvider());
-    } catch (error) {
-        console.error("Login Error:", error);
-    }
+    try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch (error) { console.error(error); }
 });
 
 elements.logoutBtn.addEventListener('click', () => signOut(auth));
@@ -100,14 +109,13 @@ elements.logoutBtn.addEventListener('click', () => signOut(auth));
 function handleLogoutUI() {
     elements.loginBtn.classList.remove('hidden');
     elements.userInfo.classList.add('hidden');
-    elements.messagesList.innerHTML = '<div class="loading-spinner">Please Sign In to View the Chat</div>';
+    elements.messagesList.innerHTML = '<div class="loading-spinner">Please Sign In to Join</div>';
     elements.msgInput.disabled = true;
     elements.sendBtn.disabled = true;
     elements.setupModal.classList.add('hidden');
-    if(elements.activeUsersBar) elements.activeUsersBar.classList.add('hidden');
-    
-    if (unsubscribeChat) { unsubscribeChat(); unsubscribeChat = null; }
-    if (unsubscribeUsers) { unsubscribeUsers(); unsubscribeUsers = null; }
+    elements.activeUsersBar.classList.add('hidden');
+    if (unsubscribeChat) unsubscribeChat();
+    if (unsubscribeUsers) unsubscribeUsers();
 }
 
 async function checkUserProfile(user) {
@@ -116,65 +124,44 @@ async function checkUserProfile(user) {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists() && docSnap.data().chatInfo) {
-            const data = docSnap.data().chatInfo;
-            chatDisplayName = data.displayName;
+            chatDisplayName = docSnap.data().chatInfo.displayName;
             elements.userName.textContent = chatDisplayName;
             enableChat();
         } else {
             elements.setupDisplayName.value = user.displayName || '';
             elements.setupModal.classList.remove('hidden');
         }
-    } catch (error) {
-        console.error("Profile Error:", error);
-        alert("An error occurred while loading your profile.");
-    }
+    } catch (e) { console.error(e); }
 }
 
-// Setup Modal Logic
-function validateSetupForm() {
-    const name = elements.setupDisplayName.value.trim();
-    const isAge = elements.checkAge.checked;
-    const isTerms = elements.checkTerms.checked;
-    const isConduct = elements.checkConduct.checked;
-
-    elements.completeSetupBtn.disabled = !(name.length >= 3 && isAge && isTerms && isConduct);
+// Setup Form
+function validateSetup() {
+    const valid = elements.setupDisplayName.value.trim().length >= 3 && 
+                 elements.checkAge.checked && elements.checkTerms.checked && elements.checkConduct.checked;
+    elements.completeSetupBtn.disabled = !valid;
 }
-
 [elements.setupDisplayName, elements.checkAge, elements.checkTerms, elements.checkConduct].forEach(el => {
-    if(el) { // Check if element exists to avoid errors
-        el.addEventListener('input', validateSetupForm);
-        el.addEventListener('change', validateSetupForm);
-    }
+    if(el) el.addEventListener('change', validateSetup);
 });
+if(elements.setupDisplayName) elements.setupDisplayName.addEventListener('input', validateSetup);
 
 if(elements.completeSetupBtn) {
     elements.completeSetupBtn.addEventListener('click', async () => {
         const user = auth.currentUser;
         if (!user) return;
-
-        elements.completeSetupBtn.textContent = "Saving...";
-        const name = elements.setupDisplayName.value.trim();
-
+        
         try {
             await setDoc(doc(db, 'user-profiles', user.uid), {
-                chatInfo: {
-                    displayName: name,
-                    termsAccepted: true,
-                    ageConfirmed: true,
-                    joinedAt: serverTimestamp()
-                },
-                totalLikes: 0, // تهيئة عدد اللايكات
+                chatInfo: { displayName: elements.setupDisplayName.value.trim(), joinedAt: serverTimestamp() },
+                totalLikes: 0,
                 lastActive: serverTimestamp()
             }, { merge: true });
-
+            
             elements.setupModal.classList.add('hidden');
-            chatDisplayName = name;
-            elements.userName.textContent = name;
+            chatDisplayName = elements.setupDisplayName.value.trim();
+            elements.userName.textContent = chatDisplayName;
             enableChat();
-        } catch (error) {
-            console.error("Save Error:", error);
-            alert("Failed to save profile data.");
-        }
+        } catch (e) { alert("Error saving profile"); }
     });
 }
 
@@ -182,131 +169,43 @@ function enableChat() {
     elements.msgInput.disabled = false;
     elements.sendBtn.disabled = false;
     loadMessages();
-    trackActiveUsersAndBadges(); // تفعيل نظام التتبع
+    trackActiveUsers();
 }
 
-// --- 6. Active Users & Badges System ---
-
-function trackActiveUsersAndBadges() {
+// --- Active Users ---
+function trackActiveUsers() {
     const user = auth.currentUser;
-    
-    // 1. تحديث وجود المستخدم (Online Status)
     if (user) {
-        const updatePresence = async () => {
-            try {
-                await updateDoc(doc(db, 'user-profiles', user.uid), {
-                    lastActive: serverTimestamp()
-                });
-            } catch(e) { console.log("Presence update failed", e); }
-        };
-        updatePresence(); 
-        setInterval(updatePresence, 60000); // تحديث كل دقيقة
+        const update = () => updateDoc(doc(db, 'user-profiles', user.uid), { lastActive: serverTimestamp() }).catch(()=>{});
+        update();
+        setInterval(update, 60000);
     }
 
-    // 2. مراقبة المستخدمين (لحساب الشارات والعدد النشط)
     const q = query(collection(db, 'user-profiles'));
-
     unsubscribeUsers = onSnapshot(q, (snapshot) => {
-        let onlineCount = 0;
-        const now = new Date();
-        const fiveMinutesAgo = new Date(now.getTime() - 5 * 60000);
-
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            // تحديث الكاش للشارات
-            usersCache[doc.id] = data.totalLikes || 0;
-
-            // حساب النشطين
+        let count = 0;
+        const cutoff = new Date(Date.now() - 5 * 60000); // 5 mins ago
+        snapshot.forEach(d => {
+            const data = d.data();
+            usersCache[d.id] = data.totalLikes || 0;
             if (data.lastActive) {
-                // التعامل مع Timestamp الخاص بـ Firebase
-                const lastActiveDate = data.lastActive.toDate ? data.lastActive.toDate() : new Date(data.lastActive);
-                if (lastActiveDate > fiveMinutesAgo) {
-                    onlineCount++;
-                }
+                const last = data.lastActive.toDate ? data.lastActive.toDate() : new Date(data.lastActive);
+                if (last > cutoff) count++;
             }
         });
-
-        if (elements.activeUsersBar) {
-            elements.activeUsersBar.classList.remove('hidden');
-            elements.activeCount.textContent = onlineCount;
-        }
-        
-        // إعادة رسم الرسائل لتحديث الشارات (اختياري لتحديث فوري)
-        // نقوم بإعادة الرسم فقط إذا كانت الرسائل محملة بالفعل لتجنب الوميض القوي
-        if(document.querySelectorAll('.message').length > 0) {
-             // يمكن تحسين هذا الجزء لتحديث الشارات فقط بدلاً من إعادة تحميل كل الرسائل
-             // لكن للتبسيط سنعتمد على التحديث عند وصول رسائل جديدة أو تحميل الصفحة
-        }
+        elements.activeUsersBar.classList.remove('hidden');
+        elements.activeCount.textContent = count;
     });
 }
 
-function getBadgeHTML(likes) {
-    if (!likes || likes < 100) return '';
-    
-    let badgeClass = '';
-    let badgeTitle = '';
-    let icon = '';
-
-    if (likes >= 5000) {
-        badgeClass = 'badge-mentor';
-        badgeTitle = 'Community Mentor';
-        icon = '<i class="fas fa-crown"></i>';
-    } else if (likes >= 1000) {
-        badgeClass = 'badge-trusted';
-        badgeTitle = 'Trusted Helper';
-        icon = '<i class="fas fa-shield-alt"></i>';
-    } else if (likes >= 500) {
-        badgeClass = 'badge-solver';
-        badgeTitle = 'Problem Solver';
-        icon = '<i class="fas fa-lightbulb"></i>';
-    } else if (likes >= 250) {
-        badgeClass = 'badge-active';
-        badgeTitle = 'Active Helper';
-        icon = '<i class="fas fa-star"></i>';
-    } else if (likes >= 100) {
-        badgeClass = 'badge-helper';
-        badgeTitle = 'Helper';
-        icon = '<i class="fas fa-hands-helping"></i>';
-    }
-
-    return `<span class="user-badge ${badgeClass}" title="${likes} Likes">${icon} ${badgeTitle}</span>`;
-}
-
-// --- 7. Chat Logic & Filtering ---
-
+// --- Chat Logic ---
 function loadMessages() {
     const q = query(collection(db, CHAT_COLLECTION), orderBy('timestamp', 'asc'));
-
     unsubscribeChat = onSnapshot(q, (snapshot) => {
         elements.messagesList.innerHTML = '';
-        snapshot.forEach((docSnap) => {
-            const msg = docSnap.data();
-            msg.id = docSnap.id;
-            renderMessage(msg);
-        });
+        snapshot.forEach(doc => renderMessage({ ...doc.data(), id: doc.id }));
         scrollToBottom();
     });
-}
-
-function containsForbiddenContent(text) {
-    const lowerText = text.toLowerCase();
-    if (URL_PATTERN.test(lowerText)) return "Links are not allowed in this chat.";
-    if (SOCIAL_MEDIA_PATTERN.test(lowerText)) return "Social media names are prohibited.";
-    if (NUMBER_PATTERN.test(lowerText)) return "Using too many consecutive numbers is prohibited.";
-
-    for (let word of PROFANITY_LIST) {
-        const wordRegex = new RegExp(`\\b${word}\\b|${word.replace(/(\w)/g, '$1\\*?')}`, 'i');
-        if (wordRegex.test(lowerText)) return "Profanity is strictly forbidden.";
-    }
-    return null; 
-}
-
-function showSecurityAlert(message) {
-    elements.alertMessage.textContent = message;
-    elements.securityAlert.classList.remove('hidden');
-    setTimeout(() => {
-        elements.securityAlert.classList.add('hidden');
-    }, 3000);
 }
 
 elements.messageForm.addEventListener('submit', async (e) => {
@@ -314,206 +213,84 @@ elements.messageForm.addEventListener('submit', async (e) => {
     const text = elements.msgInput.value.trim();
     if (!text) return;
 
-    const violation = containsForbiddenContent(text);
-    if (violation) {
-        showSecurityAlert(violation);
-        elements.msgInput.value = ''; 
-        return; 
+    // Basic Validation
+    if (URL_PATTERN.test(text) || SOCIAL_MEDIA_PATTERN.test(text)) {
+        showSecurityAlert("Links and social handles are not allowed.");
+        return;
     }
 
     const user = auth.currentUser;
-    
     try {
-        const messageData = {
-            text: text,
-            userId: user.uid,
-            userName: chatDisplayName || user.displayName,
-            userPhoto: user.photoURL || 'https://via.placeholder.com/35',
-            timestamp: serverTimestamp(),
-            isDeleted: false,
-            likes: 0,       // New
-            likedBy: []     // New
+        const payload = {
+            text, userId: user.uid, userName: chatDisplayName, userPhoto: user.photoURL,
+            timestamp: serverTimestamp(), isDeleted: false, likes: 0, likedBy: []
         };
-
         if (currentReplyTo) {
-            messageData.replyTo = {
-                id: currentReplyTo.id,
-                name: currentReplyTo.userName,
-                text: currentReplyTo.text.substring(0, 50) + (currentReplyTo.text.length > 50 ? '...' : '')
-            };
+            payload.replyTo = { id: currentReplyTo.id, name: currentReplyTo.userName, text: currentReplyTo.text };
         }
-
-        await addDoc(collection(db, CHAT_COLLECTION), messageData);
-        
+        await addDoc(collection(db, CHAT_COLLECTION), payload);
         elements.msgInput.value = '';
-        cancelReply(); 
-    } catch (error) {
-        console.error("Send Error:", error);
-    }
+        cancelReply();
+    } catch (e) { console.error(e); }
 });
 
-// --- 8. Rendering Messages (Updated) ---
-
 function renderMessage(msg) {
-    const currentUser = auth.currentUser;
-    const isMe = currentUser && msg.userId === currentUser.uid;
-    const isDeleted = msg.isDeleted === true;
-
+    const isMe = auth.currentUser && msg.userId === auth.currentUser.uid;
     const div = document.createElement('div');
     div.className = `message ${isMe ? 'me' : 'others'}`;
     div.id = `msg-${msg.id}`;
-
-    // Get Badge HTML based on cached likes
-    const userLikes = usersCache[msg.userId] || 0;
-    const badgeHTML = getBadgeHTML(userLikes);
-
-    let timeString = '';
-    if (msg.timestamp) {
-        const date = msg.timestamp.toDate();
-        timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
-
-    let contentHTML = '';
     
-    if (isDeleted) {
-        contentHTML = `<div class="msg-content deleted"><i class="fas fa-ban"></i> This message has been deleted.</div>`;
-    } else {
-        let replyHTML = '';
-        if (msg.replyTo) {
-            replyHTML = `
-                <div class="reply-context" onclick="scrollToMessage('${msg.replyTo.id}')">
-                    <small>Replying to <b>${sanitize(msg.replyTo.name)}</b></small><br>
-                    <span style="opacity:0.8">${sanitize(msg.replyTo.text)}</span>
-                </div>
-            `;
-        }
-
-        // Like Button Logic
-        const likedByMe = msg.likedBy && currentUser && msg.likedBy.includes(currentUser.uid);
-        const likeCount = msg.likes || 0;
-        const heartClass = likedByMe ? 'fas' : 'far'; 
-        const btnClass = likedByMe ? 'liked' : '';
-
-        contentHTML = `
-            <div class="msg-content">
-                ${replyHTML}
-                ${sanitize(msg.text)}
-                
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px; border-top:1px solid rgba(255,255,255,0.1); padding-top:4px;">
-                    <div style="font-size: 0.65rem; opacity: 0.6;">${timeString}</div>
-                    
-                    <div class="like-container">
-                        <span class="like-count">${likeCount > 0 ? likeCount : ''}</span>
-                        <button class="like-btn ${btnClass} id="like-${msg.id}">
-                            <i class="${heartClass} fa-heart"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
+    if (msg.isDeleted) {
+        div.innerHTML = `<div class="msg-content deleted"><small>Deleted Message</small></div>`;
+        elements.messagesList.appendChild(div);
+        return;
     }
 
-    let actionsHTML = '';
-    if (!isDeleted) {
-        actionsHTML = `
-            <div class="msg-actions">
-                <button class="action-btn reply-btn" title="Reply"><i class="fas fa-reply"></i></button>
-                ${isMe ? `<button class="action-btn delete-btn" title="Delete"><i class="fas fa-trash"></i></button>` : ''}
-            </div>
-        `;
+    const likes = msg.likes || 0;
+    const isLiked = auth.currentUser && msg.likedBy && msg.likedBy.includes(auth.currentUser.uid);
+    const badgeHTML = getBadge(usersCache[msg.userId] || 0);
+
+    let replyHTML = '';
+    if (msg.replyTo) {
+        replyHTML = `<div class="reply-context" onclick="scrollToMsg('${msg.replyTo.id}')">
+            <small>Reply to: <b>${sanitize(msg.replyTo.name)}</b></small>
+            <div style="opacity:0.7; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:200px;">${sanitize(msg.replyTo.text)}</div>
+        </div>`;
     }
 
     div.innerHTML = `
-        ${!isMe ? `<div class="msg-header">
-            <img src="${msg.userPhoto}" class="msg-avatar"> 
-            <span>${sanitize(msg.userName)}</span>
-            ${badgeHTML}
-        </div>` : ''}
-        ${contentHTML}
-        ${actionsHTML}
+        ${!isMe ? `<div class="msg-header"><img src="${msg.userPhoto}" class="msg-avatar"> <b>${sanitize(msg.userName)}</b> ${badgeHTML}</div>` : ''}
+        <div class="msg-content">
+            ${replyHTML}
+            ${sanitize(msg.text)}
+            <div style="display:flex; justify-content:space-between; margin-top:5px; font-size:0.7rem; opacity:0.6; align-items:center;">
+                <span>${msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '...'}</span>
+                <div class="like-container">
+                    <span>${likes || ''}</span>
+                    <button class="like-btn ${isLiked ? 'liked' : ''}"><i class="${isLiked ? 'fas' : 'far'} fa-heart"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="msg-actions">
+            <button class="action-btn reply-btn"><i class="fas fa-reply"></i></button>
+            ${isMe ? `<button class="action-btn delete-btn"><i class="fas fa-trash"></i></button>` : ''}
+        </div>
     `;
 
-    // Event Listeners
-    if (!isDeleted) {
-        // Reply
-        const replyBtn = div.querySelector('.reply-btn');
-        if (replyBtn) replyBtn.addEventListener('click', () => initiateReply(msg));
-        
-        // Delete
-        const deleteBtn = div.querySelector('.delete-btn');
-        if (deleteBtn) deleteBtn.addEventListener('click', () => deleteMessage(msg.id));
-
-        // Like (Prevent self-like)
-        const likeBtn = div.querySelector('.like-btn');
-        if (likeBtn && !isMe) {
-            likeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleLike(msg.id, msg.userId, msg.likedBy || []);
-            });
-        } else if (likeBtn && isMe) {
-            likeBtn.disabled = true;
-            likeBtn.style.opacity = '0.5';
-            likeBtn.style.cursor = 'default';
-        }
-    }
+    // Listeners
+    div.querySelector('.reply-btn').onclick = () => initiateReply(msg);
+    if(isMe) div.querySelector('.delete-btn').onclick = () => deleteMsg(msg.id);
+    const likeBtn = div.querySelector('.like-btn');
+    if(!isMe) likeBtn.onclick = () => toggleLike(msg);
 
     elements.messagesList.appendChild(div);
 }
 
-// --- 9. Utility Functions ---
-
-async function toggleLike(msgId, msgOwnerId, currentLikedBy) {
-    const user = auth.currentUser;
-    if (!user) {
-        alert("Please login to like messages.");
-        return;
-    }
-    if (user.uid === msgOwnerId) return; 
-
-    const msgRef = doc(db, CHAT_COLLECTION, msgId);
-    const ownerProfileRef = doc(db, 'user-profiles', msgOwnerId);
-
-    const isLiked = currentLikedBy.includes(user.uid);
-
-    try {
-        await runTransaction(db, async (transaction) => {
-            // 1. Update Message
-            if (isLiked) {
-                transaction.update(msgRef, {
-                    likes: increment(-1),
-                    likedBy: arrayRemove(user.uid)
-                });
-                // 2. Update Profile Score
-                transaction.update(ownerProfileRef, {
-                    totalLikes: increment(-1)
-                });
-            } else {
-                transaction.update(msgRef, {
-                    likes: increment(1),
-                    likedBy: arrayUnion(user.uid)
-                });
-                // 2. Update Profile Score
-                transaction.update(ownerProfileRef, {
-                    totalLikes: increment(1)
-                });
-            }
-        });
-    } catch (e) {
-        console.error("Like Error:", e);
-    }
-}
-
-async function deleteMessage(msgId) {
-    if (confirm("Are you sure you want to delete this message?")) {
-        try {
-            await updateDoc(doc(db, CHAT_COLLECTION, msgId), {
-                isDeleted: true,
-                text: "",
-                likes: 0,
-                likedBy: []
-            });
-        } catch (error) { console.error(error); }
-    }
+// Helper Functions
+function getBadge(likes) {
+    if (likes > 500) return '<span class="user-badge badge-helper"><i class="fas fa-crown"></i> Expert</span>';
+    if (likes > 100) return '<span class="user-badge badge-helper"><i class="fas fa-star"></i> Active</span>';
+    return '';
 }
 
 function initiateReply(msg) {
@@ -528,32 +305,45 @@ function cancelReply() {
     currentReplyTo = null;
     elements.replyPreview.classList.add('hidden');
 }
-if(elements.cancelReplyBtn) elements.cancelReplyBtn.addEventListener('click', cancelReply);
+if(elements.cancelReplyBtn) elements.cancelReplyBtn.onclick = cancelReply;
 
-function scrollToBottom() {
-    elements.messagesList.scrollTop = elements.messagesList.scrollHeight;
+async function toggleLike(msg) {
+    const user = auth.currentUser;
+    if(!user || user.uid === msg.userId) return;
+    const ref = doc(db, CHAT_COLLECTION, msg.id);
+    const profileRef = doc(db, 'user-profiles', msg.userId);
+    const isLiked = msg.likedBy && msg.likedBy.includes(user.uid);
+
+    try {
+        await runTransaction(db, async (t) => {
+            t.update(ref, {
+                likes: increment(isLiked ? -1 : 1),
+                likedBy: isLiked ? arrayRemove(user.uid) : arrayUnion(user.uid)
+            });
+            t.update(profileRef, { totalLikes: increment(isLiked ? -1 : 1) });
+        });
+    } catch(e) { console.error(e); }
 }
 
-window.scrollToMessage = function(msgId) {
-    const el = document.getElementById(`msg-${msgId}`);
-    if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.style.backgroundColor = '#ffffff20';
-        setTimeout(() => el.style.backgroundColor = 'transparent', 1000);
+async function deleteMsg(id) {
+    if(confirm("Delete this message?")) {
+        await updateDoc(doc(db, CHAT_COLLECTION, id), { isDeleted: true, text: '', likes: 0 });
     }
+}
+
+function showSecurityAlert(msg) {
+    elements.alertMessage.textContent = msg;
+    elements.securityAlert.classList.remove('hidden');
+    setTimeout(() => elements.securityAlert.classList.add('hidden'), 3000);
+}
+
+function scrollToBottom() { elements.messagesList.scrollTop = elements.messagesList.scrollHeight; }
+
+window.scrollToMsg = (id) => {
+    const el = document.getElementById(`msg-${id}`);
+    if(el) el.scrollIntoView({behavior: "smooth", block: "center"});
 };
 
 function sanitize(str) {
-    if (!str) return '';
-    const temp = document.createElement('div');
-    temp.textContent = str;
-    return temp.innerHTML;
+    const d = document.createElement('div'); d.textContent = str; return d.innerHTML;
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Basic text initialization if needed
-    if(elements.setupModal) {
-        elements.setupModal.querySelector('h2').innerHTML = '<i class="fas fa-shield-alt"></i> Secure Entry Setup';
-        elements.completeSetupBtn.textContent = 'Accept and Enter';
-    }
-});
