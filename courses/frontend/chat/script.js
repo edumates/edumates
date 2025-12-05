@@ -7,6 +7,9 @@ import {
     arrayUnion, arrayRemove, increment, runTransaction 
 } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
+// --- استيراد مكتبة فلترة الكلمات البذيئة (احترافي) ---
+import Filter from 'https://cdn.skypack.dev/bad-words';
+
 // 2. Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyBhCxGjQOQ88b2GynL515ZYQXqfiLPhjw4",
@@ -24,14 +27,23 @@ const db = getFirestore(app);
 
 const CHAT_COLLECTION = 'frontend-chat'; 
 
-// 3. Constants
-const PROFANITY_LIST = ["asshole", "bitch", "cunt", "fuck", "shit", "dick", "pussy", "whore", "slut", "bastard"]; // تم اختصار القائمة للعرض
-const URL_PATTERN = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/i;
-const SOCIAL_MEDIA_PATTERN = /(facebook|instagram|tiktok|snapchat|twitter|whatsapp|telegram)/i; 
+// 3. Security Constants & Configuration
+const filter = new Filter();
+
+// إضافة قائمة كلمات عربية وإنجليزية مخصصة للحظر (يمكنك زيادة هذه القائمة)
+const CUSTOM_BAD_WORDS = ["احمق", "غبي", "حيوان", "كلب", "زباله", "سافل", "حقير", "sexy", "porn", "xxx"];
+filter.addWords(...CUSTOM_BAD_WORDS);
+
+// منع الروابط بجميع أشكالها (com, net, org, http, www, etc)
+const LINK_REGEX = /((https?:\/\/)|(www\.))|(\.[a-z]{2,3}(\/|\s|$))/i;
+const DOMAIN_EXTENSIONS = /\.(com|net|org|edu|gov|io|co|biz|info|me)\b/i;
+
+// منع الأرقام (أكثر من 3 أرقام متتالية - مثل أرقام الهواتف)
+const PHONE_NUMBER_REGEX = /\d{4,}/; 
 
 // 4. DOM Elements
 const elements = {
-    themeToggle: document.getElementById('themeToggle'), // NEW
+    themeToggle: document.getElementById('themeToggle'),
     loginBtn: document.getElementById('loginBtn'),
     logoutBtn: document.getElementById('logoutBtn'),
     userInfo: document.getElementById('userInfo'),
@@ -63,7 +75,7 @@ let unsubscribeChat = null;
 let unsubscribeUsers = null;
 let usersCache = {}; 
 
-// --- Theme Logic (New) ---
+// --- Theme Logic ---
 function initTheme() {
     const savedTheme = localStorage.getItem('chatTheme');
     if (savedTheme === 'light') {
@@ -77,18 +89,12 @@ function initTheme() {
 elements.themeToggle.addEventListener('click', () => {
     document.body.classList.toggle('light-mode');
     const isLight = document.body.classList.contains('light-mode');
-    
-    // Update Icon
     elements.themeToggle.innerHTML = isLight ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    
-    // Save Preference
     localStorage.setItem('chatTheme', isLight ? 'light' : 'dark');
 });
-
 initTheme();
 
 // --- Auth & Setup ---
-
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         elements.loginBtn.classList.add('hidden');
@@ -136,7 +142,16 @@ async function checkUserProfile(user) {
 
 // Setup Form
 function validateSetup() {
-    const valid = elements.setupDisplayName.value.trim().length >= 3 && 
+    // Check profanity in username too
+    const name = elements.setupDisplayName.value.trim();
+    if(filter.isProfane(name)) {
+        elements.setupDisplayName.style.borderColor = 'red';
+        return;
+    } else {
+        elements.setupDisplayName.style.borderColor = '';
+    }
+
+    const valid = name.length >= 3 && 
                  elements.checkAge.checked && elements.checkTerms.checked && elements.checkConduct.checked;
     elements.completeSetupBtn.disabled = !valid;
 }
@@ -149,16 +164,22 @@ if(elements.completeSetupBtn) {
     elements.completeSetupBtn.addEventListener('click', async () => {
         const user = auth.currentUser;
         if (!user) return;
+        const name = elements.setupDisplayName.value.trim();
         
+        if (filter.isProfane(name)) {
+            alert("Please choose a respectful display name.");
+            return;
+        }
+
         try {
             await setDoc(doc(db, 'user-profiles', user.uid), {
-                chatInfo: { displayName: elements.setupDisplayName.value.trim(), joinedAt: serverTimestamp() },
+                chatInfo: { displayName: name, joinedAt: serverTimestamp() },
                 totalLikes: 0,
                 lastActive: serverTimestamp()
             }, { merge: true });
             
             elements.setupModal.classList.add('hidden');
-            chatDisplayName = elements.setupDisplayName.value.trim();
+            chatDisplayName = name;
             elements.userName.textContent = chatDisplayName;
             enableChat();
         } catch (e) { alert("Error saving profile"); }
@@ -184,7 +205,7 @@ function trackActiveUsers() {
     const q = query(collection(db, 'user-profiles'));
     unsubscribeUsers = onSnapshot(q, (snapshot) => {
         let count = 0;
-        const cutoff = new Date(Date.now() - 5 * 60000); // 5 mins ago
+        const cutoff = new Date(Date.now() - 5 * 60000); 
         snapshot.forEach(d => {
             const data = d.data();
             usersCache[d.id] = data.totalLikes || 0;
@@ -208,22 +229,41 @@ function loadMessages() {
     });
 }
 
+// *** SECURITY & SENDING LOGIC ***
 elements.messageForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const text = elements.msgInput.value.trim();
+    let text = elements.msgInput.value.trim();
     if (!text) return;
 
-    // Basic Validation
-    if (URL_PATTERN.test(text) || SOCIAL_MEDIA_PATTERN.test(text)) {
-        showSecurityAlert("Links and social handles are not allowed.");
+    // 1. Check for Profanity (Using Library)
+    if (filter.isProfane(text)) {
+        showSecurityAlert("Respectful language is required. Bad words detected.");
+        return;
+    }
+
+    // 2. Check for Links & Domains
+    if (LINK_REGEX.test(text) || DOMAIN_EXTENSIONS.test(text)) {
+        showSecurityAlert("Links (URLs) are not allowed for security reasons.");
+        return;
+    }
+
+    // 3. Check for Long Numbers (Phone numbers/IDs)
+    if (PHONE_NUMBER_REGEX.test(text)) {
+        showSecurityAlert("Sharing phone numbers or long IDs is strictly prohibited.");
         return;
     }
 
     const user = auth.currentUser;
     try {
         const payload = {
-            text, userId: user.uid, userName: chatDisplayName, userPhoto: user.photoURL,
-            timestamp: serverTimestamp(), isDeleted: false, likes: 0, likedBy: []
+            text, // Text is now clean
+            userId: user.uid, 
+            userName: chatDisplayName, 
+            userPhoto: user.photoURL,
+            timestamp: serverTimestamp(), 
+            isDeleted: false, 
+            likes: 0, 
+            likedBy: []
         };
         if (currentReplyTo) {
             payload.replyTo = { id: currentReplyTo.id, name: currentReplyTo.userName, text: currentReplyTo.text };
@@ -277,7 +317,6 @@ function renderMessage(msg) {
         </div>
     `;
 
-    // Listeners
     div.querySelector('.reply-btn').onclick = () => initiateReply(msg);
     if(isMe) div.querySelector('.delete-btn').onclick = () => deleteMsg(msg.id);
     const likeBtn = div.querySelector('.like-btn');
@@ -286,7 +325,6 @@ function renderMessage(msg) {
     elements.messagesList.appendChild(div);
 }
 
-// Helper Functions
 function getBadge(likes) {
     if (likes > 500) return '<span class="user-badge badge-helper"><i class="fas fa-crown"></i> Expert</span>';
     if (likes > 100) return '<span class="user-badge badge-helper"><i class="fas fa-star"></i> Active</span>';
