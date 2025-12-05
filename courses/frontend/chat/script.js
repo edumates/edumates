@@ -7,8 +7,8 @@ import {
     arrayUnion, arrayRemove, increment, runTransaction 
 } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
-// --- استيراد مكتبة فلترة الكلمات البذيئة (احترافي) ---
-import Filter from 'https://cdn.skypack.dev/bad-words';
+// --- إصلاح الاستيراد: استخدام jsDelivr مع وضع ESM ---
+import Filter from 'https://cdn.jsdelivr.net/npm/bad-words@3.0.4/+esm';
 
 // 2. Firebase Configuration
 const firebaseConfig = {
@@ -28,15 +28,20 @@ const db = getFirestore(app);
 const CHAT_COLLECTION = 'frontend-chat'; 
 
 // 3. Security Constants & Configuration
+// تهيئة الفلتر (الآن سيعمل بدون أخطاء)
 const filter = new Filter();
 
-// إضافة قائمة كلمات عربية وإنجليزية مخصصة للحظر (يمكنك زيادة هذه القائمة)
-const CUSTOM_BAD_WORDS = ["احمق", "غبي", "حيوان", "كلب", "زباله", "سافل", "حقير", "sexy", "porn", "xxx"];
+// إضافة قائمة كلمات عربية وإنجليزية مخصصة للحظر
+// (المكتبة تحتوي على الإنجليزية، ونحن نضيف العربية والكلمات العامية)
+const CUSTOM_BAD_WORDS = [
+    "احمق", "غبي", "حيوان", "كلب", "زباله", "سافل", "حقير", "تفه",
+    "sexy", "porn", "xxx", "bitch", "fuck"
+];
 filter.addWords(...CUSTOM_BAD_WORDS);
 
 // منع الروابط بجميع أشكالها (com, net, org, http, www, etc)
 const LINK_REGEX = /((https?:\/\/)|(www\.))|(\.[a-z]{2,3}(\/|\s|$))/i;
-const DOMAIN_EXTENSIONS = /\.(com|net|org|edu|gov|io|co|biz|info|me)\b/i;
+const DOMAIN_EXTENSIONS = /\.(com|net|org|edu|gov|io|co|biz|info|me|xyz)\b/i;
 
 // منع الأرقام (أكثر من 3 أرقام متتالية - مثل أرقام الهواتف)
 const PHONE_NUMBER_REGEX = /\d{4,}/; 
@@ -86,35 +91,39 @@ function initTheme() {
     }
 }
 
-elements.themeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('light-mode');
-    const isLight = document.body.classList.contains('light-mode');
-    elements.themeToggle.innerHTML = isLight ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    localStorage.setItem('chatTheme', isLight ? 'light' : 'dark');
-});
+if(elements.themeToggle) {
+    elements.themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+        const isLight = document.body.classList.contains('light-mode');
+        elements.themeToggle.innerHTML = isLight ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        localStorage.setItem('chatTheme', isLight ? 'light' : 'dark');
+    });
+}
 initTheme();
 
 // --- Auth & Setup ---
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        elements.loginBtn.classList.add('hidden');
-        elements.userInfo.classList.remove('hidden');
-        elements.userAvatar.src = user.photoURL || 'https://via.placeholder.com/32';
+        if(elements.loginBtn) elements.loginBtn.classList.add('hidden');
+        if(elements.userInfo) elements.userInfo.classList.remove('hidden');
+        if(elements.userAvatar) elements.userAvatar.src = user.photoURL || 'https://via.placeholder.com/32';
         await checkUserProfile(user);
     } else {
         handleLogoutUI();
     }
 });
 
-elements.loginBtn.addEventListener('click', async () => {
-    try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch (error) { console.error(error); }
-});
+if(elements.loginBtn) {
+    elements.loginBtn.addEventListener('click', async () => {
+        try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch (error) { console.error(error); }
+    });
+}
 
-elements.logoutBtn.addEventListener('click', () => signOut(auth));
+if(elements.logoutBtn) elements.logoutBtn.addEventListener('click', () => signOut(auth));
 
 function handleLogoutUI() {
-    elements.loginBtn.classList.remove('hidden');
-    elements.userInfo.classList.add('hidden');
+    if(elements.loginBtn) elements.loginBtn.classList.remove('hidden');
+    if(elements.userInfo) elements.userInfo.classList.add('hidden');
     elements.messagesList.innerHTML = '<div class="loading-spinner">Please Sign In to Join</div>';
     elements.msgInput.disabled = true;
     elements.sendBtn.disabled = true;
@@ -140,12 +149,18 @@ async function checkUserProfile(user) {
     } catch (e) { console.error(e); }
 }
 
-// Setup Form
+// Setup Form Validation
 function validateSetup() {
+    if(!elements.setupDisplayName) return;
+    
     // Check profanity in username too
     const name = elements.setupDisplayName.value.trim();
-    if(filter.isProfane(name)) {
+    let isProfane = false;
+    try { isProfane = filter.isProfane(name); } catch(e) { console.log("Filter not ready yet"); }
+
+    if(isProfane) {
         elements.setupDisplayName.style.borderColor = 'red';
+        elements.completeSetupBtn.disabled = true;
         return;
     } else {
         elements.setupDisplayName.style.borderColor = '';
@@ -155,6 +170,7 @@ function validateSetup() {
                  elements.checkAge.checked && elements.checkTerms.checked && elements.checkConduct.checked;
     elements.completeSetupBtn.disabled = !valid;
 }
+
 [elements.setupDisplayName, elements.checkAge, elements.checkTerms, elements.checkConduct].forEach(el => {
     if(el) el.addEventListener('change', validateSetup);
 });
@@ -214,8 +230,8 @@ function trackActiveUsers() {
                 if (last > cutoff) count++;
             }
         });
-        elements.activeUsersBar.classList.remove('hidden');
-        elements.activeCount.textContent = count;
+        if(elements.activeUsersBar) elements.activeUsersBar.classList.remove('hidden');
+        if(elements.activeCount) elements.activeCount.textContent = count;
     });
 }
 
@@ -235,7 +251,7 @@ elements.messageForm.addEventListener('submit', async (e) => {
     let text = elements.msgInput.value.trim();
     if (!text) return;
 
-    // 1. Check for Profanity (Using Library)
+    // 1. Check for Profanity
     if (filter.isProfane(text)) {
         showSecurityAlert("Respectful language is required. Bad words detected.");
         return;
@@ -317,14 +333,22 @@ function renderMessage(msg) {
         </div>
     `;
 
-    div.querySelector('.reply-btn').onclick = () => initiateReply(msg);
-    if(isMe) div.querySelector('.delete-btn').onclick = () => deleteMsg(msg.id);
+    // Listeners
+    const replyBtn = div.querySelector('.reply-btn');
+    if(replyBtn) replyBtn.onclick = () => initiateReply(msg);
+    
+    if(isMe) {
+        const delBtn = div.querySelector('.delete-btn');
+        if(delBtn) delBtn.onclick = () => deleteMsg(msg.id);
+    }
+    
     const likeBtn = div.querySelector('.like-btn');
-    if(!isMe) likeBtn.onclick = () => toggleLike(msg);
+    if(!isMe && likeBtn) likeBtn.onclick = () => toggleLike(msg);
 
     elements.messagesList.appendChild(div);
 }
 
+// Helpers
 function getBadge(likes) {
     if (likes > 500) return '<span class="user-badge badge-helper"><i class="fas fa-crown"></i> Expert</span>';
     if (likes > 100) return '<span class="user-badge badge-helper"><i class="fas fa-star"></i> Active</span>';
