@@ -7,7 +7,7 @@ import {
     arrayUnion, arrayRemove, increment, runTransaction 
 } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
-// --- إصلاح الاستيراد: استخدام jsDelivr مع وضع ESM ---
+// استيراد الفلتر (Filter)
 import Filter from 'https://cdn.jsdelivr.net/npm/bad-words@3.0.4/+esm';
 
 // 2. Firebase Configuration
@@ -28,22 +28,18 @@ const db = getFirestore(app);
 const CHAT_COLLECTION = 'frontend-chat'; 
 
 // 3. Security Constants & Configuration
-// تهيئة الفلتر (الآن سيعمل بدون أخطاء)
 const filter = new Filter();
 
-// إضافة قائمة كلمات عربية وإنجليزية مخصصة للحظر
-// (المكتبة تحتوي على الإنجليزية، ونحن نضيف العربية والكلمات العامية)
+// إضافة قائمة كلمات محظورة مخصصة
 const CUSTOM_BAD_WORDS = [
     "احمق", "غبي", "حيوان", "كلب", "زباله", "سافل", "حقير", "تفه",
     "sexy", "porn", "xxx", "bitch", "fuck"
 ];
 filter.addWords(...CUSTOM_BAD_WORDS);
 
-// منع الروابط بجميع أشكالها (com, net, org, http, www, etc)
+// منع الروابط والأرقام الطويلة
 const LINK_REGEX = /((https?:\/\/)|(www\.))|(\.[a-z]{2,3}(\/|\s|$))/i;
 const DOMAIN_EXTENSIONS = /\.(com|net|org|edu|gov|io|co|biz|info|me|xyz)\b/i;
-
-// منع الأرقام (أكثر من 3 أرقام متتالية - مثل أرقام الهواتف)
 const PHONE_NUMBER_REGEX = /\d{4,}/; 
 
 // 4. DOM Elements
@@ -69,16 +65,13 @@ const elements = {
     checkAge: document.getElementById('checkAge'),
     checkTerms: document.getElementById('checkTerms'),
     checkConduct: document.getElementById('checkConduct'),
-    completeSetupBtn: document.getElementById('completeSetupBtn'),
-    activeUsersBar: document.getElementById('activeUsersBar'),
-    activeCount: document.getElementById('activeCount')
+    completeSetupBtn: document.getElementById('completeSetupBtn')
+    // تم حذف activeUsersBar و activeCount
 };
 
 let currentReplyTo = null;
 let chatDisplayName = null; 
 let unsubscribeChat = null; 
-let unsubscribeUsers = null;
-let usersCache = {}; 
 
 // --- Theme Logic ---
 function initTheme() {
@@ -128,9 +121,7 @@ function handleLogoutUI() {
     elements.msgInput.disabled = true;
     elements.sendBtn.disabled = true;
     elements.setupModal.classList.add('hidden');
-    elements.activeUsersBar.classList.add('hidden');
     if (unsubscribeChat) unsubscribeChat();
-    if (unsubscribeUsers) unsubscribeUsers();
 }
 
 async function checkUserProfile(user) {
@@ -153,10 +144,9 @@ async function checkUserProfile(user) {
 function validateSetup() {
     if(!elements.setupDisplayName) return;
     
-    // Check profanity in username too
     const name = elements.setupDisplayName.value.trim();
     let isProfane = false;
-    try { isProfane = filter.isProfane(name); } catch(e) { console.log("Filter not ready yet"); }
+    try { isProfane = filter.isProfane(name); } catch(e) { }
 
     if(isProfane) {
         elements.setupDisplayName.style.borderColor = 'red';
@@ -206,33 +196,7 @@ function enableChat() {
     elements.msgInput.disabled = false;
     elements.sendBtn.disabled = false;
     loadMessages();
-    trackActiveUsers();
-}
-
-// --- Active Users ---
-function trackActiveUsers() {
-    const user = auth.currentUser;
-    if (user) {
-        const update = () => updateDoc(doc(db, 'user-profiles', user.uid), { lastActive: serverTimestamp() }).catch(()=>{});
-        update();
-        setInterval(update, 60000);
-    }
-
-    const q = query(collection(db, 'user-profiles'));
-    unsubscribeUsers = onSnapshot(q, (snapshot) => {
-        let count = 0;
-        const cutoff = new Date(Date.now() - 5 * 60000); 
-        snapshot.forEach(d => {
-            const data = d.data();
-            usersCache[d.id] = data.totalLikes || 0;
-            if (data.lastActive) {
-                const last = data.lastActive.toDate ? data.lastActive.toDate() : new Date(data.lastActive);
-                if (last > cutoff) count++;
-            }
-        });
-        if(elements.activeUsersBar) elements.activeUsersBar.classList.remove('hidden');
-        if(elements.activeCount) elements.activeCount.textContent = count;
-    });
+    // تم حذف استدعاء trackActiveUsers
 }
 
 // --- Chat Logic ---
@@ -251,19 +215,16 @@ elements.messageForm.addEventListener('submit', async (e) => {
     let text = elements.msgInput.value.trim();
     if (!text) return;
 
-    // 1. Check for Profanity
     if (filter.isProfane(text)) {
         showSecurityAlert("Respectful language is required. Bad words detected.");
         return;
     }
 
-    // 2. Check for Links & Domains
     if (LINK_REGEX.test(text) || DOMAIN_EXTENSIONS.test(text)) {
         showSecurityAlert("Links (URLs) are not allowed for security reasons.");
         return;
     }
 
-    // 3. Check for Long Numbers (Phone numbers/IDs)
     if (PHONE_NUMBER_REGEX.test(text)) {
         showSecurityAlert("Sharing phone numbers or long IDs is strictly prohibited.");
         return;
@@ -272,7 +233,7 @@ elements.messageForm.addEventListener('submit', async (e) => {
     const user = auth.currentUser;
     try {
         const payload = {
-            text, // Text is now clean
+            text, 
             userId: user.uid, 
             userName: chatDisplayName, 
             userPhoto: user.photoURL,
@@ -304,7 +265,6 @@ function renderMessage(msg) {
 
     const likes = msg.likes || 0;
     const isLiked = auth.currentUser && msg.likedBy && msg.likedBy.includes(auth.currentUser.uid);
-    const badgeHTML = getBadge(usersCache[msg.userId] || 0);
 
     let replyHTML = '';
     if (msg.replyTo) {
@@ -314,17 +274,17 @@ function renderMessage(msg) {
         </div>`;
     }
 
+    // تصميم هيكل الرسالة الجديد (Clean & Professional)
     div.innerHTML = `
-        ${!isMe ? `<div class="msg-header"><img src="${msg.userPhoto}" class="msg-avatar"> <b>${sanitize(msg.userName)}</b> ${badgeHTML}</div>` : ''}
+        ${!isMe ? `<div class="msg-header"><img src="${msg.userPhoto}" class="msg-avatar"> <b>${sanitize(msg.userName)}</b></div>` : ''}
         <div class="msg-content">
             ${replyHTML}
             ${sanitize(msg.text)}
-            <div style="display:flex; justify-content:space-between; margin-top:5px; font-size:0.7rem; opacity:0.6; align-items:center;">
+            <div class="msg-meta">
                 <span>${msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '...'}</span>
-                <div class="like-container">
-                    <span>${likes || ''}</span>
-                    <button class="like-btn ${isLiked ? 'liked' : ''}"><i class="${isLiked ? 'fas' : 'far'} fa-heart"></i></button>
-                </div>
+                <button class="like-btn ${isLiked ? 'liked' : ''}">
+                    ${likes > 0 ? likes : ''} <i class="${isLiked ? 'fas' : 'far'} fa-heart"></i>
+                </button>
             </div>
         </div>
         <div class="msg-actions">
@@ -348,13 +308,6 @@ function renderMessage(msg) {
     elements.messagesList.appendChild(div);
 }
 
-// Helpers
-function getBadge(likes) {
-    if (likes > 500) return '<span class="user-badge badge-helper"><i class="fas fa-crown"></i> Expert</span>';
-    if (likes > 100) return '<span class="user-badge badge-helper"><i class="fas fa-star"></i> Active</span>';
-    return '';
-}
-
 function initiateReply(msg) {
     currentReplyTo = msg;
     elements.replyPreview.classList.remove('hidden');
@@ -373,7 +326,6 @@ async function toggleLike(msg) {
     const user = auth.currentUser;
     if(!user || user.uid === msg.userId) return;
     const ref = doc(db, CHAT_COLLECTION, msg.id);
-    const profileRef = doc(db, 'user-profiles', msg.userId);
     const isLiked = msg.likedBy && msg.likedBy.includes(user.uid);
 
     try {
@@ -382,7 +334,7 @@ async function toggleLike(msg) {
                 likes: increment(isLiked ? -1 : 1),
                 likedBy: isLiked ? arrayRemove(user.uid) : arrayUnion(user.uid)
             });
-            t.update(profileRef, { totalLikes: increment(isLiked ? -1 : 1) });
+            // تم إزالة تحديث البروفايل الخاص بالمستخدم لتسريع العملية
         });
     } catch(e) { console.error(e); }
 }
