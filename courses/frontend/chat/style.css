@@ -340,3 +340,57 @@ body.light-mode .navbar { background-color: rgba(255, 255, 255, 0.85); }
     cursor: pointer;
 }
 body.light-mode .reply-context { background: rgba(0,0,0,0.05); border-left-color: var(--accent-color); }
+/* --- Security Alert Toast Notification --- */
+.security-alert {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    /* توسيط العنصر تماماً مع السماح بالحركة */
+    transform: translateX(-50%) translateY(0);
+    
+    background-color: rgba(220, 38, 38, 0.95); /* لون أحمر عصري وجذاب */
+    color: #ffffff;
+    
+    padding: 12px 24px;
+    min-width: 300px;
+    max-width: 90%;
+    
+    border-radius: 50px; /* جعل الحواف دائرية بالكامل (Pill Shape) */
+    box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.4), 
+                0 4px 6px -2px rgba(0, 0, 0, 0.1); /* ظل ناعم */
+                
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    
+    z-index: 2000;
+    font-weight: 500;
+    font-size: 0.95rem;
+    
+    backdrop-filter: blur(8px); /* تأثير الزجاج */
+    -webkit-backdrop-filter: blur(8px);
+    
+    /* حركة انسيابية جداً (Bouncy Animation) */
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    opacity: 1;
+}
+
+/* حالة الاختفاء */
+.security-alert.hidden {
+    transform: translateX(-50%) translateY(-200%); /* يرتفع للأعلى ليختفي */
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* تنسيق أيقونة التنبيه داخله */
+.security-alert i {
+    font-size: 1.2rem;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
