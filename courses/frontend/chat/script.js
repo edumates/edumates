@@ -4,7 +4,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChang
 import { 
     getFirestore, collection, addDoc, onSnapshot, query, orderBy, 
     serverTimestamp, updateDoc, doc, getDoc, setDoc, 
-    arrayUnion, arrayRemove, increment, runTransaction 
+    runTransaction 
 } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
 // استيراد الفلتر (Filter)
@@ -66,7 +66,6 @@ const elements = {
     checkTerms: document.getElementById('checkTerms'),
     checkConduct: document.getElementById('checkConduct'),
     completeSetupBtn: document.getElementById('completeSetupBtn')
-    // تم حذف activeUsersBar و activeCount
 };
 
 let currentReplyTo = null;
@@ -180,7 +179,7 @@ if(elements.completeSetupBtn) {
         try {
             await setDoc(doc(db, 'user-profiles', user.uid), {
                 chatInfo: { displayName: name, joinedAt: serverTimestamp() },
-                totalLikes: 0,
+                // removed totalLikes
                 lastActive: serverTimestamp()
             }, { merge: true });
             
@@ -196,7 +195,6 @@ function enableChat() {
     elements.msgInput.disabled = false;
     elements.sendBtn.disabled = false;
     loadMessages();
-    // تم حذف استدعاء trackActiveUsers
 }
 
 // --- Chat Logic ---
@@ -238,9 +236,8 @@ elements.messageForm.addEventListener('submit', async (e) => {
             userName: chatDisplayName, 
             userPhoto: user.photoURL,
             timestamp: serverTimestamp(), 
-            isDeleted: false, 
-            likes: 0, 
-            likedBy: []
+            isDeleted: false
+            // removed likes and likedBy
         };
         if (currentReplyTo) {
             payload.replyTo = { id: currentReplyTo.id, name: currentReplyTo.userName, text: currentReplyTo.text };
@@ -263,9 +260,6 @@ function renderMessage(msg) {
         return;
     }
 
-    const likes = msg.likes || 0;
-    const isLiked = auth.currentUser && msg.likedBy && msg.likedBy.includes(auth.currentUser.uid);
-
     let replyHTML = '';
     if (msg.replyTo) {
         replyHTML = `<div class="reply-context" onclick="scrollToMsg('${msg.replyTo.id}')">
@@ -274,7 +268,7 @@ function renderMessage(msg) {
         </div>`;
     }
 
-    // تصميم هيكل الرسالة الجديد (Clean & Professional)
+    // تم إزالة زر اللايك والعداد الخاص به
     div.innerHTML = `
         ${!isMe ? `<div class="msg-header"><img src="${msg.userPhoto}" class="msg-avatar"> <b>${sanitize(msg.userName)}</b></div>` : ''}
         <div class="msg-content">
@@ -282,9 +276,6 @@ function renderMessage(msg) {
             ${sanitize(msg.text)}
             <div class="msg-meta">
                 <span>${msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '...'}</span>
-                <button class="like-btn ${isLiked ? 'liked' : ''}">
-                    ${likes > 0 ? likes : ''} <i class="${isLiked ? 'fas' : 'far'} fa-heart"></i>
-                </button>
             </div>
         </div>
         <div class="msg-actions">
@@ -302,8 +293,7 @@ function renderMessage(msg) {
         if(delBtn) delBtn.onclick = () => deleteMsg(msg.id);
     }
     
-    const likeBtn = div.querySelector('.like-btn');
-    if(!isMe && likeBtn) likeBtn.onclick = () => toggleLike(msg);
+    // removed like button listener
 
     elements.messagesList.appendChild(div);
 }
@@ -322,26 +312,12 @@ function cancelReply() {
 }
 if(elements.cancelReplyBtn) elements.cancelReplyBtn.onclick = cancelReply;
 
-async function toggleLike(msg) {
-    const user = auth.currentUser;
-    if(!user || user.uid === msg.userId) return;
-    const ref = doc(db, CHAT_COLLECTION, msg.id);
-    const isLiked = msg.likedBy && msg.likedBy.includes(user.uid);
-
-    try {
-        await runTransaction(db, async (t) => {
-            t.update(ref, {
-                likes: increment(isLiked ? -1 : 1),
-                likedBy: isLiked ? arrayRemove(user.uid) : arrayUnion(user.uid)
-            });
-            // تم إزالة تحديث البروفايل الخاص بالمستخدم لتسريع العملية
-        });
-    } catch(e) { console.error(e); }
-}
+// removed toggleLike function completely
 
 async function deleteMsg(id) {
     if(confirm("Delete this message?")) {
-        await updateDoc(doc(db, CHAT_COLLECTION, id), { isDeleted: true, text: '', likes: 0 });
+        // removed likes: 0 reset
+        await updateDoc(doc(db, CHAT_COLLECTION, id), { isDeleted: true, text: '' });
     }
 }
 
