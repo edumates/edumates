@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edumates - Backend Roadmap</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="../../roadmap.css">
+  <link rel="stylesheet" href="../frontend/courses-det-styles.css"> 
+  <link rel="stylesheet" href="backend-style.css"> 
+</head>
+<body>
+  <nav class="navbar">
+    <a href="../index.html" class="logo">Edumates</a>
+    <button class="mobile-menu-btn" aria-label="Open Menu">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="nav-links">
+      <a href="../../index.html" class="nav-link">Home</a>
+      <a href="../../courses-page/courses.html" class="nav-link active">Courses</a>
+      <a href="#footer" class="nav-link">Contact Us</a>
+      <div class="auth-buttons">
+        <button class="google-login-btn" id="googleLoginBtn">
+          <i class="fab fa-google"></i> Sign in with Google
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="breadcrumbs">
+    <a href="../../index.html">Home</a> > <a href="../../courses-page/courses.html">Courses</a> > <span>Backend Path</span>
+  </div>
+
+  <section class="course-details-section">
+    <div class="section-header">
+      <h2>Backend Developer Path</h2>
+      <p>Master server-side logic with Python, Django, and Databases.</p>
+      <button class="view-roadmap-btn" id="viewRoadmapBtn">View Roadmap</button>
+      <a href="chat/index.html" class="chat-btn" id="chatBtn">
+        <i class="fas fa-comments"></i> Chat
+      </a>
+      
+      <div class="roadmap-modal" id="roadmapModal">
+        <div class="roadmap-content">
+          <span class="close-roadmap" id="closeRoadmap">&times;</span>
+          <h2>Backend Roadmap</h2>
+          <div class="roadmap-scroll-container">
+            <ul id="roadmapList">
+                <li class="level-title">Beginner</li>
+                <li class="roadmap-task" data-skill="Python">Programming Language (Python) <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="WebBasics">Web basics (HTTP, REST APIs) <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="Databases">Databases (SQL, NoSQL basics) <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="CRUD">Simple CRUD Application <button class="mark-done">Check</button></li>
+                
+                <li class="level-title">Intermediate</li>
+                <li class="roadmap-task" data-skill="Django">Frameworks (Django) <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="Auth">Authentication & Authorization <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="AdvDB">Advanced Database Management <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="FileCloud">File Handling & Cloud Storage <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="Testing">Testing (Unit & Integration) <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="Deployment">Deployment Basics <button class="mark-done">Check</button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="level-container" id="beginner-level">
+        <h2 class="level-heading">Level 1: Beginner</h2>
+        
+        <div class="topic-card" id="python-section">
+            <h3><i class="fab fa-python"></i> 1. Programming Language (Python)</h3>
+            <div class="resources-split">
+                <div class="res-col free-col">
+                    <span class="badge free">Free Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="py-official">
+                            <a href="https://docs.python.org/3/tutorial/" target="_blank">Python Official Documentation</a>
+                            <div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                        </li>
+                        <li data-link-id="py-mosh">
+                            <a href="https://youtu.be/_uQrJ0TkZlc" target="_blank">Programming with Mosh (Youtube)</a>
+                            <div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                        </li>
+                        <li data-link-id="py-fcc">
+                            <a href="https://www.freecodecamp.org/learn/scientific-computing-with-python-v7/" target="_blank">FreeCodeCamp Python Cert</a>
+                            <div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="res-col paid-col">
+                    <span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="py-angela">
+                            <a href="https://www.udemy.com/course/100-days-of-code/" target="_blank">100 Days of Code: Python (Angela Yu)</a>
+                            <div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                        </li>
+                         <li data-link-id="py-coursera">
+                            <a href="https://www.coursera.org/specializations/python" target="_blank">Python for Everybody (Coursera)</a>
+                            <div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                        </li>
+                        <li data-link-id="py-aut">
+                            <a href="https://www.udemy.com/course/automate/" target="_blank">Automate the Boring Stuff</a>
+                            <div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card" id="web-basics-section">
+            <h3><i class="fas fa-globe"></i> 2. Web Basics (HTTP & REST APIs)</h3>
+            <div class="resources-split">
+                <div class="res-col free-col">
+                    <span class="badge free">Free Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="web-mdn"><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP" target="_blank">MDN Web Docs: HTTP</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="web-rest"><a href="https://restfulapi.net/" target="_blank">RestfulAPI.net (Concepts)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="web-postman"><a href="https://learning.postman.com/docs/getting-started/introduction/" target="_blank">Postman Learning Center</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+                <div class="res-col paid-col">
+                    <span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                         <li data-link-id="web-fem"><a href="https://frontendmasters.com/courses/api-design-nodejs-v4/" target="_blank">FEM: API Design</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="web-udemy"><a href="https://www.udemy.com/course/understanding-typescript/" target="_blank">Udemy: HTTP & APIs</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="web-educative"><a href="https://www.educative.io/courses/grokking-modern-system-design-interview-for-engineers-managers" target="_blank">Educative: System Design</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <h3><i class="fas fa-database"></i> 3. Databases (SQL & NoSQL)</h3>
+            <div class="resources-split">
+                <div class="res-col free-col"><span class="badge free">Free Top 3</span>
+                     <ul class="resource-list">
+                        <li data-link-id="db-sqlbolt"><a href="https://sqlbolt.com/" target="_blank">SQLBolt (Interactive SQL)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="db-mongo"><a href="https://learn.mongodb.com/" target="_blank">MongoDB University (Official)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="db-khan"><a href="https://www.khanacademy.org/computing/computer-programming/sql" target="_blank">Khan Academy SQL</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                     </ul>
+                </div>
+                <div class="res-col paid-col"><span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="db-udemy"><a href="https://www.udemy.com/course/the-complete-sql-bootcamp/" target="_blank">Complete SQL Bootcamp (Zero to Hero)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="db-datacamp"><a href="https://www.datacamp.com/courses/introduction-to-sql" target="_blank">DataCamp: SQL Fundamentals</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="db-pluralsight"><a href="https://www.pluralsight.com/paths/sql-fundamentals" target="_blank">Pluralsight SQL Path</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <h3><i class="fas fa-laptop-code"></i> 4. Simple CRUD Application</h3>
+             <div class="resources-split">
+                <div class="res-col free-col">
+                    <span class="badge free">Free Top 3</span>
+                    <ul class="resource-list">
+                         <li data-link-id="crud-dennis"><a href="https://youtu.be/llbtoQTt4qw" target="_blank">Dennis Ivy (Django To-Do List)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="crud-flask"><a href="https://youtu.be/PUh6r15974M" target="_blank">Flask CRUD Application (Tutorial)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="crud-realpython"><a href="https://realpython.com/django-todo-lists/" target="_blank">RealPython: Django To-Do App</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+                <div class="res-col paid-col">
+                    <span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                         <li data-link-id="crud-udemy-proj"><a href="https://www.udemy.com/course/python-django-dev-to-deployment/" target="_blank">Udemy: Python Django Dev to Deployment</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="crud-testdriven"><a href="https://testdriven.io/courses/django-rest-framework/" target="_blank">TestDriven.io: Django REST</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="crud-edu"><a href="https://www.educative.io/courses/django-python-web-development" target="_blank">Educative: Web Dev with Django</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="level-container" id="intermediate-level">
+        <h2 class="level-heading">Level 2: Intermediate</h2>
+        
+        <div class="topic-card">
+            <h3><i class="fas fa-layer-group"></i> 5. Frameworks (Django)</h3>
+            <div class="resources-split">
+                <div class="res-col free-col"><span class="badge free">Free Top 3</span>
+                     <ul class="resource-list">
+                        <li data-link-id="dj-official"><a href="https://www.djangoproject.com/start/" target="_blank">Django Official Documentation</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="dj-girls"><a href="https://tutorial.djangogirls.org/en/" target="_blank">Django Girls Tutorial</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="dj-mozilla"><a href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django" target="_blank">MDN Django Guide</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                     </ul>
+                </div>
+                <div class="res-col paid-col"><span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="dj-udemy"><a href="https://www.udemy.com/course/python-and-django-full-stack-web-developer-bootcamp/" target="_blank">Python & Django Full Stack (Portilla)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="dj-2scoops"><a href="https://www.feldroy.com/books/two-scoops-of-django-3-x" target="_blank">Two Scoops of Django (Best Book)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="dj-advanced"><a href="https://www.udemy.com/course/django-python-advanced/" target="_blank">Build Backend API with Django</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <h3><i class="fas fa-user-lock"></i> 6. Authentication (JWT/OAuth)</h3>
+             <div class="resources-split">
+                <div class="res-col free-col">
+                    <span class="badge free">Free Top 3</span>
+                    <ul class="resource-list">
+                         <li data-link-id="auth-simplejwt"><a href="https://django-rest-framework-simplejwt.readthedocs.io/en/latest/" target="_blank">Simple JWT Docs</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="auth-auth0"><a href="https://auth0.com/blog/" target="_blank">Auth0 Blog (OAuth Concepts)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="auth-yt"><a href="https://youtu.be/xjMP0hspNLE" target="_blank">Django + React JWT (Tutorial)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+                <div class="res-col paid-col">
+                    <span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                         <li data-link-id="auth-fem"><a href="https://frontendmasters.com/courses/web-security/" target="_blank">Web Security (Mike North)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="auth-udemy"><a href="https://www.udemy.com/course/oauth-2-master-class/" target="_blank">OAuth 2.0 Master Class</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="auth-testdriven"><a href="https://testdriven.io/courses/auth-django-react/" target="_blank">TestDriven: Auth with Django & React</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <h3><i class="fas fa-server"></i> 7. Advanced Database Management</h3>
+            <p style="margin-bottom:15px; color:#666;">Relations, Indexing, Normalization.</p>
+             <div class="resources-split">
+                <div class="res-col free-col"><span class="badge free">Free Top 3</span>
+                     <ul class="resource-list">
+                        <li data-link-id="adb-index"><a href="https://use-the-index-luke.com/" target="_blank">Use The Index, Luke!</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="adb-cmu"><a href="https://15445.courses.cs.cmu.edu/" target="_blank">CMU Database Systems Course</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="adb-django-opt"><a href="https://docs.djangoproject.com/en/stable/topics/db/optimization/" target="_blank">Django DB Optimization Docs</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                     </ul>
+                </div>
+                <div class="res-col paid-col"><span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="adb-udemy"><a href="https://www.udemy.com/course/database-design-introduction/" target="_blank">Database Design & Management</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="adb-hackerrank"><a href="https://www.hackerrank.com/domains/sql" target="_blank">HackerRank Advanced SQL</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="adb-coursera"><a href="https://www.coursera.org/learn/intro-to-relational-databases" target="_blank">Relational Database Design</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <h3><i class="fas fa-file-upload"></i> 8. File Handling & Cloud Storage</h3>
+             <div class="resources-split">
+                <div class="res-col free-col"><span class="badge free">Free Top 3</span>
+                     <ul class="resource-list">
+                        <li data-link-id="file-django"><a href="https://docs.djangoproject.com/en/stable/topics/files/" target="_blank">Django File Uploads</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="file-s3"><a href="https://testdriven.io/blog/storing-django-static-and-media-files-on-amazon-s3/" target="_blank">Django + AWS S3 Guide</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="file-boto3"><a href="https://boto3.amazonaws.com/v1/documentation/api/latest/index.html" target="_blank">Boto3 Documentation (Python SDK)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                     </ul>
+                </div>
+                <div class="res-col paid-col"><span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="file-aws"><a href="https://www.udemy.com/course/aws-certified-developer-associate/" target="_blank">AWS Certified Developer</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="file-edu-cloud"><a href="https://www.educative.io/path/cloud-computing-fundamentals" target="_blank">Cloud Computing Fundamentals</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="file-pluralsight"><a href="https://www.pluralsight.com/paths/python-on-aws" target="_blank">Python on AWS Path</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <h3><i class="fas fa-vial"></i> 9. Testing (Unit & Integration)</h3>
+             <div class="resources-split">
+                <div class="res-col free-col"><span class="badge free">Free Top 3</span>
+                     <ul class="resource-list">
+                        <li data-link-id="test-pytest"><a href="https://docs.pytest.org/en/7.1.x/" target="_blank">PyTest Documentation</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="test-django"><a href="https://docs.djangoproject.com/en/stable/topics/testing/" target="_blank">Testing in Django (Official)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="test-obey"><a href="https://www.obeythetestinggoat.com/" target="_blank">Obey the Testing Goat (TDD Book)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                     </ul>
+                </div>
+                <div class="res-col paid-col"><span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="test-udemy"><a href="https://www.udemy.com/course/python-pytest-mastery/" target="_blank">Python Pytest Mastery</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="test-testdriven"><a href="https://testdriven.io/courses/test-driven-development-django-drf/" target="_blank">TDD with Django, Docker, and DRF</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="test-fem"><a href="https://frontendmasters.com/courses/testing-practices-principles/" target="_blank">Testing Practices & Principles</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <h3><i class="fas fa-cloud-upload-alt"></i> 10. Deployment Basics</h3>
+             <div class="resources-split">
+                <div class="res-col free-col"><span class="badge free">Free Top 3</span>
+                     <ul class="resource-list">
+                        <li data-link-id="dep-heroku"><a href="https://devcenter.heroku.com/articles/getting-started-with-python" target="_blank">Heroku Python Guide</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="dep-vercel"><a href="https://vercel.com/docs/functions/serverless-functions/runtimes/python" target="_blank">Vercel for Python</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="dep-pa"><a href="https://help.pythonanywhere.com/pages/DeployingDjangoProject/" target="_blank">PythonAnywhere (Simplest)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                     </ul>
+                </div>
+                <div class="res-col paid-col"><span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="dep-do"><a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-20-04" target="_blank">DigitalOcean Django Setup</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="dep-udemy"><a href="https://www.udemy.com/course/docker-kubernetes-the-practical-guide/" target="_blank">Docker & Kubernetes</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="dep-aws"><a href="https://aws.amazon.com/getting-started/hands-on/deploy-python-application/" target="_blank">AWS Elastic Beanstalk</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div class="survey-modal" id="surveyModal" aria-hidden="true">
+      <div class="survey-content">
+        <span class="close-survey" id="closeSurvey">&times;</span>
+        <h3>Welcome to Backend Chat</h3>
+        <p class="survey-intro">Connect with other backend developers.</p>
+        <div class="survey-form">
+            <div class="form-group">
+                <label for="surveyNameInput">Display Name:</label>
+                <input type="text" id="surveyNameInput" placeholder="Enter your name">
+            </div>
+            <div class="survey-terms-box">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="surveyTermsCheck">
+                    <span class="checkmark"></span>
+                    <span class="terms-text">I agree to the Terms of Use.</span>
+                </label>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="surveyConductCheck">
+                    <span class="checkmark"></span>
+                    <span class="terms-text">I pledge not to misuse the chat.</span>
+                </label>
+            </div>
+            <button id="startChattingBtn" class="btn start-chat-btn" disabled>Agree & Start Chatting</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+    <footer class="site-footer" id="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h2 class="footer-logo">Edumates</h2>
+                <p class="footer-description">A structured learning platform built to guide you from beginner to job-ready.</p>
+                <div class="social-links">
+                   <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a> 
+                </div>
+            </div>
+
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h3 class="footer-title">Quick Links</h3>
+                    <ul>
+                        <li><a href="../../index.html" class="footer-link">Home</a></li>
+                        <li><a href="../../courses-page/courses.html" class="footer-link">Courses</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-title">Support</h3>
+                    <ul>
+                        <li><a href="#" class="footer-link"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+                        <li><a href="#" class="footer-link"><i class="fas fa-chevron-right"></i> Terms of Use</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-title">Contact Us</h3>
+                    <ul>
+                        <li><a href="#" class="footer-link"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                        <li><a href="#" class="footer-link"><i class="fas fa-envelope"></i> Email Support</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="copyright">© <span class="current-year"></span> Edumates. All rights reserved.</p>
+        </div>
+    </footer>
+  <script type="module" src="backend-script.js"></script>
+</body>
+</html>

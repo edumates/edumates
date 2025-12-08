@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edumates - Frontend Roadmap</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="../../roadmap.css">
+  <link rel="stylesheet" href="courses-det-styles.css">
+  </head>
+<body>
+  <nav class="navbar">
+    <a href="../index.html" class="logo">Edumates</a>
+    <button class="mobile-menu-btn" aria-label="Open Menu">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="nav-links">
+      <a href="../../index.html" class="nav-link">Home</a>
+      <a href="../../courses-page/courses.html" class="nav-link active">Courses</a>
+      <a href="#footer" class="nav-link">Contact Us</a>
+      <div class="auth-buttons">
+        <button class="google-login-btn" id="googleLoginBtn">
+          <i class="fab fa-google"></i> Sign in with Google
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="breadcrumbs">
+    <a href="../../index.html">Home</a> > <a href="../../courses-page/courses.html">Courses</a> > <span>Frontend Path</span>
+  </div>
+
+  <section class="course-details-section">
+    <div class="section-header">
+      <h2>Frontend Developer Path</h2>
+      <p>Master web development from beginner to intermediate with curated free and paid resources.</p>
+      <button class="view-roadmap-btn" id="viewRoadmapBtn">View Roadmap</button>
+      <a href="chat/index.html" class="chat-btn" id="chatBtn">
+        <i class="fas fa-comments"></i> Chat
+      </a>
+      
+      <div class="roadmap-modal" id="roadmapModal">
+        <div class="roadmap-content">
+          <span class="close-roadmap" id="closeRoadmap">&times;</span>
+          <h2>Frontend Roadmap</h2>
+          <div class="roadmap-scroll-container">
+            <ul id="roadmapList">
+                <li class="level-title">Beginner</li>
+                <li class="roadmap-task" data-skill="HTML">HTML <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="CSS">CSS <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="Responsive">Responsive Design <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="JavaScript">JavaScript <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="GitGithub">Git & GitHub <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="UIUX">UI/UX Basics <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="Figma">Figma <button class="mark-done">Check</button></li>
+                
+                <li class="level-title">Intermediate</li>
+                <li class="roadmap-task" data-skill="API">REST APIs & HTTP <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="Framework">Framework (React/Vue) <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="State">State Management <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="BuildTools">Build Tools (Vite) <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="Performance">Performance Basics <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="Security">Security Basics <button class="mark-done">Check</button></li>
+                <li class="roadmap-task" data-skill="WebAPIs">Web APIs (Storage) <button class="mark-done">Check</button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="level-container" id="beginner-level">
+        <h2 class="level-heading">Level 1: Beginner</h2>
+        
+        <div class="topic-card" id="html-section">
+            <h3><i class="fab fa-html5"></i> 1. HTML</h3>
+            <div class="resources-split">
+                <div class="res-col free-col">
+                    <span class="badge free">Free Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="html-mdn">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/HTML" target="_blank">MDN Web Docs (The Bible of Web)</a>
+                            <div class="rating-stars">
+                                <span class="average-rating">0.0</span>
+                                <i class="fas fa-star" data-value="1"></i>
+                                <i class="fas fa-star" data-value="2"></i>
+                                <i class="fas fa-star" data-value="3"></i>
+                                <i class="fas fa-star" data-value="4"></i>
+                                <i class="fas fa-star" data-value="5"></i>
+                            </div>
+                        </li>
+                        <li data-link-id="html-fcc">
+                            <a href="https://www.freecodecamp.org/learn/2022/responsive-web-design/" target="_blank">FreeCodeCamp Curriculum</a>
+                            <div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                        </li>
+                        <li data-link-id="html-traversy">
+                            <a href="https://youtu.be/HD13eq_Pmp8" target="_blank">Traversy Media HTML Crash Course</a>
+                            <div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="res-col paid-col">
+                    <span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="html-jonas">
+                            <a href="https://www.udemy.com/course/design-and-develop-a-killer-website-with-html5-and-css3/" target="_blank">Udemy: HTML & CSS by Jonas</a>
+                            <div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                        </li>
+                         <li data-link-id="html-fem">
+                            <a href="https://frontendmasters.com/courses/web-development-v3/" target="_blank">Frontend Masters Bootcamp</a>
+                            <div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                        </li>
+                        <li data-link-id="html-frontendmentor">
+                            <a href="https://www.frontendmentor.io/pro" target="_blank">Frontend Mentor Pro (Projects)</a>
+                            <div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card" id="css-section">
+            <h3><i class="fab fa-css3-alt"></i> 2. CSS</h3>
+            <div class="resources-split">
+                <div class="res-col free-col">
+                    <span class="badge free">Free Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="css-webdev"><a href="https://web.dev/learn/css/" target="_blank">Web.dev Learn CSS (Google)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="css-kevin"><a href="https://www.youtube.com/@KevinPowell" target="_blank">Kevin Powell (The CSS King)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="css-tricks"><a href="https://css-tricks.com/" target="_blank">CSS-Tricks (Best Articles)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+                <div class="res-col paid-col">
+                    <span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                         <li data-link-id="css-josh"><a href="https://css-for-js.dev/" target="_blank">CSS for JS Devs (Josh Comeau)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="css-udemy-adv"><a href="https://www.udemy.com/course/advanced-css-and-sass/" target="_blank">Advanced CSS & Sass (Jonas)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="css-fe-masters"><a href="https://frontendmasters.com/learn/css/" target="_blank">Frontend Masters CSS Path</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <h3><i class="fas fa-mobile-alt"></i> 3. Responsive Design</h3>
+            <div class="resources-split">
+                <div class="res-col free-col"><span class="badge free">Free Top 3</span>
+                     <ul class="resource-list">
+                        <li data-link-id="resp-conquering"><a href="https://courses.kevinpowell.co/conquering-responsive-layouts" target="_blank">Conquering Responsive Layouts</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="resp-webdev"><a href="https://web.dev/learn/design/" target="_blank">Web.dev Responsive Design</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="resp-fcc"><a href="https://youtu.be/srvNrQMgQ1s" target="_blank">FCC Responsive Course</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                     </ul>
+                </div>
+                <div class="res-col paid-col"><span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="resp-scrimba"><a href="https://scrimba.com/learn/responsive" target="_blank">Scrimba Responsive Design</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="resp-fem"><a href="https://frontendmasters.com/courses/responsive-web-design/" target="_blank">Frontend Masters Responsive</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="resp-udemy"><a href="https://www.udemy.com/course/modern-html-css-from-the-beginning/" target="_blank">Udemy (Brad Traversy)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card" id="js-section">
+            <h3><i class="fab fa-js"></i> 4. JavaScript</h3>
+             <div class="resources-split">
+                <div class="res-col free-col">
+                    <span class="badge free">Free Top 3</span>
+                    <ul class="resource-list">
+                         <li data-link-id="js-info"><a href="https://javascript.info/" target="_blank">JavaScript.info (Best Text)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="js-netninja"><a href="https://youtube.com/playlist?list=PL4cUxeGkcC9haFPT7J25Q9GRB_ZkuaI_V" target="_blank">Net Ninja Modern JS</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="js-fcc"><a href="https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures-v8/" target="_blank">FCC JS Data Structures</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+                <div class="res-col paid-col">
+                    <span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                         <li data-link-id="js-jonas"><a href="https://www.udemy.com/course/the-complete-javascript-course/" target="_blank">Complete JS Course (Jonas)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="js-wesbos"><a href="https://beginnerjavascript.com/" target="_blank">Beginner JavaScript (Wes Bos)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="js-fem"><a href="https://frontendmasters.com/courses/deep-javascript-v3/" target="_blank">Frontend Masters JS Deep Dive</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card">
+             <h3><i class="fab fa-git-alt"></i> 5. Git & GitHub</h3>
+              <div class="resources-split">
+                <div class="res-col free-col"><span class="badge free">Free Top 3</span>
+                     <ul class="resource-list">
+                        <li data-link-id="git-scm"><a href="https://git-scm.com/book/en/v2" target="_blank">Pro Git Book (Official)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="git-fcc"><a href="https://youtu.be/RGOj5yH7evk" target="_blank">FreeCodeCamp Git Course</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="git-netninja"><a href="https://youtube.com/playlist?list=PL4cUxeGkcC9goXbgTDQ0n_4TBzOO0ocPR" target="_blank">Net Ninja Git & GitHub</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                     </ul>
+                </div>
+                <div class="res-col paid-col"><span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="git-udemy"><a href="https://www.udemy.com/course/git-and-github-bootcamp/" target="_blank">Udemy: Git Bootcamp (Colt)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="git-fem"><a href="https://frontendmasters.com/courses/git-in-depth/" target="_blank">Frontend Masters Git In-depth</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="git-plural"><a href="https://www.pluralsight.com/paths/mastering-git" target="_blank">Pluralsight Git Path</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card">
+             <h3><i class="fas fa-pen-nib"></i> 6. UI/UX Basics</h3>
+             <div class="resources-split">
+                <div class="res-col free-col"><span class="badge free">Free Top 3</span>
+                     <ul class="resource-list">
+                        <li data-link-id="uiux-google"><a href="https://www.coursera.org/professional-certificates/google-ux-design" target="_blank">Google UX (Audit Mode)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="uiux-laws"><a href="https://lawsofux.com/" target="_blank">Laws of UX (Principles)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="uiux-figma"><a href="https://www.youtube.com/@Figma" target="_blank">Figma Official YouTube</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                     </ul>
+                </div>
+                <div class="res-col paid-col"><span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="uiux-refactoring"><a href="https://www.refactoringui.com/" target="_blank">Refactoring UI (Best Book)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="uiux-coursera"><a href="https://www.coursera.org/professional-certificates/google-ux-design" target="_blank">Google UX Cert (Paid)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="uiux-designcode"><a href="https://designcode.io/" target="_blank">DesignCode.io</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card" id="figma-section">
+             <h3><i class="fab fa-figma"></i> 7. Figma</h3>
+             <div class="resources-split">
+                <div class="res-col free-col"><span class="badge free">Free Top 3</span>
+                     <ul class="resource-list">
+                        <li data-link-id="figma-official"><a href="https://www.youtube.com/playlist?list=PLXDU_eVOJTx7QHLShNqIXL1Cgbxj7HlN4" target="_blank">Figma 101 (Official)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="figma-fcc"><a href="https://youtu.be/c9Wg6Cb_YlU" target="_blank">FCC Figma Course</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="figma-designcourse"><a href="https://www.youtube.com/@DesignCourse" target="_blank">DesignCourse (YouTube)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                     </ul>
+                </div>
+                <div class="res-col paid-col"><span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="figma-ztm"><a href="https://zerotomastery.io/courses/learn-figma/" target="_blank">ZeroToMastery Figma</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="figma-memorisely"><a href="https://www.memorisely.com/" target="_blank">Memorisely Bootcamp</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="figma-dribbble"><a href="https://dribbble.com/courses" target="_blank">Dribbble Product Design</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="level-container" id="intermediate-level">
+        <h2 class="level-heading">Level 2: Intermediate</h2>
+        
+        <div class="topic-card">
+            <h3><i class="fas fa-network-wired"></i> 1. REST APIs & HTTP</h3>
+            <div class="resources-split">
+                <div class="res-col free-col"><span class="badge free">Free Top 3</span>
+                     <ul class="resource-list">
+                        <li data-link-id="api-mdn"><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP" target="_blank">MDN HTTP Docs</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="api-postman"><a href="https://learning.postman.com/docs/getting-started/introduction/" target="_blank">Postman Learning Center</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="api-fcc"><a href="https://youtu.be/GZvSYJDk-us" target="_blank">FCC APIs for Beginners</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                     </ul>
+                </div>
+                <div class="res-col paid-col"><span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="api-udemy"><a href="https://www.udemy.com/course/nodejs-the-complete-guide/" target="_blank">Udemy: Node & APIs (Max)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="api-fem"><a href="https://frontendmasters.com/courses/api-design-nodejs-v4/" target="_blank">Frontend Masters API Design</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="api-pluralsight"><a href="https://www.pluralsight.com/courses/designing-restful-web-apis" target="_blank">Pluralsight REST APIs</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card" id="frameworks-section">
+            <h3><i class="fab fa-react"></i> 2. Framework (React)</h3>
+             <div class="resources-split">
+                <div class="res-col free-col">
+                    <span class="badge free">Free Top 3</span>
+                    <ul class="resource-list">
+                         <li data-link-id="react-docs"><a href="https://react.dev" target="_blank">React.dev (Official Docs)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="react-scrimba"><a href="https://scrimba.com/learn/learnreact" target="_blank">Scrimba: Learn React Free</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="react-fcc"><a href="https://youtu.be/bMknfKXIFA8" target="_blank">FCC React Course</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+                <div class="res-col paid-col">
+                    <span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                         <li data-link-id="react-epic"><a href="https://epicreact.dev/" target="_blank">Epic React (Kent C. Dodds)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="react-udemy-max"><a href="https://www.udemy.com/course/react-the-complete-guide-incl-redux/" target="_blank">React Complete Guide (Max)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                         <li data-link-id="react-fem"><a href="https://frontendmasters.com/courses/react-v8/" target="_blank">Frontend Masters React</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <h3><i class="fas fa-database"></i> 3. State Management (Context/Redux)</h3>
+             <div class="resources-split">
+                <div class="res-col free-col"><span class="badge free">Free Top 3</span>
+                     <ul class="resource-list">
+                        <li data-link-id="state-redux"><a href="https://redux-toolkit.js.org/" target="_blank">Redux Toolkit Official</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="state-codevo"><a href="https://youtube.com/playlist?list=PLC3y8-rFHvwhAh1AndzRQI0asUs5gXB87" target="_blank">Codevolution React Redux</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="state-fcc"><a href="https://youtu.be/93p3LxR9xfM" target="_blank">FCC Redux Course</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                     </ul>
+                </div>
+                <div class="res-col paid-col"><span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="state-egghead"><a href="https://egghead.io/courses/fundamentals-of-redux-course-from-dan-abramov-bd5cc867" target="_blank">Egghead.io (Dan Abramov)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="state-fem"><a href="https://frontendmasters.com/courses/redux-fundamentals/" target="_blank">Frontend Masters Redux</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="state-udemy"><a href="https://www.udemy.com/course/react-the-complete-guide-incl-redux/" target="_blank">Udemy (Included in Max)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <h3><i class="fas fa-tools"></i> 4. Build Tools (Vite/Webpack)</h3>
+             <div class="resources-split">
+                <div class="res-col free-col"><span class="badge free">Free Top 3</span>
+                     <ul class="resource-list">
+                        <li data-link-id="vite-docs"><a href="https://vitejs.dev/" target="_blank">Vite Official Docs</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="webpack-docs"><a href="https://webpack.js.org/concepts/" target="_blank">Webpack Concepts</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="tools-fireship"><a href="https://youtu.be/XKLwFtsVFlA" target="_blank">Fireship: Vite vs Webpack</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                     </ul>
+                </div>
+                <div class="res-col paid-col"><span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="tools-fem"><a href="https://frontendmasters.com/courses/vite/" target="_blank">Frontend Masters: Vite</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="webpack-udemy"><a href="https://www.udemy.com/course/webpack-2-the-complete-developers-guide/" target="_blank">Webpack Complete Guide</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="tools-egghead"><a href="https://egghead.io/q/vite" target="_blank">Egghead.io Vite Courses</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <h3><i class="fas fa-tachometer-alt"></i> 5. Performance Basics</h3>
+             <div class="resources-split">
+                <div class="res-col free-col"><span class="badge free">Free Top 3</span>
+                     <ul class="resource-list">
+                        <li data-link-id="perf-google"><a href="https://web.dev/learn/performance" target="_blank">Web.dev Performance</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="perf-patterns"><a href="https://www.patterns.dev/" target="_blank">Patterns.dev (Optimization)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="perf-chrome"><a href="https://www.youtube.com/@ChromeDevs" target="_blank">Chrome Developers YouTube</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                     </ul>
+                </div>
+                <div class="res-col paid-col"><span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="perf-fem"><a href="https://frontendmasters.com/courses/web-performance/" target="_blank">Frontend Masters Performance</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="perf-udemy"><a href="https://www.udemy.com/course/web-performance-101/" target="_blank">Udemy Web Performance</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="perf-email"><a href="https://perf.email/" target="_blank">Performance Email Course</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <h3><i class="fas fa-shield-alt"></i> 6. Security Basics</h3>
+             <div class="resources-split">
+                <div class="res-col free-col"><span class="badge free">Free Top 3</span>
+                     <ul class="resource-list">
+                        <li data-link-id="sec-owasp"><a href="https://owasp.org/www-project-top-ten/" target="_blank">OWASP Top 10 (Critical)</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="sec-portswigger"><a href="https://portswigger.net/web-security" target="_blank">PortSwigger Web Security Academy</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="sec-mdn"><a href="https://developer.mozilla.org/en-US/docs/Web/Security" target="_blank">MDN Web Security</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                     </ul>
+                </div>
+                <div class="res-col paid-col"><span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="sec-udemy"><a href="https://www.udemy.com/course/learn-ethical-hacking-from-scratch/" target="_blank">Udemy: Web Security & Hacking</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="sec-fem"><a href="https://frontendmasters.com/courses/web-security/" target="_blank">Frontend Masters Security</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="sec-plural"><a href="https://www.pluralsight.com/paths/web-security" target="_blank">Pluralsight Security Path</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <h3><i class="fas fa-cogs"></i> 7. Web APIs (LocalStorage, etc.)</h3>
+             <div class="resources-split">
+                <div class="res-col free-col"><span class="badge free">Free Top 3</span>
+                     <ul class="resource-list">
+                        <li data-link-id="webapi-mdn"><a href="https://developer.mozilla.org/en-US/docs/Web/API" target="_blank">MDN Web APIs Index</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="webapi-jsinfo"><a href="https://javascript.info/web-api" target="_blank">JavaScript.info Browser APIs</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="webapi-google"><a href="https://developers.google.com/web/updates/capabilities" target="_blank">Google Web Capabilities</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                     </ul>
+                </div>
+                <div class="res-col paid-col"><span class="badge paid">Paid Top 3</span>
+                    <ul class="resource-list">
+                        <li data-link-id="webapi-fem"><a href="https://frontendmasters.com/courses/browser-apis/" target="_blank">FEM: Service Workers & APIs</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="webapi-paid"><a href="https://www.udemy.com/course/javascript-web-projects-20-projects-to-build-your-portfolio/" target="_blank">Udemy: 20 Web Projects</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                        <li data-link-id="webapi-educative"><a href="https://www.educative.io/" target="_blank">Educative.io Web Tracks</a><div class="rating-stars"><span class="average-rating">0.0</span><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+      </div>
+    </div>
+
+    <div class="survey-modal" id="surveyModal" aria-hidden="true">
+      <div class="survey-content">
+        <span class="close-survey" id="closeSurvey">&times;</span>
+        <h3>Welcome to Community Chat</h3>
+        <p class="survey-intro">Before you start, please complete your profile and agree to our community guidelines.</p>
+        <div class="survey-form">
+            <div class="form-group">
+                <label for="surveyNameInput">Display Name:</label>
+                <input type="text" id="surveyNameInput" placeholder="Enter your name (e.g., Ahmed Ali)">
+            </div>
+            <div class="survey-terms-box">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="surveyTermsCheck">
+                    <span class="checkmark"></span>
+                    <span class="terms-text">I agree to the Terms of Use and Privacy Policy.</span>
+                </label>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="surveyConductCheck">
+                    <span class="checkmark"></span>
+                    <span class="terms-text">I pledge not to misuse the chat.</span>
+                </label>
+            </div>
+            <button id="startChattingBtn" class="btn start-chat-btn" disabled>Agree & Start Chatting</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+    <footer class="site-footer" id="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h2 class="footer-logo">Edumates</h2>
+                <p class="footer-description">A structured learning platform built to guide you from beginner to job-ready.</p>
+                <div class="social-links">
+                   <a href="https://www.facebook.com/profile.php?id=61573714877124" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://x.com/edumates_?t=7uVsGeKx1uNor4VjoeSAzg&s=09" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.linkedin.com/in/mostafa-edumates-2ba076378?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" class="social-link"><i class="fab fa-linkedin-in"></i></a> 
+                </div>
+            </div>
+
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h3 class="footer-title">Quick Links</h3>
+                    <ul>
+                        <li><a href="../../index.html" class="footer-link">Home</a></li>
+                        <li><a href="../../courses-page/courses.html" class="footer-link">Courses</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-title">Support</h3>
+                    <ul>
+                        <li><a href="../../legal/privacy-policy.html" class="footer-link"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+                        <li><a href="../../legal/terms-of-use.html" class="footer-link"><i class="fas fa-chevron-right"></i> Terms of Use</a></li>
+                       <li><a href="../../legal/about.html" class="footer-link"><i class="fas fa-chevron-right"></i> About Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-title">Contact Us</h3>
+                    <ul>
+                        <li><a href="https://wa.me/+201055415811" class="footer-link"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                        <li><a href="mailto:m41940147@gmail.com" class="footer-link"><i class="fas fa-envelope"></i> Email Support</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="copyright">© <span class="current-year"></span> Edumates. All rights reserved.</p>
+        </div>
+    </footer>
+  <script type="module" src="courses-det-script.js"></script>
+</body>
+</html>
+
+
+
+
