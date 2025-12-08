@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
             category: "Web Development",
             level: "Beginner",
             image: "../pic/courses-pic/frontend-pic.jpg",
-            lessons: 24,
+            lessons: 84,
             price: "Free",
             description: "Master the fundamentals of web interface development using HTML and CSS to build stunning, interactive, and responsive websites.",
             link: "../courses/frontend/courses-det.html"
@@ -33,10 +33,10 @@ document.addEventListener('DOMContentLoaded', function() {
             category: "Web Development",
             level: "Beginner",
             image: "../pic/courses-pic/backend.jpg",
-            lessons: 17,
+            lessons: 60,
             price: "Free",
             description: "Learn the core concepts of server-side programming using Node.js and Express to build robust and dynamic web applications.",
-            link: "../courses/BackEnd/courses=det.html"
+            link: "../courses/BackEnd/BackEnd.html"
         },
         {
             id: 3,
@@ -144,4 +144,5 @@ document.addEventListener('DOMContentLoaded', function() {
     app.init();
 
 });
+
 
