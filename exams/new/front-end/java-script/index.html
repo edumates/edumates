@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EDUMATES JS 2.0</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-L6LJJZ6S57"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-L6LJJZ6S57');
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <div class="logo">EDUMATES JS 2.0</div>
+      <div class="tagline">رحلة من المبتدئ إلى المحترف في JavaScript</div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="mcq">اختيار من متعدد</button>
+      <button class="tab-btn" data-tab="practical">المهام العملية</button>
+      <button class="tab-btn" data-tab="result">النتيجة</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- === اختيار من متعدد === -->
+    <div id="mcq" class="tab active">
+      <div class="card">
+        <h3>الاختيار من متعدد (30 سؤالًا)</h3>
+        <div class="hint">
+          <span class="badge">مبتدئ</span>
+          <span class="badge">متوسط</span>
+          <span class="badge">متقدم</span>
+          <span class="badge">محترف</span>
+        </div>
+        <p>أجب ثم اضغط “حفظ الإجابات”.</p>
+        <form id="mcq-form"></form>
+        <div class="actions">
+          <button class="primary huge" id="save-mcq">حفظ الإجابات</button>
+          <span id="mcq-score" class="badge">0 / 30</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- === المهام العملية === -->
+    <div id="practical" class="tab">
+      <div class="card">
+        <h3>المهام العملية (10 تحديات)</h3>
+        <p>اكتب كود JavaScript، ثم “تشغيل” و“تحقق”.</p>
+        <div id="tasks" class="tasks"></div>
+        <div class="actions">
+          <button class="primary huge" id="save-practical">حفظ النتائج</button>
+          <span id="practical-score" class="badge">0 / 10</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- === النتيجة === -->
+    <div id="result" class="tab">
+      <div class="card result-card">
+        <h3>النتيجة النهائية</h3>
+        <div class="grid-2">
+          <div class="level-box">
+            <div class="big">الاختيار: <span id="res-mcq">0</span>/30</div>
+            <div class="big">العملي: <span id="res-practical">0</span>/10</div>
+            <br>
+            <div class="big">المجموع: <span id="res-total">0</span>/40</div>
+          </div>
+          <div class="level-box">
+            <div class="big">مستواك</div>
+            <div class="level" id="res-level">—</div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="primary huge" id="calc-final">عرض النتيجة</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    © 2025 EDUMATES JS 2.0 — من المبتدئ إلى المحترف
+  </footer>
+
+  <!-- CodeMirror -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script src="index.js"></script>
+</body>
+</html>
