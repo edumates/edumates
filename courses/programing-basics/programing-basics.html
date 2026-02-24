@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edumates - أساسيات البرمجة</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="programing-basics.css">
+  <script src="programing-basics.js" defer></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-L6LJJZ6S57"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-L6LJJZ6S57');
+  </script>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <a href="../../index.html" class="logo">Edumates</a>
+    <div class="nav-links">
+      <a href="../../index.html" class="nav-link active">الرئيسية</a>
+      <a href="../../courses-page/courses.html" class="nav-link">الكورسات</a>
+      <a href="#footer" class="nav-link">اتصل بنا</a>
+      <div class="auth-buttons">
+        <button id="googleLoginBtn" class="google-login-btn">
+          <i class="fab fa-google"></i> تسجيل الدخول عبر جوجل
+        </button>
+      </div>
+    </div>
+    <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+  </nav>
+
+  <!-- Breadcrumbs -->
+  <div class="breadcrumbs">
+    <a href="../../index.html">الرئيسية</a> > <a href="../../courses-page/courses.html">الكورسات</a> > <span>أساسيات البرمجة</span>
+  </div>
+
+  <!-- Roadmap Modal -->
+  <div id="roadmapModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <span id="closeModal" class="close-modal">×</span>
+      <h2>أساسيات البرمجة: كيف تبدأ؟</h2>
+      <div class="modal-body">
+        <h1>طريقك لدخول عالم البرمجة</h1>
+        
+        <div class="roadmap-step">
+          <h3>ابدأ بـ (ما قبل البرمجة)</h3>
+          <p>ستتعلم ما هي البرمجة وما هو محرر الأكواد. شاهد جميع الفيديوهات لفهم الأساسيات.</p>
+          <a href="#concepts-section" class="step-btn">ابدأ هنا</a>
+        </div>
+
+        <div class="roadmap-step">
+          <h3>ثم ننتقل إلى (محررات الأكواد)</h3>
+          <p>ستتعلم VS Code، أشهر محرر أكواد، والذي ستكتب عليه الكود طوال الرحلة.</p>
+          <a href="#editors-section" class="step-btn">تعلم VS Code</a>
+        </div>
+
+        <div class="roadmap-step">
+          <h3>Python: اللغة الأسهل</h3>
+          <p>هنا ستتعلم المفاهيم البرمجية الأساسية بأشهر وأسهل لغة في العالم. ابدأ بالمتغيرات والحلقات!</p>
+          <a href="#python-section" class="step-btn">ابدأ Python</a>
+        </div>
+
+        <h3>نصائح سريعة للنجاح:</h3>
+        <ul class="tips-list">
+          <li>مارس يومياً لمدة 30 دقيقة فقط.</li>
+          <li>لا تخف من الأخطاء – هي أفضل معلم!</li>
+          <li>بنِ مشاريع صغيرة مثل حاسبة بسيطة بعد الأسبوع الأول.</li>
+        </ul>
+
+        <div class="modal-actions">
+          <button id="startLearningBtn" class="start-btn">ابدأ الرحلة الآن!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Course Details Section -->
+  <section class="course-details-section">
+    <div class="section-header">
+      <h2>تعلم أساسيات البرمجة</h2>
+      <p>اكتشف أساسيات البرمجة مع موارد تعليمية شاملة تشمل فيديوهات، كتب، واختبارات تفاعلية</p>
+      <button class="view-roadmap-btn" id="viewRoadmapBtn">خارطة الطريق</button>
+      <button class="chat-btn" id="chatBtn">
+        <i class="fas fa-comments"></i> المحادثة
+      </button>
+    </div>
+
+    <!-- ما قبل البرمجة -->
+    <div class="language-section" id="concepts-section">
+      <h3>ما قبل البرمجة</h3>
+      <div class="resources-container">
+        <img src="../../pic/programing-basics/pm.jpeg" alt="Programming Concepts" class="course-image">
+        <div class="video-links">
+          <h4>فيديوهات الشرح</h4>
+          <ul>
+            <li data-link-id="concepts-intro">
+              <div class="link-title">
+                <a href="https://youtu.be/-5RfI6JvWvs?si=TRLEeJ1kp53sSqV1" target="_blank">ما هي البرمجة</a>
+                <i class="fas fa-chevron-down toggle-arrow"></i>
+              </div>
+              <div class="rating-stars">
+                <span class="average-rating">0.0</span>
+                <span class="rating-count">(0 تقييم)</span>
+                <i class="fas fa-star" data-value="1"></i>
+                <i class="fas fa-star" data-value="2"></i>
+                <i class="fas fa-star" data-value="3"></i>
+                <i class="fas fa-star" data-value="4"></i>
+                <i class="fas fa-star" data-value="5"></i>
+              </div>
+              <div class="features-list">
+                <p>تعريف البرمجة وأهميتها</p>
+                <p>أنواع لغات البرمجة</p>
+                <p>المفاهيم الأساسية</p>
+              </div>
+            </li>
+            <li data-link-id="concepts-algorithms">
+              <div class="link-title">
+                <a href="https://youtube.com/playlist?list=PLoP3S2S1qTfCVIETOGwaK3lyaL3UKu403&si=nmrUp4b3KSDjj_Kp" target="_blank">ما هو محرر الاكواد</a>
+                <i class="fas fa-chevron-down toggle-arrow"></i>
+              </div>
+              <div class="rating-stars">
+                <span class="average-rating">0.0</span>
+                <span class="rating-count">(0 تقييم)</span>
+                <i class="fas fa-star" data-value="1"></i>
+                <i class="fas fa-star" data-value="2"></i>
+                <i class="fas fa-star" data-value="3"></i>
+                <i class="fas fa-star" data-value="4"></i>
+                <i class="fas fa-star" data-value="5"></i>
+              </div>
+              <div class="features-list">
+                <p>مقدمة في الخوارزميات</p>
+                <p>هياكل البيانات الأساسية</p>
+                <p>تمارين تطبيقية</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="book-links">
+          <h4>مواقع مهمة</h4>
+          <ul>
+            <li data-link-id="concepts-mdn">
+              <div class="link-title">
+                <a href="https://developer.mozilla.org/en-US/docs/Glossary/Algorithm" target="_blank">مفاهيم البرمجة - MDN</a>
+                <i class="fas fa-chevron-down toggle-arrow"></i>
+              </div>
+              <div class="rating-stars">
+                <span class="average-rating">0.0</span>
+                <span class="rating-count">(0 تقييم)</span>
+                <i class="fas fa-star" data-value="1"></i>
+                <i class="fas fa-star" data-value="2"></i>
+                <i class="fas fa-star" data-value="3"></i>
+                <i class="fas fa-star" data-value="4"></i>
+                <i class="fas fa-star" data-value="5"></i>
+              </div>
+              <div class="features-list">
+                <p>مرجع شامل للمفاهيم</p>
+                <p>شروحات مفصلة</p>
+                <p>أمثلة عملية</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <!-- <div class="quiz-button"> -->
+          <!-- <a href="../exams/programming-basics/concepts/index.html" class="quiz-btn">اختبار المفاهيم</a> -->
+        <!-- </div> -->
+      </div>
+    </div>
+
+    <!-- Code Editors Section (الثاني الآن) -->
+    <div class="language-section" id="editors-section">
+      <h3><i class="fas fa-code"></i> محررات الأكواد</h3>
+      <div class="resources-container">
+        <img src="../../pic/programing-basics/editors.png" alt="Code Editors" class="course-image">
+        <div class="video-links">
+          <h4>فيديوهات الشرح</h4>
+          <ul>
+            <li data-link-id="editors-vscode">
+              <div class="link-title">
+                <a href="https://youtu.be/ArRmu6-txyw?si=-_x2j4x8-L4AbZWR" target="_blank">تعلم VS Code</a>
+                <i class="fas fa-chevron-down toggle-arrow"></i>
+              </div>
+              <div class="rating-stars">
+                <span class="average-rating">0.0</span>
+                <span class="rating-count">(0 تقييم)</span>
+                <i class="fas fa-star" data-value="1"></i>
+                <i class="fas fa-star" data-value="2"></i>
+                <i class="fas fa-star" data-value="3"></i>
+                <i class="fas fa-star" data-value="4"></i>
+                <i class="fas fa-star" data-value="5"></i>
+              </div>
+              <div class="features-list">
+                <p>تثبيت وإعداد VS Code</p>
+                <p>الإضافات الأساسية</p>
+                <p>نصائح وإنتاجية</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="book-links">
+          <h4>مواقع مهمة</h4>
+          <ul>
+            <li data-link-id="editors-official">
+              <div class="link-title">
+                <a href="https://code.visualstudio.com/docs" target="_blank">الوثائق الرسمية - VS Code</a>
+                <i class="fas fa-chevron-down toggle-arrow"></i>
+              </div>
+              <div class="rating-stars">
+                <span class="average-rating">0.0</span>
+                <span class="rating-count">(0 تقييم)</span>
+                <i class="fas fa-star" data-value="1"></i>
+                <i class="fas fa-star" data-value="2"></i>
+                <i class="fas fa-star" data-value="3"></i>
+                <i class="fas fa-star" data-value="4"></i>
+                <i class="fas fa-star" data-value="5"></i>
+              </div>
+              <div class="features-list">
+                <p>الدليل الرسمي</p>
+                <p>أحدث الميزات</p>
+                <p>إضافات مفيدة</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <!-- <div class="quiz-button"> -->
+          <!-- <a href="../exams/programming-basics/editors/index.html" class="quiz-btn">اختبار المحررات</a> -->
+        <!-- </div> -->
+      </div>
+    </div>
+
+    <!-- Python Section (الثالث الآن) -->
+    <div class="language-section" id="python-section">
+      <h3><i class="fab fa-python"></i> Python</h3>
+      <div class="resources-container">
+        <img src="../../pic/programing-basics/python.jpg" alt="Python Course" class="course-image">
+        <div class="video-links">
+          <h4>فيديوهات الشرح</h4>
+          <ul>
+            <li data-link-id="python-elzero">
+              <div class="link-title">
+                <a href="https://youtu.be/9OgOay9bRU8?si=7ceen_rdOWJU0lv">اساسيات البرمجة ببايثون مختصر</a>
+                <i class="fas fa-chevron-down toggle-arrow"></i>
+              </div>
+              <div class="rating-stars">
+                <span class="average-rating">0.0</span>
+                <span class="rating-count">(0 تقييم)</span>
+                <i class="fas fa-star" data-value="1"></i>
+                <i class="fas fa-star" data-value="2"></i>
+                <i class="fas fa-star" data-value="3"></i>
+                <i class="fas fa-star" data-value="4"></i>
+                <i class="fas fa-star" data-value="5"></i>
+              </div>
+              <div class="features-list">
+                <p>شرح مبسط للمبتدئين</p>
+                <p>تغطية شاملة للأساسيات</p>
+                <p>تمارين عملية</p>
+              </div>
+            </li>
+            <li data-link-id="python-ibrahim-adel">
+              <div class="link-title">
+                <a href="https://youtu.be/ij6qQQlGKtE?si=jGGF2qNjeIBnGbjc">اساسيات بايثون مفصلا</a>
+                <i class="fas fa-chevron-down toggle-arrow"></i>
+              </div>
+              <div class="rating-stars">
+                <span class="average-rating">0.0</span>
+                <span class="rating-count">(0 تقييم)</span>
+                <i class="fas fa-star" data-value="1"></i>
+                <i class="fas fa-star" data-value="2"></i>
+                <i class="fas fa-star" data-value="3"></i>
+                <i class="fas fa-star" data-value="4"></i>
+                <i class="fas fa-star" data-value="5"></i>
+              </div>
+              <div class="features-list">
+                <p>محتوى مجاني بالكامل</p>
+                <p>شرح خطوة بخطوة</p>
+                <p>مشاريع عملية</p>
+              </div>
+            </li>
+            <li data-link-id="python-codezilla">
+              <div class="link-title">
+                <a href="https://youtube.com/playlist?list=PLuXY3ddo_8nzrO74UeZQVZOb5-wIS6krJ&si=-8rFJmtqQE3uD9ap">دورة عملية - Codezilla</a>
+                <i class="fas fa-chevron-down toggle-arrow"></i>
+              </div>
+              <div class="rating-stars">
+                <span class="average-rating">0.0</span>
+                <span class="rating-count">(0 تقييم)</span>
+                <i class="fas fa-star" data-value="1"></i>
+                <i class="fas fa-star" data-value="2"></i>
+                <i class="fas fa-star" data-value="3"></i>
+                <i class="fas fa-star" data-value="4"></i>
+                <i class="fas fa-star" data-value="5"></i>
+              </div>
+              <div class="features-list">
+                <p>تعليم تفاعلي</p>
+                <p>تمارين برمجية</p>
+                <p>مشاريع بسيطة</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="book-links">
+          <h4>مواقع مهمة</h4>
+          <ul>
+            <li data-link-id="python-hsoub">
+              <div class="link-title">
+                <a href="https://academy.hsoub.com/programming/python/%D8%A3%D8%B3%D8%A7%D8%B3%D9%8A%D8%A7%D8%AA-%D8%A7%D9%84%D8%A8%D8%B1%D9%85%D8%AC%D8%A9-%D8%A8%D9%84%D8%BA%D8%A9-%D8%A8%D8%A7%D9%8A%D8%AB%D9%88%D9%86-r1815/">Python - حسوب</a>
+                <i class="fas fa-chevron-down toggle-arrow"></i>
+              </div>
+              <div class="rating-stars">
+                <span class="average-rating">0.0</span>
+                <span class="rating-count">(0 تقييم)</span>
+                <i class="fas fa-star" data-value="1"></i>
+                <i class="fas fa-star" data-value="2"></i>
+                <i class="fas fa-star" data-value="3"></i>
+                <i class="fas fa-star" data-value="4"></i>
+                <i class="fas fa-star" data-value="5"></i>
+              </div>
+              <div class="features-list">
+                <p>مرجع شامل</p>
+                <p>أمثلة عملية</p>
+                <p>محتوى موثوق</p>
+              </div>
+            </li>
+            <li data-link-id="python-scrimba">
+              <div class="link-title">
+                <a href="https://scrimba.com/learn-python-c03?utm_source=chatgpt.com">دروس تفاعلية - Scrimba</a>
+                <i class="fas fa-chevron-down toggle-arrow"></i>
+              </div>
+              <div class="rating-stars">
+                <span class="average-rating">0.0</span>
+                <span class="rating-count">(0 تقييم)</span>
+                <i class="fas fa-star" data-value="1"></i>
+                <i class="fas fa-star" data-value="2"></i>
+                <i class="fas fa-star" data-value="3"></i>
+                <i class="fas fa-star" data-value="4"></i>
+                <i class="fas fa-star" data-value="5"></i>
+              </div>
+              <div class="features-list">
+                <p>شرح مبسط</p>
+                <p>تمارين تفاعلية</p>
+                <p>مجاني بالكامل</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <!-- <div class="quiz-button"> -->
+          <!-- <a href="../exams/programming-basics/python/index.html" class="quiz-btn">اختبار Python</a> -->
+        <!-- </div> -->
+      </div>
+    </div>
+<!-- ... (الكود السابق لقسم Python ينتهي هنا) -->
+
+    <!-- Algorithms Section (القسم الجديد) -->
+    <div class="language-section" id="algorithms-section">
+      <h3><i class="fas fa-cogs"></i> الخوارزميات</h3>
+      <div class="resources-container">
+        <img src="../../pic/programing-basics/algorithms.png" alt="Algorithms" class="course-image"> <!-- غير المسار إلى صورة مناسبة -->
+        <div class="video-links">
+          <h4>فيديوهات الشرح</h4>
+          <ul>
+            <li data-link-id="algorithms-elzero">
+              <div class="link-title">
+                <a href="https://youtu.be/jPDtod7M_Bc?si=gXfjTLLRNGh-cFkD" target="_blank">ما هي الخوارزميات</a>
+                <i class="fas fa-chevron-down toggle-arrow"></i>
+              </div>
+              <div class="rating-stars">
+                <span class="average-rating">0.0</span>
+                <span class="rating-count">(0 تقييم)</span>
+                <i class="fas fa-star" data-value="1"></i>
+                <i class="fas fa-star" data-value="2"></i>
+                <i class="fas fa-star" data-value="3"></i>
+                <i class="fas fa-star" data-value="4"></i>
+                <i class="fas fa-star" data-value="5"></i>
+              </div>
+              <div class="features-list">
+                <p>مقدمة في الخوارزميات</p>
+                <p>أمثلة على Sorting وSearching</p>
+                <p>تمارين عملية</p>
+              </div>
+            </li>
+            <li data-link-id="algorithms-codezilla">
+              <div class="link-title">
+                <a href="https://youtu.be/IYEkbGhabfk?si=a76YY_CuAMkQi8q3" target="_blank">التعرف على الخوارزميات</a> <!-- غير الرابط إذا لزم -->
+                <i class="fas fa-chevron-down toggle-arrow"></i>
+              </div>
+              <div class="rating-stars">
+                <span class="average-rating">0.0</span>
+                <span class="rating-count">(0 تقييم)</span>
+                <i class="fas fa-star" data-value="1"></i>
+                <i class="fas fa-star" data-value="2"></i>
+                <i class="fas fa-star" data-value="3"></i>
+                <i class="fas fa-star" data-value="4"></i>
+                <i class="fas fa-star" data-value="5"></i>
+              </div>
+              <div class="features-list">
+                <p>تعليم تفاعلي</p>
+                <p>تمارين برمجية</p>
+                <p>مشاريع بسيطة</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="book-links">
+          <h4>مواقع مهمة</h4>
+          <ul>
+            <li data-link-id="algorithms-geeksforgeeks">
+              <div class="link-title">
+                <a href="https://www.geeksforgeeks.org/fundamentals-of-algorithms/" target="_blank">GeeksforGeeks - Algorithms</a>
+                <i class="fas fa-chevron-down toggle-arrow"></i>
+              </div>
+              <div class="rating-stars">
+                <span class="average-rating">0.0</span>
+                <span class="rating-count">(0 تقييم)</span>
+                <i class="fas fa-star" data-value="1"></i>
+                <i class="fas fa-star" data-value="2"></i>
+                <i class="fas fa-star" data-value="3"></i>
+                <i class="fas fa-star" data-value="4"></i>
+                <i class="fas fa-star" data-value="5"></i>
+              </div>
+              <div class="features-list">
+                <p>مرجع شامل للخوارزميات</p>
+                <p>أمثلة بلغات متعددة</p>
+                <p>تمارين مجانية</p>
+              </div>
+            </li>
+            <li data-link-id="algorithms-leetcode">
+              <div class="link-title">
+                <a href="https://leetcode.com/explore/learn/" target="_blank">LeetCode - Algorithms Basics</a>
+                <i class="fas fa-chevron-down toggle-arrow"></i>
+              </div>
+              <div class="rating-stars">
+                <span class="average-rating">0.0</span>
+                <span class="rating-count">(0 تقييم)</span>
+                <i class="fas fa-star" data-value="1"></i>
+                <i class="fas fa-star" data-value="2"></i>
+                <i class="fas fa-star" data-value="3"></i>
+                <i class="fas fa-star" data-value="4"></i>
+                <i class="fas fa-star" data-value="5"></i>
+              </div>
+              <div class="features-list">
+                <p>تمارين تفاعلية</p>
+                <p>شرح خطوة بخطوة</p>
+                <p>دعم لـ Python وغيرها</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <!-- <div class="quiz-button">
+          <a href="../exams/programming-basics/algorithms/index.html" class="quiz-btn">اختبار الألغوريثمات</a>
+        </div> -->
+      </div>
+    </div> 
+    <!-- Chat Popup -->
+    <!-- Chat Popup -->
+    <div id="chatPopup" class="chat-popup" aria-hidden="true">
+      <div class="chat-content">
+        <span id="closeChat" class="close-chat"><i class="fas fa-times"></i></span>
+        <h2>محادثة الطلاب</h2>
+        <div id="chatLoading" class="chat-loading">جارٍ التحميل...</div>
+        <div id="chatMessages" class="chat-messages"></div>
+        <div class="chat-input">
+          <input id="messageInput" type="text" placeholder="اكتب رسالتك...">
+          <button id="sendMessageBtn" class="send-message-btn">
+            <i class="fas fa-paper-plane"></i> إرسال
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <h2 class="footer-logo">Edumates</h2>
+        <p class="footer-description">منصة التعليم التفاعلي التي تساعدك على تطوير مهاراتك وتحقيق أهدافك</p>
+        <div class="social-links">
+          <a href="https://www.facebook.com/profile.php?id=61573714877124" class="social-link"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://x.com/edumates_?t=7uVsGeKx1uNor4VjoeSAzg&s=09" class="social-link"><i class="fab fa-twitter"></i></a>
+          <a href="https://www.linkedin.com/in/mostafa-edumates-2ba076378?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+      <div class="footer-links">
+        
+        <div class="footer-column">
+          <h3 class="footer-title">المساعدة</h3>
+          <ul>
+             <li><a href="../../legal/privacy-policy.html" class="footer-link"><i class="fas fa-chevron-left"></i> سياسة الخصوصية</a></li>
+             <li><a href="../../legal/terms-of-use.html" class="footer-link"><i class="fas fa-chevron-left"></i> شروط الاستخدام</a></li>
+             <li><a href="../../legal/about.html" class="footer-link"><i class="fas fa-chevron-left"></i>عنا</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3 class="footer-title">تواصل معنا</h3>
+          <ul>
+            <li>
+              <a href="https://wa.me/201055415811" target="_blank" class="footer-link">
+              <i class="fab fa-whatsapp"></i> واتساب
+              </a>
+            </li>
+            <li>
+              <a href="mailto:m41940147@gmail.com" class="footer-link">
+                <i class="fas fa-envelope"></i> ايميل التواصل
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="copyright">© <span class="current-year"></span> Edumates. جميع الحقوق محفوظة.</p>
+    </div>
+  </footer>
+</body>
+</html>
