@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { categories, portfolioItems } from "@/data/portfolio";
@@ -37,82 +37,189 @@ function PortfolioCard({
         ? [item.image]
         : [];
   const [index, setIndex] = useState(0);
+  const [open, setOpen] = useState(false);
   const current = imgs[index] ?? imgs[0];
 
+  // إغلاق الـ Lightbox بمفتاح Escape
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+      if (e.key === "ArrowLeft")
+        setIndex((i) => (i - 1 + imgs.length) % imgs.length);
+      if (e.key === "ArrowRight")
+        setIndex((i) => (i + 1) % imgs.length);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, imgs.length]);
+
   return (
-    <article className="group overflow-hidden rounded-2xl border border-border bg-card">
-      <div className="relative aspect-4/3 overflow-hidden bg-muted">
-        {current ? (
+    <>
+      <article className="group overflow-hidden rounded-2xl border border-border bg-card">
+        <div className="relative aspect-4/3 overflow-hidden bg-muted">
+          {current ? (
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="size-full cursor-zoom-in"
+              aria-label={`تكبير صورة ${item.title}`}
+            >
+              <img
+                src={current}
+                alt={item.title}
+                loading="lazy"
+                className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+            </button>
+          ) : (
+            <div className="flex size-full items-center justify-center text-sm text-muted-foreground">
+              لا توجد صورة
+            </div>
+          )}
+
+          {imgs.length > 1 && (
+            <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+              {imgs.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIndex(i);
+                  }}
+                  aria-label={`صورة ${i + 1}`}
+                  className={
+                    i === index
+                      ? "h-2.5 w-2.5 rounded-full bg-gold shadow"
+                      : "h-2.5 w-2.5 rounded-full bg-white/70 hover:bg-white"
+                  }
+                />
+              ))}
+            </div>
+          )}
+
+          {imgs.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIndex((i) => (i - 1 + imgs.length) % imgs.length);
+                }}
+                aria-label="الصورة السابقة"
+                className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-2 py-1 text-sm text-white opacity-0 transition-opacity group-hover:opacity-100"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIndex((i) => (i + 1) % imgs.length);
+                }}
+                aria-label="الصورة التالية"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-2 py-1 text-sm text-white opacity-0 transition-opacity group-hover:opacity-100"
+              >
+                ›
+              </button>
+            </>
+          )}
+        </div>
+
+        <div className="p-6">
+          <span className="text-xs font-bold text-gold">{item.category}</span>
+          <h2 className="mt-2 text-base">{item.title}</h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            {item.description}
+          </p>
+          {item.link && (
+            <a
+              href={item.link}
+              target="_blank"
+              rel="noopener"
+              className="mt-4 inline-block text-sm font-bold text-primary underline"
+            >
+              عرض العمل
+            </a>
+          )}
+        </div>
+      </article>
+
+      {/* Lightbox — تكبير الصورة */}
+      {open && current && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4"
+          onClick={() => setOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="عرض الصورة مكبرة"
+        >
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="absolute right-4 top-4 rounded-full bg-white/10 px-3 py-1.5 text-lg text-white hover:bg-white/20"
+            aria-label="إغلاق"
+          >
+            ✕
+          </button>
+
+          {imgs.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIndex((i) => (i - 1 + imgs.length) % imgs.length);
+                }}
+                className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/10 px-3 py-2 text-2xl text-white hover:bg-white/20 md:left-6"
+                aria-label="السابقة"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIndex((i) => (i + 1) % imgs.length);
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/10 px-3 py-2 text-2xl text-white hover:bg-white/20 md:right-6"
+                aria-label="التالية"
+              >
+                ›
+              </button>
+            </>
+          )}
+
           <img
             src={current}
             alt={item.title}
-            loading="lazy"
-            className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="max-h-[90vh] max-w-[95vw] rounded-lg object-contain shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
           />
-        ) : (
-          <div className="flex size-full items-center justify-center text-sm text-muted-foreground">
-            لا توجد صورة
-          </div>
-        )}
 
-        {imgs.length > 1 && (
-          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
-            {imgs.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setIndex(i)}
-                aria-label={`صورة ${i + 1}`}
-                className={
-                  i === index
-                    ? "h-2.5 w-2.5 rounded-full bg-gold shadow"
-                    : "h-2.5 w-2.5 rounded-full bg-white/70 hover:bg-white"
-                }
-              />
-            ))}
-          </div>
-        )}
-
-        {imgs.length > 1 && (
-          <>
-            <button
-              type="button"
-              onClick={() => setIndex((i) => (i - 1 + imgs.length) % imgs.length)}
-              aria-label="الصورة السابقة"
-              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-2 py-1 text-sm text-white opacity-0 transition-opacity group-hover:opacity-100"
-            >
-              ‹
-            </button>
-            <button
-              type="button"
-              onClick={() => setIndex((i) => (i + 1) % imgs.length)}
-              aria-label="الصورة التالية"
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-2 py-1 text-sm text-white opacity-0 transition-opacity group-hover:opacity-100"
-            >
-              ›
-            </button>
-          </>
-        )}
-      </div>
-
-      <div className="p-6">
-        <span className="text-xs font-bold text-gold">{item.category}</span>
-        <h2 className="mt-2 text-base">{item.title}</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          {item.description}
-        </p>
-        {item.link && (
-          <a
-            href={item.link}
-            target="_blank"
-            rel="noopener"
-            className="mt-4 inline-block text-sm font-bold text-primary underline"
-          >
-            عرض العمل
-          </a>
-        )}
-      </div>
-    </article>
+          {imgs.length > 1 && (
+            <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 gap-2">
+              {imgs.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIndex(i);
+                  }}
+                  className={
+                    i === index
+                      ? "h-2.5 w-2.5 rounded-full bg-gold"
+                      : "h-2.5 w-2.5 rounded-full bg-white/50 hover:bg-white"
+                  }
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </>
   );
 }
 
