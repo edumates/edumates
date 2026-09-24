@@ -1,8 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
-import { SectionHeading } from "@/components/site/SectionHeading";
 import { categories, portfolioItems } from "@/data/portfolio";
 
 export const Route = createFileRoute("/portfolio")({
@@ -26,10 +25,103 @@ export const Route = createFileRoute("/portfolio")({
   component: Portfolio,
 });
 
+function PortfolioCard({
+  item,
+}: {
+  item: (typeof portfolioItems)[number];
+}) {
+  const imgs =
+    item.images?.length > 0
+      ? item.images
+      : item.image
+        ? [item.image]
+        : [];
+  const [index, setIndex] = useState(0);
+  const current = imgs[index] ?? imgs[0];
+
+  return (
+    <article className="group overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="relative aspect-4/3 overflow-hidden bg-muted">
+        {current ? (
+          <img
+            src={current}
+            alt={item.title}
+            loading="lazy"
+            className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex size-full items-center justify-center text-sm text-muted-foreground">
+            لا توجد صورة
+          </div>
+        )}
+
+        {imgs.length > 1 && (
+          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+            {imgs.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setIndex(i)}
+                aria-label={`صورة ${i + 1}`}
+                className={
+                  i === index
+                    ? "h-2.5 w-2.5 rounded-full bg-gold shadow"
+                    : "h-2.5 w-2.5 rounded-full bg-white/70 hover:bg-white"
+                }
+              />
+            ))}
+          </div>
+        )}
+
+        {imgs.length > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={() => setIndex((i) => (i - 1 + imgs.length) % imgs.length)}
+              aria-label="الصورة السابقة"
+              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-2 py-1 text-sm text-white opacity-0 transition-opacity group-hover:opacity-100"
+            >
+              ‹
+            </button>
+            <button
+              type="button"
+              onClick={() => setIndex((i) => (i + 1) % imgs.length)}
+              aria-label="الصورة التالية"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-2 py-1 text-sm text-white opacity-0 transition-opacity group-hover:opacity-100"
+            >
+              ›
+            </button>
+          </>
+        )}
+      </div>
+
+      <div className="p-6">
+        <span className="text-xs font-bold text-gold">{item.category}</span>
+        <h2 className="mt-2 text-base">{item.title}</h2>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          {item.description}
+        </p>
+        {item.link && (
+          <a
+            href={item.link}
+            target="_blank"
+            rel="noopener"
+            className="mt-4 inline-block text-sm font-bold text-primary underline"
+          >
+            عرض العمل
+          </a>
+        )}
+      </div>
+    </article>
+  );
+}
+
 function Portfolio() {
   const [active, setActive] = useState<string>("الكل");
   const items =
-    active === "الكل" ? portfolioItems : portfolioItems.filter((i) => i.category === active);
+    active === "الكل"
+      ? portfolioItems
+      : portfolioItems.filter((i) => i.category === active);
 
   return (
     <div className="min-h-screen">
@@ -38,9 +130,12 @@ function Portfolio() {
       <section className="surface-navy">
         <div className="mx-auto max-w-4xl px-5 py-20 text-center">
           <span className="text-xs font-bold text-gold">معرض الأعمال</span>
-          <h1 className="mt-4 text-4xl leading-tight md:text-5xl">أعمال تتحدث عن نفسها</h1>
+          <h1 className="mt-4 text-4xl leading-tight md:text-5xl">
+            أعمال تتحدث عن نفسها
+          </h1>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed opacity-85">
-            مجموعة مختارة من الملفات التي صممناها وكتبناها — مصنّفة حسب نوع الخدمة.
+            مجموعة مختارة من الملفات التي صممناها وكتبناها — مصنّفة حسب نوع
+            الخدمة.
           </p>
         </div>
       </section>
@@ -64,36 +159,7 @@ function Portfolio() {
 
         <div className="grid gap-6 md:grid-cols-3">
           {items.map((item) => (
-            <article
-              key={item.id}
-              className="group overflow-hidden rounded-2xl border border-border bg-card"
-            >
-              <div className="aspect-4/3 overflow-hidden bg-muted">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  loading="lazy"
-                  className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-              </div>
-              <div className="p-6">
-                <span className="text-xs font-bold text-gold">{item.category}</span>
-                <h2 className="mt-2 text-base">{item.title}</h2>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {item.description}
-                </p>
-                {item.link && (
-                  <a
-                    href={item.link}
-                    target="_blank"
-                    rel="noopener"
-                    className="mt-4 inline-block text-sm font-bold text-primary underline"
-                  >
-                    عرض العمل
-                  </a>
-                )}
-              </div>
-            </article>
+            <PortfolioCard key={item.id} item={item} />
           ))}
         </div>
       </section>
@@ -104,7 +170,12 @@ function Portfolio() {
           <p className="mx-auto mt-3 max-w-xl text-sm opacity-80">
             أرسل لنا تفاصيل طلبك ونعود إليك بخطة تنفيذ ومدة وسعر.
           </p>
-          <a href="https://wa.me/966538396424" target="_blank" rel="noopener" className="btn-base btn-gold mt-7">
+          <a
+            href="https://wa.me/966538396424"
+            target="_blank"
+            rel="noopener"
+            className="btn-base btn-gold mt-7"
+          >
             تواصل معنا
           </a>
         </div>
