@@ -101,17 +101,17 @@ function Home() {
     <div className="min-h-screen">
       <Header />
 
+      {/* Hero */}
       <section className="surface-navy relative overflow-hidden">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-20 md:grid-cols-[1.1fr_0.9fr] md:py-28">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-1.5 text-xs font-bold">
-              <Sparkles className="size-3.5 text-gold" /> خبرة تتجاوز 7 سنوات
-            </span>
-            <h1 className="mt-6 text-4xl leading-tight text-surface-foreground md:text-5xl">
+            {/* تم حذف شارة «خبرة تتجاوز 7 سنوات» */}
+            <h1 className="text-4xl leading-tight text-surface-foreground md:text-5xl">
               ملفاتك هي انطباعك الأول.
               <br />
               <span className="text-gold-gradient">نجعله انطباعاً لا يُنسى.</span>
             </h1>
+
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <a
                 href="https://wa.me/966538396424"
@@ -124,7 +124,12 @@ function Home() {
               <Link to="/portfolio" className="btn-base btn-ghost-light">
                 شاهد أعمالنا
               </Link>
+              {/* زر جديد ينتقل لقسم المكتبة والخريطة أسفل الصفحة */}
+              <a href="#library" className="btn-base btn-ghost-light">
+                زُرنا في المكتبة
+              </a>
             </div>
+
             <p className="mt-6 max-w-xl text-base leading-relaxed text-surface-foreground/85">
               استوديو ابتكار يكتب ويصمم السير الذاتية والعروض التقديمية والمستندات الرسمية
               بمعايير مهنية دقيقة. نعمل أونلاين مع كل مناطق المملكة، ونستقبلك حضورياً في الطائف.
@@ -135,8 +140,8 @@ function Home() {
             <div className="grid grid-cols-3 gap-4 text-center">
               {[
                 { k: "+7", v: "سنوات خبرة" },
-                { k: "+900", v: "ملف مُنجز" },
-                { k: "24س", v: "متوسط الرد" },
+                { k: "+100", v: "ملف مُنجز" },
+                { k: "2س", v: "متوسط الرد" },
               ].map((s) => (
                 <div key={s.v}>
                   <div className="font-display text-2xl font-extrabold text-gold">{s.k}</div>
@@ -158,6 +163,7 @@ function Home() {
         </div>
       </section>
 
+      {/* خدمات */}
       <section className="mx-auto max-w-6xl px-5 py-20">
         <SectionHeading
           eyebrow="خدماتنا"
@@ -185,6 +191,7 @@ function Home() {
         </div>
       </section>
 
+      {/* لماذا ابتكار */}
       <section className="bg-muted py-20">
         <div className="mx-auto max-w-6xl px-5">
           <SectionHeading
@@ -203,6 +210,7 @@ function Home() {
         </div>
       </section>
 
+      {/* أعمال مميزة — إصلاح الصور */}
       <section className="mx-auto max-w-6xl px-5 py-20">
         <SectionHeading
           eyebrow="أعمالنا"
@@ -210,28 +218,36 @@ function Home() {
           description="كل نموذج يعرض مشكلة العميل والحل الذي صمّمناه."
         />
         <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {featured.map((item) => (
-            <article
-              key={item.id}
-              className="group overflow-hidden rounded-2xl border border-border bg-card"
-            >
-              <div className="aspect-4/3 overflow-hidden">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  loading="lazy"
-                  className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-              </div>
-              <div className="p-6">
-                <span className="text-xs font-bold text-gold">{item.category}</span>
-                <h3 className="mt-2 text-base">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {item.description}
-                </p>
-              </div>
-            </article>
-          ))}
+          {featured.map((item) => {
+            // الصورة الأولى من المصفوفة، أو image القديم إن وُجد
+            const img =
+              item.images?.[0] ?? item.image ?? "";
+
+            return (
+              <article
+                key={item.id}
+                className="group overflow-hidden rounded-2xl border border-border bg-card"
+              >
+                <div className="aspect-4/3 overflow-hidden bg-muted">
+                  {img ? (
+                    <img
+                      src={img}
+                      alt={item.title}
+                      loading="lazy"
+                      className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : null}
+                </div>
+                <div className="p-6">
+                  <span className="text-xs font-bold text-gold">{item.category}</span>
+                  <h3 className="mt-2 text-base">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {item.description}
+                  </p>
+                </div>
+              </article>
+            );
+          })}
         </div>
         <div className="mt-10 text-center">
           <Link to="/portfolio" className="btn-base btn-outline-navy">
@@ -240,7 +256,8 @@ function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 pb-20">
+      {/* المكتبة والخريطة — id للتنقل من الزر */}
+      <section id="library" className="mx-auto max-w-6xl scroll-mt-24 px-5 pb-20">
         <div className="surface-navy grid gap-8 rounded-3xl p-8 md:grid-cols-2 md:p-10">
           <div className="flex flex-col justify-center">
             <span className="inline-flex items-center gap-2 text-xs font-bold text-gold">
