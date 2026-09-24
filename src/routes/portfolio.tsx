@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { categories, portfolioItems } from "@/data/portfolio";
@@ -25,6 +25,48 @@ export const Route = createFileRoute("/portfolio")({
   component: Portfolio,
 });
 
+/** الحد الأدنى للمسافة (بكسل) لاعتبار الحركة سحباً */
+const SWIPE_THRESHOLD = 50;
+
+function useSwipe(
+  onSwipeLeft: () => void,
+  onSwipeRight: () => void,
+  enabled: boolean
+) {
+  const startX = useRef<number | null>(null);
+  const startY = useRef<number | null>(null);
+
+  const onStart = (clientX: number, clientY: number) => {
+    if (!enabled) return;
+    startX.current = clientX;
+    startY.current = clientY;
+  };
+
+  const onEnd = (clientX: number, clientY: number) => {
+    if (!enabled || startX.current === null || startY.current === null) return;
+    const dx = clientX - startX.current;
+    const dy = clientY - startY.current;
+    startX.current = null;
+    startY.current = null;
+
+    // تجاهل السحب العمودي القوي (تمرير الصفحة)
+    if (Math.abs(dy) > Math.abs(dx)) return;
+    if (Math.abs(dx) < SWIPE_THRESHOLD) return;
+
+    if (dx < 0) onSwipeLeft();  // سحب لليسار → الصورة التالية
+    else onSwipeRight();       // سحب لليمين → الصورة السابقة
+  };
+
+  return {
+    onTouchStart: (e: React.TouchEvent) =>
+      onStart(e.touches[0].clientX, e.touches[0].clientY),
+    onTouchEnd: (e: React.TouchEvent) =>
+      onEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY),
+    onMouseDown: (e: React.MouseEvent) => onStart(e.clientX, e.clientY),
+    onMouseUp: (e: React.MouseEvent) => onEnd(e.clientX, e.clientY),
+  };
+}
+
 function PortfolioCard({
   item,
 }: {
@@ -39,16 +81,19 @@ function PortfolioCard({
   const [index, setIndex] = useState(0);
   const [open, setOpen] = useState(false);
   const current = imgs[index] ?? imgs[0];
+  const multi = imgs.length > 1;
 
-  // إغلاق الـ Lightbox بمفتاح Escape
+  const goPrev = () => setIndex((i) => (i - 1 + imgs.length) % imgs.length);
+  const goNext = () => setIndex((i) => (i + 1) % imgs.length);
+
+  const swipeHandlers = useSwipe(goNext, goPrev, multi);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
-      if (e.key === "ArrowLeft")
-        setIndex((i) => (i - 1 + imgs.length) % imgs.length);
-      if (e.key === "ArrowRight")
-        setIndex((i) => (i + 1) % imgs.length);
+      if (e.key === "ArrowLeft") goPrev();
+      if (e.key === "ArrowRight") goNext();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -57,7 +102,10 @@ function PortfolioCard({
   return (
     <>
       <article className="group overflow-hidden rounded-2xl border border-border bg-card">
-        <div className="relative aspect-4/3 overflow-hidden bg-muted">
+        <div
+          className="relative aspect-4/3 touch-pan-y overflow-hidden bg-muted select-none"
+          {...swipeHandlers}
+        >
           {current ? (
             <button
               type="button"
@@ -69,7 +117,8 @@ function PortfolioCard({
                 src={current}
                 alt={item.title}
                 loading="lazy"
-                className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                draggable={false}
+                className="pointer-events-none size-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             </button>
           ) : (
@@ -78,34 +127,20 @@ function PortfolioCard({
             </div>
           )}
 
-          {imgs.length > 1 && (
-            <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
-              {imgs.map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIndex(i);
-                  }}
-                  aria-label={`صورة ${i + 1}`}
-                  className={
-                    i === index
-                      ? "h-2.5 w-2.5 rounded-full bg-gold shadow"
-                      : "h-2.5 w-2.5 rounded-full bg-white/70 hover:bg-white"
-                  }
-                />
-              ))}
+          {/* مؤشر عدد الصور */}
+          {multi && (
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-2.5 py-1 text-[11px] font-medium text-white">
+              {index + 1} / {imgs.length}
             </div>
           )}
 
-          {imgs.length > 1 && (
+          {multi && (
             <>
               <button
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setIndex((i) => (i - 1 + imgs.length) % imgs.length);
+                  goPrev();
                 }}
                 aria-label="الصورة السابقة"
                 className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-2 py-1 text-sm text-white opacity-0 transition-opacity group-hover:opacity-100"
@@ -116,7 +151,7 @@ function PortfolioCard({
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setIndex((i) => (i + 1) % imgs.length);
+                  goNext();
                 }}
                 aria-label="الصورة التالية"
                 className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-2 py-1 text-sm text-white opacity-0 transition-opacity group-hover:opacity-100"
@@ -146,75 +181,61 @@ function PortfolioCard({
         </div>
       </article>
 
-      {/* Lightbox — تكبير الصورة */}
+      {/* Lightbox */}
       {open && current && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4"
           onClick={() => setOpen(false)}
           role="dialog"
           aria-modal="true"
-          aria-label="عرض الصورة مكبرة"
         >
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="absolute right-4 top-4 rounded-full bg-white/10 px-3 py-1.5 text-lg text-white hover:bg-white/20"
+            className="absolute right-4 top-4 z-10 rounded-full bg-white/10 px-3 py-1.5 text-lg text-white hover:bg-white/20"
             aria-label="إغلاق"
           >
             ✕
           </button>
 
-          {imgs.length > 1 && (
-            <>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIndex((i) => (i - 1 + imgs.length) % imgs.length);
-                }}
-                className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/10 px-3 py-2 text-2xl text-white hover:bg-white/20 md:left-6"
-                aria-label="السابقة"
-              >
-                ‹
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIndex((i) => (i + 1) % imgs.length);
-                }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/10 px-3 py-2 text-2xl text-white hover:bg-white/20 md:right-6"
-                aria-label="التالية"
-              >
-                ›
-              </button>
-            </>
-          )}
-
-          <img
-            src={current}
-            alt={item.title}
-            className="max-h-[90vh] max-w-[95vw] rounded-lg object-contain shadow-2xl"
+          <div
+            className="relative flex max-h-[90vh] max-w-[95vw] items-center justify-center"
             onClick={(e) => e.stopPropagation()}
-          />
-
-          {imgs.length > 1 && (
-            <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 gap-2">
-              {imgs.map((_, i) => (
+            {...swipeHandlers}
+          >
+            {multi && (
+              <>
                 <button
-                  key={i}
                   type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIndex(i);
-                  }}
-                  className={
-                    i === index
-                      ? "h-2.5 w-2.5 rounded-full bg-gold"
-                      : "h-2.5 w-2.5 rounded-full bg-white/50 hover:bg-white"
-                  }
-                />
-              ))}
+                  onClick={goPrev}
+                  className="absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 px-3 py-2 text-2xl text-white hover:bg-white/20 md:-left-12"
+                  aria-label="السابقة"
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  onClick={goNext}
+                  className="absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 px-3 py-2 text-2xl text-white hover:bg-white/20 md:-right-12"
+                  aria-label="التالية"
+                >
+                  ›
+                </button>
+              </>
+            )}
+
+            <img
+              src={current}
+              alt={item.title}
+              draggable={false}
+              className="max-h-[90vh] max-w-[95vw] select-none rounded-lg object-contain shadow-2xl"
+            />
+          </div>
+
+          {multi && (
+            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1.5 text-xs text-white">
+              {index + 1} / {imgs.length}
+              <span className="mr-2 opacity-70"> — اسحب للتبديل</span>
             </div>
           )}
         </div>
