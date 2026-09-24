@@ -293,12 +293,6 @@ function Home() {
             </div>
           </div>
           <div className="h-72 overflow-hidden rounded-2xl border border-white/15 md:h-80">
-            <iframe
-              title="موقع مكتبة الريادة"
-              src="https://www.google.com/maps?q=%D9%85%D9%83%D8%AA%D8%A8%D8%A9%20%D8%A7%D9%84%D8%B1%D9%8A%D8%A7%D8%AF%D8%A9%20%D8%A7%D9%84%D8%B7%D8%A7%D8%A6%D9%81&output=embed"
-              className="size-full"
-              loading="lazy"
-            />
           </div>
         </div>
       </section>
